@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="reseau">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="noeud" minOccurs="1" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:attribute name="id" type="xs:long" use="required"/>
+                        <xs:attribute name="x" type="xs:integer" use="required"/>
+                        <xs:attribute name="y" type="xs:integer" use="required"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="troncon" minOccurs="1" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:attribute name="destination" type="xs:long" use="required"/>
+                        <xs:attribute name="longueur" type="xs:double" use="required"/>
+                        <xs:attribute name="nomRue" type="xs:string" use="required"/>
+                        <xs:attribute name="origine" type="xs:long" use="required"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

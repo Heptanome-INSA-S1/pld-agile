@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="demandeDeLivraisons">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="entrepot">
+                    <xs:complexType>
+                        <xs:attribute name="adresse" type="xs:long" use="required"/>
+                        <xs:attribute name="heureDepart" type="xs:string" use="required"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="livraison" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:attribute name="adresse" type="xs:long" use="required"/>
+                        <xs:attribute name="debutPlage" use="optional">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:pattern value="([0-1]?\d|2[0-3]):([0-5]?\d):([0-5]?\d)"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:attribute>
+                        <xs:attribute name="duree" type="xs:integer" use="optional"/>
+                        <xs:attribute name="finPlage" use="optional">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:pattern value="([0-1]?\d|2[0-3]):([0-5]?\d):([0-5]?\d)"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:attribute>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
