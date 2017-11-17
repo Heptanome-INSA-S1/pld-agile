@@ -21,23 +21,15 @@ open class Graph<N, out E : Measurable>(
 
   /**
    * Return the list of outEdges of the graph. To get the outEdges of a graph
-   * use graph.outEdges\[node.id\]
+   * use graph.outEdges\[node.index\]
    */
   val outEdges: List<List<Edge<N, E>>> get() = internalOutEdges
 
-  fun outEdgesOf(node: N): List<Edge<N, E>> {
-    return outEdges[nodes.first { it.element == node }.id]
-  }
-
   /**
    * Return the list of inEdges of the graph. To get the inEdges of a node use
-   * graph.inEdges\[node.id\]
+   * graph.inEdges\[node.index\]
    */
   val inEdges: List<List<Edge<N, E>>> get() = internalInEdges
-
-  fun inEdgesOf(node: N): List<Edge<N, E>> {
-    return inEdges[nodes.first { it.element == node }.id]
-  }
 
   /**
    * Return the adjacencyMatrix of the graph
@@ -46,12 +38,10 @@ open class Graph<N, out E : Measurable>(
 
     val matrix = Array<IntArray>(nodes.size, { _ -> IntArray(nodes.size, { _ -> worstLength }) })
 
-    for (i in nodes.indices) {
-      for (j in nodes.indices) {
-        val edge = inEdges[j].firstOrNull { edge -> edge.from.id == i }
-        if (edge != null) {
-          matrix[i][j] = edge.element.length
-        }
+    for (i: Int in nodes.indices) {
+      for(edge: Edge<N,E> in outEdges[i]) {
+        val j: Int = edge.to.index
+        matrix[i][j] = edge.element.length
       }
     }
 
@@ -74,16 +64,17 @@ open class Graph<N, out E : Measurable>(
       val edgeElement = it.second
       val edge = Edge(from, edgeElement, to)
 
-      internalOutEdges[from.id].add(edge)
-      internalInEdges[to.id].add(edge)
+      internalOutEdges[from.index].add(edge)
+      internalInEdges[to.index].add(edge)
 
     }
 
   }
 
-  override fun toString(): String {
-    return "Graph(nodes=$nodes, internalOutEdges=$internalOutEdges)"
-  }
+  fun outEdgesOf(node: N): List<Edge<N, E>> = outEdges[nodes.first { it.element == node }.index]
 
+  fun inEdgesOf(node: N): List<Edge<N, E>> = inEdges[nodes.first { it.element == node }.index]
+
+  override fun toString(): String = "Graph(nodes=$nodes, internalOutEdges=$internalOutEdges)"
 
 }

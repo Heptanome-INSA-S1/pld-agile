@@ -92,11 +92,11 @@ class PlanSerializerTest {
     val plan: Plan = planSerializer.unserialize(planAsElement)
 
     Assert.assertEquals(2, plan.nodes.size)
-    Assert.assertEquals(1, plan.outEdges[plan.nodes.first { it.element.id == 1 }.id].size)
-    Assert.assertEquals(0, plan.outEdges[plan.nodes.first { it.element.id == 2 }.id].size)
-    Assert.assertEquals(0, plan.inEdges[plan.nodes.first { it.element.id == 1 }.id].size)
-    Assert.assertEquals(1, plan.inEdges[plan.nodes.first { it.element.id == 2 }.id].size)
-    val road = plan.outEdges[plan.nodes.first { it.element.id == 1 }.id].first()
+    Assert.assertEquals(1, plan.outEdges[plan.nodes.first { it.element.id == 1L }.index].size)
+    Assert.assertEquals(0, plan.outEdges[plan.nodes.first { it.element.id == 2L }.index].size)
+    Assert.assertEquals(0, plan.inEdges[plan.nodes.first { it.element.id == 1L }.index].size)
+    Assert.assertEquals(1, plan.inEdges[plan.nodes.first { it.element.id == 2L }.index].size)
+    val road = plan.outEdges[plan.nodes.first { it.element.id == 1L }.index].first()
 
     Assert.assertEquals("Main road", road.element.name)
     Assert.assertEquals(20, road.element.length)

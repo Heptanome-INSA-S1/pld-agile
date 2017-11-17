@@ -31,9 +31,9 @@ class Path<out N, out E : Measurable>(
   override fun toString(): String {
     if (nodes.isEmpty()) return "Unknown path"
 
-    val stringBuilder = StringBuilder()
+    val stringBuilder: StringBuilder = StringBuilder()
         .append("[")
-    for (i in 0 until nodes.size - 1) {
+    for (i: Int in 0 until nodes.size - 1) {
       stringBuilder.append(nodes[i])
           .append("] ")
           .append(edges[i])

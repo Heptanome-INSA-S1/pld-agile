@@ -7,7 +7,5 @@ interface Measurable : Comparable<Measurable> {
 
   val length: Int
 
-  override operator fun compareTo(other: Measurable): Int {
-    return length.compareTo(other.length)
-  }
+  override operator fun compareTo(other: Measurable): Int = length.compareTo(other.length)
 }

@@ -9,11 +9,11 @@ import tornadofx.*
  * Default home screen
  */
 class Home : View() {
-  // Plan the current view to resources/view/Home.fxml
+  // Map the current view to resources/view/Home.fxml
   override val root: BorderPane by fxml("/view/Home.fxml")
   // Create an integer property
   val counter = SimpleIntegerProperty()
-  // Create a label which will display the value
+  // Create a label which will display the value. Match with label fx:id="counterLabel"
   val counterLabel: Label by fxid()
 
   init {

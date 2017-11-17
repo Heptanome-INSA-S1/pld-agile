@@ -9,7 +9,7 @@ import java.util.*
 class DeepFirstSearchImpl<Node, out E : Measurable>(
     private val graph: Graph<Node, E>,
     override val source: Node,
-    visitor: ((Node) -> Unit)?
+    visitor: ((Node) -> Unit)? = null
 ) : DeepFirstSearch<Node, E> {
 
   private val internalSourceNode = graph.nodes.first { node -> node.element == source }
@@ -37,20 +37,20 @@ class DeepFirstSearchImpl<Node, out E : Measurable>(
   private fun compute() {
 
     val stack = Stack<Int>()
-    stack.push(internalSourceNode.id)
+    stack.push(internalSourceNode.index)
 
     val visited = Array<Boolean>(graph.nodes.size, { _ -> false })
     fun getNextUnvisitedChilds(nodeId: Int): Pair<Int, E>? {
       return graph.outEdges[nodeId]
-          .filterNot { visited[it.to.id] }
+          .filterNot { visited[it.to.index] }
           .sortedBy { it.element.length }
           .map { edge ->
-            Pair(edge.to.id, edge.element)
+            Pair(edge.to.index, edge.element)
           }.firstOrNull()
     }
 
-    visited[internalSourceNode.id] = true
-    internalTreeNodes.add(graph.nodes[internalSourceNode.id].element)
+    visited[internalSourceNode.index] = true
+    internalTreeNodes.add(graph.nodes[internalSourceNode.index].element)
     while (stack.isNotEmpty()) {
 
       val currentNode = stack.peek()
@@ -72,20 +72,20 @@ class DeepFirstSearchImpl<Node, out E : Measurable>(
   private fun computeWithVisitor(visitor: (Node) -> Unit) {
 
     val stack = Stack<Int>()
-    stack.push(internalSourceNode.id)
-
+    stack.push(internalSourceNode.index)
+    visitor(internalSourceNode.element)
     val visited = Array<Boolean>(graph.nodes.size, { _ -> false })
     fun getNextUnvisitedChilds(nodeId: Int): Pair<Int, E>? {
       return graph.outEdges[nodeId]
-          .filterNot { visited[it.to.id] }
+          .filterNot { visited[it.to.index] }
           .sortedBy { it.element.length }
           .map { edge ->
-            Pair(edge.to.id, edge.element)
+            Pair(edge.to.index, edge.element)
           }.firstOrNull()
     }
 
-    visited[internalSourceNode.id] = true
-    internalTreeNodes.add(graph.nodes[internalSourceNode.id].element)
+    visited[internalSourceNode.index] = true
+    internalTreeNodes.add(graph.nodes[internalSourceNode.index].element)
     while (stack.isNotEmpty()) {
 
       val currentNode = stack.peek()

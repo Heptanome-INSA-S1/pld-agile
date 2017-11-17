@@ -26,18 +26,18 @@ class DijsktraImpl<Node, out E : Measurable>(
   }
 
   private fun compute() {
-    parent[internalSourceNode.id] = internalSourceNode.id
-    parent[internalSourceNode.id] = null
+    parent[internalSourceNode.index] = internalSourceNode.index
+    parent[internalSourceNode.index] = null
 
     val threaten = Array<Boolean>(graph.nodes.size, { _ ->
       false
     })
     val d = Array<Double>(graph.nodes.size, { _ -> Double.POSITIVE_INFINITY })
-    d[internalSourceNode.id] = .0
+    d[internalSourceNode.index] = .0
 
     val nextNodes = PriorityQueue<Pair<Double, Int>>(kotlin.Comparator { o1, o2 -> o1.first.compareTo(o2.first) })
-    nextNodes.add(Pair(.0, internalSourceNode.id))
-    threaten[internalSourceNode.id] = true
+    nextNodes.add(Pair(.0, internalSourceNode.index))
+    threaten[internalSourceNode.index] = true
 
     while (nextNodes.isNotEmpty()) {
       val currentNode = nextNodes.peek().second
@@ -46,7 +46,7 @@ class DijsktraImpl<Node, out E : Measurable>(
       nextNodes.poll()
 
       for (n in graph.outEdges[currentNode]) {
-        val neighbour = n.to.id
+        val neighbour = n.to.index
         val edge = n.element.length
         if (threaten[neighbour]) {
           continue
@@ -63,29 +63,29 @@ class DijsktraImpl<Node, out E : Measurable>(
   }
 
   private fun computeWithVisitor(visitor: (Node) -> Unit) {
-    parent[internalSourceNode.id] = internalSourceNode.id
-    parent[internalSourceNode.id] = null
+    parent[internalSourceNode.index] = internalSourceNode.index
+    parent[internalSourceNode.index] = null
 
     val threaten = Array<Boolean>(graph.nodes.size, { _ ->
       false
     })
     val d = Array<Double>(graph.nodes.size, { _ -> Double.POSITIVE_INFINITY })
-    d[internalSourceNode.id] = .0
+    d[internalSourceNode.index] = .0
 
     val nextNodes = PriorityQueue<Pair<Double, Int>>(kotlin.Comparator { o1, o2 -> o1.first.compareTo(o2.first) })
-    nextNodes.add(Pair(.0, internalSourceNode.id))
-    threaten[internalSourceNode.id] = true
+    nextNodes.add(Pair(.0, internalSourceNode.index))
+    threaten[internalSourceNode.index] = true
 
     while (nextNodes.isNotEmpty()) {
       val currentNode = nextNodes.peek().second
 
-      visitor.invoke(graph.nodes[currentNode].element)
+      visitor(graph.nodes[currentNode].element)
 
       threaten[currentNode] = true
       nextNodes.poll()
 
       for (n in graph.outEdges[currentNode]) {
-        val neighbour = n.to.id
+        val neighbour = n.to.index
         val edge = n.element.length
         if (threaten[neighbour]) {
           continue
@@ -102,7 +102,7 @@ class DijsktraImpl<Node, out E : Measurable>(
   }
 
   override fun getShortestPathNodes(destination: Node): List<Node> {
-    val nodeIndex: Int = graph.nodes.find { n -> n.element == destination }!!.id
+    val nodeIndex: Int = graph.nodes.find { n -> n.element == destination }!!.index
 
     var current: Int? = nodeIndex
     var previous: Int? = parent[nodeIndex]
@@ -113,7 +113,7 @@ class DijsktraImpl<Node, out E : Measurable>(
       val p = graph.nodes[previous]
       path.add(0, p.element)
       current = previous
-      previous = parent[p.id]
+      previous = parent[p.index]
 
     }
 
@@ -126,7 +126,7 @@ class DijsktraImpl<Node, out E : Measurable>(
   }
 
   override fun getShortestPathEdges(destination: Node): List<E> {
-    val nodeIndex: Int = graph.nodes.find { n -> n.element == destination }!!.id
+    val nodeIndex: Int = graph.nodes.find { n -> n.element == destination }!!.index
 
     var previous: Edge<Node, E>? = parentEdge[nodeIndex]
 
@@ -134,7 +134,7 @@ class DijsktraImpl<Node, out E : Measurable>(
     while (previous != null) {
 
       path.add(0, previous.element)
-      previous = parentEdge[previous.from.id]
+      previous = parentEdge[previous.from.index]
 
     }
 

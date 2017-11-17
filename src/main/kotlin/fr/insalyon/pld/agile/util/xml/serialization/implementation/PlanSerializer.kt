@@ -33,7 +33,7 @@ class PlanSerializer(
   }
 
   override fun unserialize(element: Element): Plan {
-    val nodeFromId: MutableMap<Int, Intersection> = mutableMapOf<Int, Intersection>()
+    val nodeFromId: MutableMap<Long, Intersection> = mutableMapOf<Long, Intersection>()
     val nodes: Set<Intersection> = element
         .getElementsByTagName(XmlConfig.Intersection.TAG)
         .map {
@@ -41,19 +41,17 @@ class PlanSerializer(
           nodeFromId[intersection.id] = intersection
           intersection
         }.toSet()
-    val junctions: Set<Triple<Intersection, Junction, Intersection>> = element
+    val edges: Set<Triple<Intersection, Junction, Intersection>> = element
         .getElementsByTagName(XmlConfig.Junction.TAG)
         .map {
           val junction = junctionSerializer.unserialize(it as Element)
-          val from: Intersection = nodeFromId[(it as Element).getAttribute(XmlConfig.Junction.FROM).toInt()]!!
-          val to: Intersection = nodeFromId[it.getAttribute(XmlConfig.Junction.TO).toInt()]!!
+          val from: Intersection = nodeFromId[it.getAttribute(XmlConfig.Junction.FROM).toLong()]!!
+          val to: Intersection = nodeFromId[it.getAttribute(XmlConfig.Junction.TO).toLong()]!!
           Triple(from,junction,to)
         }.toSet()
-    return Plan(nodes, junctions)
+    return Plan(nodes, edges)
   }
 
-  private fun <T> NodeList.map(transform: (Node) -> T): List<T> {
-    return List<T>(length, { index -> transform(item(index)) })
-  }
+  private fun <T> NodeList.map(transform: (Node) -> T): List<T> = List(length, { index -> transform(item(index)) })
 
 }

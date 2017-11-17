@@ -23,7 +23,7 @@ class IntersectionSerializer(
 
   override fun unserialize(element: Element): Intersection {
     return Intersection(
-        element.getAttribute(XmlConfig.Intersection.ID).toInt(),
+        element.getAttribute(XmlConfig.Intersection.ID).toLong(),
         element.getAttribute(XmlConfig.Intersection.X).toInt(),
         element.getAttribute(XmlConfig.Intersection.Y).toInt()
     )

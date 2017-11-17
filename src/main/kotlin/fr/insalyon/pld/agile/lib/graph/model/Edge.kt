@@ -8,7 +8,5 @@ class Edge<N, out E : Measurable>(
     val element: E,
     val to: Node<N>
 ) {
-  override fun toString(): String {
-    return "Edge(from=${from.id}, to=${to.id}, element=$element)"
-  }
+  override fun toString(): String = "Edge(from=${from.index}, to=${to.index}, element=$element)"
 }
