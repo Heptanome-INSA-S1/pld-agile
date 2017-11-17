@@ -17,7 +17,7 @@ class DefaultState : State {
     override fun loadPlan(pathFile: String): Plan {
         val validator: XmlValidatorImpl = XmlValidatorImpl()
         val sourceFile = File(pathFile)
-        val xsdFile = File("./../../../resources/xsd/map.xsd")
+        val xsdFile = File("xsd/map.xsd")
 
         if(!sourceFile.exists()) throw FileNotFoundException("The file $pathFile was not found")
         if(sourceFile.extension != "xml") throw InvalidFormatException("The file $pathFile is not a xml file")
