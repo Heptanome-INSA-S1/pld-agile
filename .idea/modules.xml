@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/agile.iml" filepath="$PROJECT_DIR$/.idea/modules/agile.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/agile_main.iml" filepath="$PROJECT_DIR$/.idea/modules/agile_main.iml" group="agile" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/agile_main.iml" filepath="$PROJECT_DIR$/.idea/modules/agile_main.iml" group="agile" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/agile_test.iml" filepath="$PROJECT_DIR$/.idea/modules/agile_test.iml" group="agile" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/agile_test.iml" filepath="$PROJECT_DIR$/.idea/modules/agile_test.iml" group="agile" />
     </modules>
   </component>
