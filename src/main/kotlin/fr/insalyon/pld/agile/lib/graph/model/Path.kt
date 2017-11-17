@@ -8,7 +8,7 @@ import fr.insalyon.pld.agile.POSITIVE_INFINITY
  * Empty path means the current way does not exist
  * @exception RuntimeException Will raise a RuntimeException on creation if the nodes size does match with edges size.
  */
-class Path<out N, out E : Measurable>(
+data class Path<out N, out E : Measurable>(
     val nodes: List<N>,
     val edges: List<E>
 ) : Measurable {

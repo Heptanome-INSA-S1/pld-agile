@@ -1,5 +1,10 @@
 package fr.insalyon.pld.agile.model
 
+/**
+ * An instant of the day : HH:MM:ss
+ * If the instant if after the current day it will threaten as "FUTURE"
+ * If the instant is before the current day it will be threaten as "PAST"
+ */
 class Instant private constructor(
     private val _seconds: Int = 0,
     private val alwaysAfter: Boolean = false,
@@ -14,8 +19,19 @@ class Instant private constructor(
     val PAST = Instant(Int.MIN_VALUE, alwaysBefore = true)
   }
 
+  /**
+   * The hour field of the instant
+   */
   val hour by lazy { (_seconds % SECONDS_PER_DAY) / SECONDS_PER_HOUR }
+
+  /**
+   * The minutes field of the instant
+   */
   val minutes by lazy { (_seconds) % SECONDS_PER_HOUR / SECONDS_PER_MINUTES }
+
+  /**
+   * The seconds field of the instant
+   */
   val seconds by lazy { _seconds % SECONDS_PER_MINUTES }
 
   constructor(hour: Int = 0, minutes: Int = 0, seconds: Int = 0): this(hour * SECONDS_PER_HOUR + minutes * SECONDS_PER_MINUTES + seconds, false, false)
@@ -39,6 +55,8 @@ class Instant private constructor(
   operator fun plus(duration: Duration): Instant = fromSeconds(toSeconds() + duration.toSeconds())
 
   operator fun minus(duration: Duration): Instant = fromSeconds(toSeconds() - duration.toSeconds())
+
+  operator fun minus(instant: Instant): Duration = (_seconds - instant._seconds).seconds
 
   fun toSeconds(): Int = _seconds
 
@@ -68,15 +86,22 @@ class Instant private constructor(
     return result
   }
 
+  override fun toString(): String {
+    if(alwaysBefore) return "PAST"
+    if(alwaysAfter) return "FUTURE"
+    return "$hour:$minutes:$seconds"
+  }
+
+
 }
 
-infix fun Int.H(minutes: Int): Instant {
+infix fun Int.h(minutes: Int): Instant {
   if(this < 0 || this > 23) throw IllegalStateException("Hour must be between 0 and 24")
   if(minutes < 0 || minutes > 59) throw IllegalStateException("Minutes must be between 0 and 59")
   return Instant(this, minutes)
 }
 
-infix fun Instant.M(seconds: Int): Instant {
+infix fun Instant.m(seconds: Int): Instant {
   if(seconds < 0 || seconds > 59) throw IllegalStateException("Seconds must be between 0 and 60")
   return this + Duration(seconds = seconds)
 }

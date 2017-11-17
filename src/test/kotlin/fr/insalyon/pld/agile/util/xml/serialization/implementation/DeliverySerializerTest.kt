@@ -30,8 +30,8 @@ class DeliverySerializerTest {
     val deliveryAsString = "<livraison adresse=\"194605312\" debutPlage=\"10:0:0\" duree=\"900\" finPlage=\"12:0:0\"/>"
     val delivery = Delivery(
         Intersection(194605312L, 10, 15),
-        10 H 0 M 0,
-        12 H 0 M 0,
+        10 h 0 m 0,
+        12 h 0 m 0,
         900.seconds
     )
     val deliveryAsElement = deliverySerializer.serialize(delivery)
@@ -50,7 +50,7 @@ class DeliverySerializerTest {
 
     val delivery = deliverySerializer.unserialize(deliveryAsElement)
 
-    assertEquals(10 H 8 M 3, delivery.startTime)
+    assertEquals(10 h 8 m 3, delivery.startTime)
     assertNull(delivery.endTime)
     assertEquals(400.seconds, delivery.duration)
 
