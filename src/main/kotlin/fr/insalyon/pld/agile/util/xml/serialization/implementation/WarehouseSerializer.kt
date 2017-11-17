@@ -7,7 +7,7 @@ import org.w3c.dom.Element
 
 class WarehouseSerializer(
     val document: Document,
-    val intersections: Map<Long, Intersection>
+    val plan: Plan
 ) : XmlSerializer<Warehouse> {
 
   override fun serialize(element: Warehouse): Element {
@@ -21,7 +21,7 @@ class WarehouseSerializer(
   override fun unserialize(element: Element): Warehouse {
 
     val intersectionId: Long = element.getAttribute(XmlConfig.Warehouse.ADDRESS).toLong()
-    val intersection: Intersection = intersections[intersectionId]!!
+    val intersection: Intersection = plan.nodes.first { it.element.id == intersectionId }.element
     val departureTime: Instant = element.getAttribute(XmlConfig.Warehouse.DEPARTURE_HOUR).toInstant()
 
     return Warehouse(

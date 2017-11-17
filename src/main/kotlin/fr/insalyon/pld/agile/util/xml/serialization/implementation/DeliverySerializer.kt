@@ -7,7 +7,7 @@ import org.w3c.dom.Element
 
 class DeliverySerializer(
     val document: Document,
-    val intersections: Map<Long, Intersection>
+    val plan: Plan
 ) : XmlSerializer<Delivery> {
   override fun serialize(element: Delivery): Element {
     val result: Element = document.createElement(XmlConfig.Delivery.TAG)
@@ -29,7 +29,7 @@ class DeliverySerializer(
   override fun unserialize(element: Element): Delivery {
 
     val intersectionId = element.getAttribute(XmlConfig.Delivery.ADDRESS).toLong()
-    val intersection = intersections[intersectionId]!!
+    val intersection = plan.nodes.first { it.element.id == intersectionId }.element
     val startTime = element.getAttributeOrNull(XmlConfig.Delivery.START_TIME)?.toInstant()
     val endTime = element.getAttributeOrNull(XmlConfig.Delivery.END_TIME)?.toInstant()
     val duration = element.getAttribute(XmlConfig.Delivery.DURATION).toInt().seconds
