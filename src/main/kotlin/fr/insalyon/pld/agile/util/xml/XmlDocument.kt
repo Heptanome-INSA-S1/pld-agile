@@ -8,11 +8,11 @@ import javax.xml.parsers.DocumentBuilderFactory
 class XmlDocument {
 
   companion object {
-    fun open(path: String): Document {
+    fun open(file: File): Document {
       val factory: DocumentBuilderFactory = DocumentBuilderFactory.newInstance()
       val builder: DocumentBuilder = factory.newDocumentBuilder()
 
-      return builder.parse(File(path))
+      return builder.parse(file)
     }
   }
 

@@ -1,13 +1,14 @@
 package fr.insalyon.pld.agile.controller.api
 
+import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
 import java.io.File
 
 interface State {
     /**
-     *
+     * qdq
      */
-    fun loadPlan(file: File) : Boolean
+    fun loadPlan(pathFile: String) : Plan
 
     /**
      *
