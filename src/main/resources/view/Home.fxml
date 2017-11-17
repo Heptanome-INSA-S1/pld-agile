@@ -12,6 +12,12 @@
     <center>
         <VBox alignment="CENTER" spacing="10">
             <!-- This label will be mapped by the counterLabel object of the view -->
+            <Label text="Hello">
+                <font>
+                    <Font size="20"/>
+                </font>
+            </Label>
+            <!-- This label will be mapped by the counterLabel object of the view -->
             <Label fx:id="counterLabel" text="0">
                 <font>
                     <Font size="20"/>
