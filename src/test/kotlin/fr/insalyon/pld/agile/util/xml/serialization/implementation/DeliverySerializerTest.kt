@@ -11,10 +11,12 @@ import javax.xml.parsers.DocumentBuilderFactory
 class DeliverySerializerTest {
 
   private val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
-  private val deliverySerializer: DeliverySerializer = DeliverySerializer(document, mapOf(
-      10L to Intersection(10L, 4, 8),
-      12L to Intersection(12L, 9, 10)
-  ))
+
+    private val plan = Plan(
+            setOf(Intersection(10L, 4, 8), Intersection(12L, 9, 10)),
+            setOf()
+    )
+  private val deliverySerializer: DeliverySerializer = DeliverySerializer(document, plan)
 
   private val serialiser: LSSerializer by lazy {
     val lsImpl: DOMImplementationLS = document.implementation.getFeature("LS", "3.0") as DOMImplementationLS
