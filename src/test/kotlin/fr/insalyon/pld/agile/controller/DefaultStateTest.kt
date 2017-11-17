@@ -34,7 +34,7 @@ class DefaulStateTest {
     @Test(expected = InvalidFormatException::class)
     fun loadPlanXMLInvalidFormat(){
         val DEFAULT_STATE = DefaultState()
-        DEFAULT_STATE.loadPlan(System.getProperty("user.dir")+"\\src\\test\\resources\\fichiersXML\\PlanXML\\planLyonSansNoeud.xml")
+        DEFAULT_STATE.loadPlan(System.getProperty("user.dir")+"\\src\\test\\resources\\fichiersXML\\PlanXML\\planLyonGrandSansNoeud.xml")
     }
 
 
