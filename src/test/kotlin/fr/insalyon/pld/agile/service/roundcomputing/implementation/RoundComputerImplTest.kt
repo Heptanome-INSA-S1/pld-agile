@@ -2,6 +2,7 @@ package fr.insalyon.pld.agile.service.roundcomputing.implementation
 
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.service.roundcomputing.api.RoundComputer
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class RoundComputerImplTest {
@@ -48,6 +49,10 @@ class RoundComputerImplTest {
 
     val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest)
     val round = roundComputer.round
+
+    assertEquals(source, round.warehouse.address)
+    assertEquals(node4, round.deliveries.first().address)
+    assertEquals(node5, round.deliveries.last().address)
 
   }
 
