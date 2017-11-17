@@ -2,7 +2,7 @@ package fr.insalyon.pld.agile.model
 
 import fr.insalyon.pld.agile.lib.graph.model.Measurable
 
-class Delivery(
+data class Delivery(
     val address: Intersection,
     val startTime: Instant? = null,
     val endTime : Instant? = null,
