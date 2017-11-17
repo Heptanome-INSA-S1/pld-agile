@@ -48,4 +48,18 @@ class Round(
 
       return duration.toSeconds()
     }
+
+  override fun toString(): String {
+    val stringBuilder = StringBuilder()
+
+    stringBuilder.append(warehouse.address.id)
+        .append(" -> ")
+
+    deliveries.forEach{ stringBuilder.append(it.address.id).append(" -> ") }
+
+    stringBuilder.append(warehouse.address.id)
+    return stringBuilder.toString()
+  }
+
+
 }

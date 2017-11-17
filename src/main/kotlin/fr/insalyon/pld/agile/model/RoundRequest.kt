@@ -6,4 +6,7 @@ package fr.insalyon.pld.agile.model
 class RoundRequest(
     val warehouse: Warehouse,
     val deliveries: Set<Delivery>
-)
+) {
+  val intersections by lazy { (listOf(warehouse.address) + deliveries.map { it.address }) }
+  val durations by lazy { listOf<Duration>(0.seconds) + deliveries.map { it.duration } }
+}
