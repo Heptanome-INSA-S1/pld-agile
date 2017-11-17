@@ -1,37 +1,46 @@
 package fr.insalyon.pld.agile.controller.api
 
+import fr.insalyon.pld.agile.controller.implementation.Controller
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
+import fr.insalyon.pld.agile.model.RoundRequest
 import java.io.File
 
-interface State {
-    /**
-     * qdq
-     */
-    fun loadPlan(pathFile: String) : Plan
+interface State<in T> {
 
-    /**
-     *
-     */
-    fun loadRoundRequest(file: File) : Boolean
+  val plan: Plan?
+  val roundRequest: RoundRequest?
+  val round: Round?
 
-    /**
-     *
-     */
-    fun calculateRound() : Round
+  fun init(element: T) {}
 
-    /**
-     *
-     */
-    fun ok(state : State) : State
+  /**
+   * qdq
+   */
+  fun loadPlan(controller: Controller, pathFile: String)
 
-    /**
-     *
-     */
-    fun undo(commands: List<Command>) : List<Command>
+  /**
+   *
+   */
+  fun loadRoundRequest(controller: Controller, file: File)
 
-    /**
-     *
-     */
-    fun redo(commands: List<Command>) : List<Command>
+  /**
+   *
+   */
+  fun calculateRound(controller: Controller)
+
+  /**
+   *
+   */
+  fun ok(controller: Controller)
+
+  /**
+   *
+   */
+  fun undo(controller: Controller, commands: List<Command>)
+
+  /**
+   *
+   */
+  fun redo(controller: Controller, commands: List<Command>)
 }

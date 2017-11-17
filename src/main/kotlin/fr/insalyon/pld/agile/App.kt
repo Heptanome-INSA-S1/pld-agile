@@ -1,5 +1,6 @@
 package fr.insalyon.pld.agile
 
+import fr.insalyon.pld.agile.controller.implementation.Controller
 import fr.insalyon.pld.agile.view.Home
 import javafx.application.Application
 
@@ -7,6 +8,9 @@ import javafx.application.Application
 class App : tornadofx.App(Home::class)
 
 fun main(args: Array<String>) {
-  // Start the application
+
+  val controller = Controller()
+  controller.loadPlan(getResourcePath("xml/planLyonPetit.xml"))
+
   Application.launch(App::class.java, *args)
 }

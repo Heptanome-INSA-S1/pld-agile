@@ -1,10 +1,13 @@
 package fr.insalyon.pld.agile.controller.implementation
 
 import com.sun.media.sound.InvalidFormatException
+import fr.insalyon.pld.agile.Config.MAP_XSD
 import fr.insalyon.pld.agile.controller.api.Command
 import fr.insalyon.pld.agile.controller.api.State
+import fr.insalyon.pld.agile.getResource
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
+import fr.insalyon.pld.agile.model.RoundRequest
 import fr.insalyon.pld.agile.util.xml.XmlDocument
 import fr.insalyon.pld.agile.util.xml.serialization.implementation.IntersectionSerializer
 import fr.insalyon.pld.agile.util.xml.serialization.implementation.JunctionSerializer
@@ -13,43 +16,39 @@ import fr.insalyon.pld.agile.util.xml.validator.implementation.XmlValidatorImpl
 import java.io.File
 import java.io.FileNotFoundException
 
-class DefaultState : State {
-    override fun loadPlan(pathFile: String): Plan {
-        val validator: XmlValidatorImpl = XmlValidatorImpl()
-        val sourceFile = File(pathFile)
-        val xsdFile = File(System.getProperty("user.dir")+"\\src\\main\\resources\\xsd\\map.xsd")
+open abstract class DefaultState<in T> : State<T> {
 
-        if(!sourceFile.exists()) throw FileNotFoundException("The file $pathFile was not found")
-        if(sourceFile.extension != "xml") throw InvalidFormatException("The file $pathFile is not a xml file")
-        if(!validator.isValid(sourceFile, xsdFile)) throw InvalidFormatException("The file $pathFile does not match the valid pattern")
+  override var plan: Plan? = null
+  override var roundRequest: RoundRequest? = null
+  override var round: Round? = null
 
-        val xmlDocument = XmlDocument.open(sourceFile)
-        val intersectionSerializer = IntersectionSerializer(xmlDocument)
-        val junctionSerializer = JunctionSerializer(xmlDocument)
-        val planSerializer = PlanSerializer(xmlDocument, intersectionSerializer, junctionSerializer)
+  override fun loadPlan(controller: Controller, pathFile: String) {
+    val validator: XmlValidatorImpl = XmlValidatorImpl()
+    val sourceFile = File(pathFile)
+    val xsdFile = getResource(MAP_XSD)
 
-        return planSerializer.unserialize(xmlDocument.documentElement)
+    if (!sourceFile.exists()) throw FileNotFoundException("The file $pathFile was not found")
+    if (sourceFile.extension != "xml") throw InvalidFormatException("The file $pathFile is not a xml file")
+    if (!validator.isValid(sourceFile, xsdFile)) throw InvalidFormatException("The file $pathFile does not match the valid pattern")
 
-    }
+    val xmlDocument = XmlDocument.open(sourceFile)
+    val intersectionSerializer = IntersectionSerializer(xmlDocument)
+    val junctionSerializer = JunctionSerializer(xmlDocument)
+    val planSerializer = PlanSerializer(xmlDocument, intersectionSerializer, junctionSerializer)
 
-    override fun loadRoundRequest(file: File): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    plan = planSerializer.unserialize(xmlDocument.documentElement)
+    controller.changeStateAndInit(controller.LOADED_PLAN_STATE, plan!!)
 
-    override fun calculateRound(): Round {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+  }
 
-    override fun ok(state: State): State {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+  override fun loadRoundRequest(controller: Controller, file: File) {}
 
-    override fun undo(commands: List<Command>): List<Command> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+  override fun calculateRound(controller: Controller) {}
 
-    override fun redo(commands: List<Command>): List<Command> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+  override fun ok(controller: Controller) {}
+
+  override fun undo(controller: Controller, commands: List<Command>) {}
+
+  override fun redo(controller: Controller, commands: List<Command>) {}
 
 }
