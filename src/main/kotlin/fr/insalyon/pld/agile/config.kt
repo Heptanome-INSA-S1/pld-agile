@@ -5,7 +5,7 @@ object Config {
   val DEFAULT_MAP = null
   val DEFAULT_DELIVERY = null
   val MAP_XSD = "xsd/map.xsd"
-  val DELIVERY_PLANNING = "xsd/delivery_planning.xsd"
+  val DELIVERY_PLANNING_XSD = "xsd/delivery_planning.xsd"
 
 
 

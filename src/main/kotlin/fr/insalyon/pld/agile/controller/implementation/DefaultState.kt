@@ -13,23 +13,31 @@ import fr.insalyon.pld.agile.util.xml.serialization.implementation.IntersectionS
 import fr.insalyon.pld.agile.util.xml.serialization.implementation.JunctionSerializer
 import fr.insalyon.pld.agile.util.xml.serialization.implementation.PlanSerializer
 import fr.insalyon.pld.agile.util.xml.validator.implementation.XmlValidatorImpl
+import javafx.stage.FileChooser
 import java.io.File
 import java.io.FileNotFoundException
 
-open abstract class DefaultState<in T> : State<T> {
+abstract class DefaultState<in T> : State<T> {
 
   override var plan: Plan? = null
   override var roundRequest: RoundRequest? = null
   override var round: Round? = null
 
-  override fun loadPlan(controller: Controller, pathFile: String) {
-    val validator: XmlValidatorImpl = XmlValidatorImpl()
-    val sourceFile = File(pathFile)
-    val xsdFile = getResource(MAP_XSD)
+  internal fun openXmlFileFromDialog(): File? {
+    val fileChooser = FileChooser()
+    fileChooser.title = "XML Plan"
+    fileChooser.extensionFilters.addAll(FileChooser.ExtensionFilter("XML Files", "*.xml"))
+    return fileChooser.showOpenDialog(null)
+  }
 
-    if (!sourceFile.exists()) throw FileNotFoundException("The file $pathFile was not found")
-    if (sourceFile.extension != "xml") throw InvalidFormatException("The file $pathFile is not a xml file")
-    if (!validator.isValid(sourceFile, xsdFile)) throw InvalidFormatException("The file $pathFile does not match the valid pattern")
+  override fun loadPlan(controller: Controller) {
+    val validator: XmlValidatorImpl = XmlValidatorImpl()
+    val xsdFile = getResource(MAP_XSD)
+    val sourceFile = openXmlFileFromDialog() ?: return
+
+    if (!sourceFile.exists()) throw FileNotFoundException("The file ${sourceFile.name} was not found")
+    if (sourceFile.extension != "xml") throw InvalidFormatException("The file ${sourceFile.name} is not a xml file")
+    if (!validator.isValid(sourceFile, xsdFile)) throw InvalidFormatException("The file ${sourceFile.name} does not match the valid pattern")
 
     val xmlDocument = XmlDocument.open(sourceFile)
     val intersectionSerializer = IntersectionSerializer(xmlDocument)
@@ -41,11 +49,17 @@ open abstract class DefaultState<in T> : State<T> {
 
   }
 
-  override fun loadRoundRequest(controller: Controller, file: File) {}
+  override fun loadRoundRequest(controller: Controller) {
+    println("Load round request was called")
+  }
 
-  override fun calculateRound(controller: Controller) {}
+  override fun calculateRound(controller: Controller) {
+    println("Calculate round was called")
+  }
 
-  override fun ok(controller: Controller) {}
+  override fun ok(controller: Controller) {
+    println("Ok was called")
+  }
 
   override fun undo(controller: Controller, commands: List<Command>) {}
 

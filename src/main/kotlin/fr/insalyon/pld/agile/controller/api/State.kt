@@ -4,7 +4,6 @@ import fr.insalyon.pld.agile.controller.implementation.Controller
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.model.RoundRequest
-import java.io.File
 
 interface State<in T> {
 
@@ -12,17 +11,17 @@ interface State<in T> {
   val roundRequest: RoundRequest?
   val round: Round?
 
-  fun init(element: T) {}
+  fun init(element: T, window: Any) {}
 
   /**
    * qdq
    */
-  fun loadPlan(controller: Controller, pathFile: String)
+  fun loadPlan(controller: Controller)
 
   /**
    *
    */
-  fun loadRoundRequest(controller: Controller, file: File)
+  fun loadRoundRequest(controller: Controller)
 
   /**
    *

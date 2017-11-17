@@ -6,10 +6,10 @@ class ErrorState : DefaultState<Pair<Exception, State<Nothing>>>(), State<Pair<E
 
   var previousState: State<Nothing> = this
 
-  override fun init(element: Pair<Exception, State<Nothing>>) {
+  override fun init(element: Pair<Exception, State<Nothing>>, window: Any) {
     val exception = element.first
     previousState = element.second
-    System.err.println(exception.toString())
+    System.err.println(exception.message)
   }
 
   override fun ok(controller: Controller) {

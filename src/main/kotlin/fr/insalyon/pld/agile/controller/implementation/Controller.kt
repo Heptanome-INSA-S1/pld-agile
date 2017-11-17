@@ -4,9 +4,9 @@ import fr.insalyon.pld.agile.controller.api.Command
 import fr.insalyon.pld.agile.controller.api.State
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.RoundRequest
-import java.io.File
+import javafx.scene.layout.StackPane
 
-class Controller {
+class Controller(val window: Any) {
 
   val INIT_STATE: State<Any> = InitState()
   val LOADED_PLAN_STATE: State<Plan> = LoadedPlanState()
@@ -15,17 +15,17 @@ class Controller {
 
   private var currentState: State<Nothing> = INIT_STATE
 
-  fun loadPlan(pathFile: String) {
+  fun loadPlan() {
     try {
-      currentState.loadPlan(this, pathFile)
+      currentState.loadPlan(this)
     } catch (e: Exception) {
       e.catchWithErrorState()
     }
   }
 
-  fun loadRoundRequest(file: File) {
+  fun loadRoundRequest() {
     try {
-      currentState.loadRoundRequest(this, file)
+      currentState.loadRoundRequest(this)
     } catch (e: Exception) {
       e.catchWithErrorState()
     }
@@ -52,12 +52,12 @@ class Controller {
   }
 
   private fun Exception.catchWithErrorState() {
-    ERROR_STATE.init(Pair(this, currentState))
+    ERROR_STATE.init(Pair(this, currentState), window)
     currentState = ERROR_STATE
   }
 
   fun <T> changeStateAndInit(nextState: State<T>, initParam: T) {
-    nextState.init(initParam)
+    nextState.init(initParam, window)
     currentState = nextState
   }
 
