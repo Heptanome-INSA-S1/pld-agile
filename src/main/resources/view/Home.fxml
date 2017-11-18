@@ -8,18 +8,29 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.HBox?>
-<BorderPane xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<BorderPane xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" minHeight="800" minWidth="1200">
     <top>
-        <HBox alignment="TOP_LEFT">
-            <MenuBar>
-                <Menu text="File">
-                    <MenuItem text="Charger plan">
-                    </MenuItem>
-                    <MenuItem text="Charger livraison">
-                    </MenuItem>
-                </Menu>
-            </MenuBar>
-        </HBox>
+        <GridPane>
+            <children>
+                <MenuBar GridPane.columnIndex="0" GridPane.rowIndex="0" >
+                    <Menu text="File">
+                        <MenuItem text="Charger plan">
+                        </MenuItem>
+                        <MenuItem text="Charger livraison">
+                        </MenuItem>
+                    </Menu>
+                </MenuBar>
+            </children>
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES"></ColumnConstraints>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints></RowConstraints>
+            </rowConstraints>
+        </GridPane>
     </top>
     <center>
         <VBox alignment="CENTER" spacing="10">
