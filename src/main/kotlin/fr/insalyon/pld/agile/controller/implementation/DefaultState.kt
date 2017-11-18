@@ -31,21 +31,21 @@ abstract class DefaultState<in T> : State<T> {
   }
 
   override fun loadPlan(controller: Controller) {
-    val validator: XmlValidatorImpl = XmlValidatorImpl()
-    val xsdFile = getResource(MAP_XSD)
-    val sourceFile = openXmlFileFromDialog() ?: return
+      val validator: XmlValidatorImpl = XmlValidatorImpl()
+      val xsdFile = getResource(MAP_XSD)
+      val sourceFile = openXmlFileFromDialog() ?: return
 
-    if (!sourceFile.exists()) throw FileNotFoundException("The file ${sourceFile.name} was not found")
-    if (sourceFile.extension != "xml") throw InvalidFormatException("The file ${sourceFile.name} is not a xml file")
-    if (!validator.isValid(sourceFile, xsdFile)) throw InvalidFormatException("The file ${sourceFile.name} does not match the valid pattern")
+      if (!sourceFile.exists()) throw FileNotFoundException("The file ${sourceFile.name} was not found")
+      if (sourceFile.extension != "xml") throw InvalidFormatException("The file ${sourceFile.name} is not a xml file")
+      if (!validator.isValid(sourceFile, xsdFile)) throw InvalidFormatException("The file ${sourceFile.name} does not match the valid pattern")
 
-    val xmlDocument = XmlDocument.open(sourceFile)
-    val intersectionSerializer = IntersectionSerializer(xmlDocument)
-    val junctionSerializer = JunctionSerializer(xmlDocument)
-    val planSerializer = PlanSerializer(xmlDocument, intersectionSerializer, junctionSerializer)
+      val xmlDocument = XmlDocument.open(sourceFile)
+      val intersectionSerializer = IntersectionSerializer(xmlDocument)
+      val junctionSerializer = JunctionSerializer(xmlDocument)
+      val planSerializer = PlanSerializer(xmlDocument, intersectionSerializer, junctionSerializer)
 
-    plan = planSerializer.unserialize(xmlDocument.documentElement)
-    controller.changeStateAndInit(controller.LOADED_PLAN_STATE, plan!!)
+      plan = planSerializer.unserialize(xmlDocument.documentElement)
+      controller.changeStateAndInit(controller.LOADED_PLAN_STATE, plan!!)
 
   }
 

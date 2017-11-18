@@ -2,7 +2,7 @@ package fr.insalyon.pld.agile.controller.implementation
 
 import fr.insalyon.pld.agile.controller.api.State
 
-class ErrorState : DefaultState<Pair<Exception, State<Nothing>>>(), State<Pair<Exception, State<Nothing>>> {
+class ErrorState : DefaultState<Pair<Exception, State<Nothing>>>(){
 
   var previousState: State<Nothing> = this
 

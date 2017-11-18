@@ -14,17 +14,20 @@ interface State<in T> {
   fun init(element: T, window: Any) {}
 
   /**
-   * qdq
+   * load the map of a city
+   * @param controller
    */
   fun loadPlan(controller: Controller)
 
   /**
-   *
+   * Load the round request
+   * @param controller
    */
   fun loadRoundRequest(controller: Controller)
 
   /**
-   *
+   * Calculate the round of the loaded round request
+   * @param controller
    */
   fun calculateRound(controller: Controller)
 

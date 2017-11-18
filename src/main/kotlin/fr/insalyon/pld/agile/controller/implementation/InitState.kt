@@ -2,4 +2,4 @@ package fr.insalyon.pld.agile.controller.implementation
 
 import fr.insalyon.pld.agile.controller.api.State
 
-class InitState : DefaultState<Any>(), State<Any>
+class InitState : DefaultState<Any>()
