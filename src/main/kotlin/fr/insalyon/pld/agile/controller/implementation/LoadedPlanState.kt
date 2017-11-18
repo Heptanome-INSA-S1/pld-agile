@@ -26,7 +26,7 @@ class LoadedPlanState : DefaultState<Plan>(), State<Plan> {
 
     val xmlDocument = XmlDocument.open(file)
     // Add code here
-    controller.changeStateAndInit(controller.LOADED_DELIVERIES_STATE, RoundRequest(Warehouse(Intersection(10), 8 H 10), setOf<Delivery>()))
+    controller.changeStateAndInit(controller.LOADED_DELIVERIES_STATE, RoundRequest(Warehouse(Intersection(10), 8 h  10), setOf<Delivery>()))
 
   }
 }
