@@ -3,6 +3,7 @@ package fr.insalyon.pld.agile.controller.implementation
 import fr.insalyon.pld.agile.controller.api.Command
 import fr.insalyon.pld.agile.controller.api.State
 import fr.insalyon.pld.agile.model.Plan
+import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.model.RoundRequest
 import javafx.scene.layout.StackPane
 
@@ -11,6 +12,7 @@ class Controller(val window: Any) {
   val INIT_STATE: State<Any> = InitState()
   val LOADED_PLAN_STATE: State<Plan> = LoadedPlanState()
   val LOADED_DELIVERIES_STATE: State<RoundRequest> = LoadedDeliveriesState()
+  val CALCULATED_ROUND_STATE: State<Round> = CalculatedRoundState()
   val ERROR_STATE: State<Pair<Exception, State<Nothing>>> = ErrorState()
 
   private var currentState: State<Nothing> = INIT_STATE
