@@ -46,10 +46,10 @@ class RoundComputerImpl(
       intersections += roundRequest.intersections[currentNode]
     }
 
-    val linkedListOfDelivery = linkedSetOf<Delivery>()
-    val linkedListOfPath = linkedSetOf<Path<Intersection, Junction>>()
+    val linkedSetOfDeliveries = linkedSetOf<Delivery>()
+    val linkedSetOfPaths = linkedSetOf<Path<Intersection, Junction>>()
 
-    linkedListOfPath.add(
+    linkedSetOfPaths.add(
         subPlan
             .outEdgesOf(roundRequest.warehouse.address)
             .first{ it.to.element == intersections[1]}
@@ -58,11 +58,11 @@ class RoundComputerImpl(
 
     for(i in 1 until intersections.size - 1) {
 
-      linkedListOfDelivery.add(
+      linkedSetOfDeliveries.add(
           roundRequest.deliveries.first { it.address == intersections[i] }
       )
 
-      linkedListOfPath.add(
+      linkedSetOfPaths.add(
           subPlan.outEdgesOf(intersections[i])
               .first { it.to.element == intersections[i+1] }
               .element
@@ -70,18 +70,18 @@ class RoundComputerImpl(
 
     }
 
-    linkedListOfDelivery.add(
+    linkedSetOfDeliveries.add(
         roundRequest.deliveries.last()
     )
 
-    linkedListOfPath.add(
+    linkedSetOfPaths.add(
         subPlan
             .outEdgesOf(roundRequest.deliveries.last().address)
             .first { it.to.element == roundRequest.warehouse.address }
             .element
     )
 
-    return Round(roundRequest.warehouse, linkedListOfDelivery, linkedListOfPath)
+    return Round(roundRequest.warehouse, linkedSetOfDeliveries, linkedSetOfPaths)
 
   }
 
