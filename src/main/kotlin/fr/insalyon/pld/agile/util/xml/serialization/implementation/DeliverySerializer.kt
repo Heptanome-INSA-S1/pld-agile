@@ -27,7 +27,6 @@ class DeliverySerializer(
   }
 
   override fun unserialize(element: Element): Delivery {
-
     val intersectionId = element.getAttribute(XmlConfig.Delivery.ADDRESS).toLong()
     val intersection = intersections[intersectionId]!!
     val startTime = element.getAttributeOrNull(XmlConfig.Delivery.START_TIME)?.toInstant()
@@ -41,6 +40,7 @@ class DeliverySerializer(
         duration
     )
   }
+
 
   private fun Element.getAttributeOrNull(name: String): String? {
     val attribute = getAttribute(name)
