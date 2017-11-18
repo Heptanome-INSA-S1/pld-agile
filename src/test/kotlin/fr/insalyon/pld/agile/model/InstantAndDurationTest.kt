@@ -77,8 +77,16 @@ class InstantAndDurationTest {
     assert(Instant.FUTURE == (day + dayDuration))
     assert(Instant.PAST == (day - dayDuration))
 
-    assert((10 H 45) > (9 H 50))
-    assert((10 H 10) + 15.minutes + 20.seconds == (10 H 25 M 20))
+    assert((10 h 45) > (9 h 50))
+    assert((10 h 10) + 15.minutes + 20.seconds == (10 h 25 m 20))
+
+  }
+
+  @Test
+  fun durationBetweenInstant() {
+
+    assertEquals(10.seconds, (10 h 1 m 50) - (10 h 1 m 40))
+    assertEquals(1.minutes + 20.seconds, (0 h 1 m 20) - (0 h 0 m 0))
 
   }
 
@@ -93,9 +101,9 @@ class InstantAndDurationTest {
   @Test
   fun stringToInstant() {
 
-    assertEquals((10 H 45).toSeconds(), "10:45:0".toInstant().toSeconds())
-    assertEquals((10 H 45 M 27).toSeconds(), "10:45:27".toInstant().toSeconds())
-    assertEquals((0 H 42 M 54).toSeconds(), "0:42:54".toInstant().toSeconds())
+    assertEquals((10 h 45).toSeconds(), "10:45:0".toInstant().toSeconds())
+    assertEquals((10 h 45 m 27).toSeconds(), "10:45:27".toInstant().toSeconds())
+    assertEquals((0 h 42 m 54).toSeconds(), "0:42:54".toInstant().toSeconds())
 
   }
 

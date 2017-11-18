@@ -2,13 +2,64 @@ package fr.insalyon.pld.agile.model
 
 import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
-import java.util.*
 
+/**
+ * A round is a computed round request
+ */
 class Round(
     val warehouse: Warehouse,
-    val deliveries: SortedSet<Delivery>,
-    val path: SortedSet<Path<Intersection, Junction>>
+    val deliveries: LinkedHashSet<Delivery>,
+    val path: LinkedHashSet<Path<Intersection, Junction>>
 ) : Measurable{
   override val length: Int
-    get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    get() {
+
+      var duration = Duration()
+
+      val deliveryIterator = deliveries.iterator()
+      val pathIterator = path.iterator()
+
+      var previousDelivery: Delivery? = null
+      var currentHour = warehouse.departureHour
+
+      for(i: Int in deliveries.indices) {
+        val destination = deliveryIterator.next()!!
+        val path = pathIterator.next()!!
+
+        if(previousDelivery != null) {
+          duration += previousDelivery.duration
+          currentHour += previousDelivery.duration
+        }
+
+        duration += path.length.seconds
+        currentHour += path.length.seconds
+
+        if(destination.startTime != null && currentHour < destination.startTime) {
+          duration += destination.startTime - currentHour
+          currentHour = destination.startTime
+        }
+        previousDelivery = destination
+
+      }
+
+      val pathToWarehouse = pathIterator.next()!!
+      duration += previousDelivery!!.duration
+      duration += pathToWarehouse.length.seconds
+
+      return duration.toSeconds()
+    }
+
+  override fun toString(): String {
+    val stringBuilder = StringBuilder()
+
+    stringBuilder.append(warehouse.address.id)
+        .append(" -> ")
+
+    deliveries.forEach{ stringBuilder.append(it.address.id).append(" -> ") }
+
+    stringBuilder.append(warehouse.address.id)
+    return stringBuilder.toString()
+  }
+
+
 }
