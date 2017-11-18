@@ -5,9 +5,22 @@ import fr.insalyon.pld.agile.controller.api.State
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.model.RoundRequest
-import javafx.scene.layout.StackPane
+import fr.insalyon.pld.agile.view.AlternativeHome
 
-class Controller(val window: Any) {
+class Controller(val window: AlternativeHome) {
+
+  internal var plan: Plan? = null
+  set(value) {
+    roundRequest = null
+    round = null
+    field = value
+  }
+  internal var roundRequest: RoundRequest? = null
+  set(value) {
+    round = null
+    field = value
+  }
+  internal var round: Round? = null
 
   val INIT_STATE: State<Any> = InitState()
   val LOADED_PLAN_STATE: State<Plan> = LoadedPlanState()
@@ -54,12 +67,16 @@ class Controller(val window: Any) {
   }
 
   private fun Exception.catchWithErrorState() {
-    ERROR_STATE.init(Pair(this, currentState), window)
+    ERROR_STATE.init(this@Controller, Pair(this, currentState))
     currentState = ERROR_STATE
   }
 
+  fun manageException(e: Exception) {
+    e.catchWithErrorState()
+  }
+
   fun <T> changeStateAndInit(nextState: State<T>, initParam: T) {
-    nextState.init(initParam, window)
+    nextState.init(this, initParam)
     currentState = nextState
   }
 
