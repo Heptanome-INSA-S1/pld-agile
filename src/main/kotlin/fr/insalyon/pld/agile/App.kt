@@ -7,6 +7,5 @@ import javafx.application.Application
 class App : tornadofx.App(Home::class)
 
 fun main(args: Array<String>) {
-  // Start the application
   Application.launch(App::class.java, *args)
 }

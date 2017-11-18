@@ -3,43 +3,66 @@ package fr.insalyon.pld.agile.controller.implementation
 import fr.insalyon.pld.agile.controller.api.Command
 import fr.insalyon.pld.agile.controller.api.State
 import fr.insalyon.pld.agile.model.Plan
-import fr.insalyon.pld.agile.model.Round
-import java.io.File
+import fr.insalyon.pld.agile.model.RoundRequest
+import javafx.scene.layout.StackPane
 
-class Controller {
+class Controller(val window: Any) {
 
-    companion object {
-        val DEFAULT_STATE = DefaultState()
+  val INIT_STATE: State<Any> = InitState()
+  val LOADED_PLAN_STATE: State<Plan> = LoadedPlanState()
+  val LOADED_DELIVERIES_STATE: State<RoundRequest> = LoadedDeliveriesState()
+  val ERROR_STATE: State<Pair<Exception, State<Nothing>>> = ErrorState()
+
+  private var currentState: State<Nothing> = INIT_STATE
+
+  fun loadPlan() {
+    try {
+      currentState.loadPlan(this)
+    } catch (e: Exception) {
+      e.catchWithErrorState()
     }
+  }
 
-    private var plan: Plan? = null
-    private var currentState = DEFAULT_STATE
-
-    fun loadPlan(pathFile: String) {
-        try {
-            plan = currentState.loadPlan(pathFile)
-        } catch (e: Exception) {
-          //  currentState = ErrorState()
-        }
+  fun loadRoundRequest() {
+    try {
+      currentState.loadRoundRequest(this)
+    } catch (e: Exception) {
+      e.catchWithErrorState()
     }
+  }
 
-    fun loadRoundRequest(file: File){
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+  fun calculateRound() {
+    try {
+      currentState.calculateRound(this)
+    } catch (e: Exception) {
+      e.catchWithErrorState()
     }
+  }
 
-    fun calculateRound(): Round {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+  fun ok() {
+    currentState.ok(this)
+  }
 
-    fun ok(state: State): State {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+  fun undo(commands: List<Command>) {
+    currentState.undo(this, commands)
+  }
 
-    fun undo(commands: List<Command>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+  fun redo(commands: List<Command>) {
+    currentState.redo(this, commands)
+  }
 
-    fun redo(commands: List<Command>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+  private fun Exception.catchWithErrorState() {
+    ERROR_STATE.init(Pair(this, currentState), window)
+    currentState = ERROR_STATE
+  }
+
+  fun <T> changeStateAndInit(nextState: State<T>, initParam: T) {
+    nextState.init(initParam, window)
+    currentState = nextState
+  }
+
+  fun <T> changeState(nextState: State<T>) {
+    currentState = nextState
+  }
+
 }
