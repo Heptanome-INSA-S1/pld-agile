@@ -4,28 +4,34 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.control.Button?>
-<BorderPane xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1">
-    <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
-    </padding>
-
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<BorderPane xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" minHeight="800" minWidth="1200">
+    <top>
+        <GridPane>
+            <children>
+                <MenuBar GridPane.columnIndex="0" GridPane.rowIndex="0" >
+                    <Menu text="File">
+                        <MenuItem text="Charger plan">
+                        </MenuItem>
+                        <MenuItem text="Charger livraison">
+                        </MenuItem>
+                    </Menu>
+                </MenuBar>
+            </children>
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES"></ColumnConstraints>
+            </columnConstraints>
+        </GridPane>
+    </top>
     <center>
         <VBox alignment="CENTER" spacing="10">
-            <!-- This label will be mapped by the counterLabel object of the view -->
-            <Label text="Hello">
-                <font>
-                    <Font size="20"/>
-                </font>
-            </Label>
-            <!-- This label will be mapped by the counterLabel object of the view -->
-            <Label fx:id="counterLabel" text="0">
-                <font>
-                    <Font size="20"/>
-                </font>
-            </Label>
-            <!-- The button will launch the method increment of the class view -->
-            <Button text="Click to increment" onAction="#increment"/>
-            <Button text="Open PlanView" onAction="#planView"/>
+            <Button text="Charger map"/>
         </VBox>
     </center>
 </BorderPane>
