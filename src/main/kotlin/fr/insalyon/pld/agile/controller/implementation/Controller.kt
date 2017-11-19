@@ -5,9 +5,9 @@ import fr.insalyon.pld.agile.controller.api.State
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.model.RoundRequest
-import fr.insalyon.pld.agile.view.AlternativeHome
+import fr.insalyon.pld.agile.view.Home
 
-class Controller(val window: AlternativeHome) {
+class Controller(val window: Home) {
 
   internal var plan: Plan? = null
   set(value) {

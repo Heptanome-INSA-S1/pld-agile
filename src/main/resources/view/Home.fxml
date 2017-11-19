@@ -17,9 +17,9 @@
             <children>
                 <MenuBar GridPane.columnIndex="0" GridPane.rowIndex="0" >
                     <Menu text="File">
-                        <MenuItem text="Charger plan">
+                        <MenuItem fx:id="loadPlanMenuItem" text="Charger plan">
                         </MenuItem>
-                        <MenuItem text="Charger livraison">
+                        <MenuItem fx:id="loadRoundRequestMenuItem" text="Charger livraison">
                         </MenuItem>
                     </Menu>
                 </MenuBar>
