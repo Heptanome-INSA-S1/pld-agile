@@ -23,7 +23,7 @@ class PlanSerializer(
     val triplets = element.outEdges.map { outEdges -> outEdges.map { edge -> Triple(edge.from.element.id, edge.element, edge.to.element.id) } }.flatten()
     val result = document.createElement(XmlConfig.Map.TAG)
     element.nodes.forEach { node -> result.appendChild(intersectionSerializer.serialize(node.element)) }
-    triplets.forEach { triplet ->
+      triplets.forEach { triplet ->
       val xmlJunction = junctionSerializer.serialize(triplet.second)
       xmlJunction.setAttribute(XmlConfig.Junction.FROM, triplet.first.toString())
       xmlJunction.setAttribute(XmlConfig.Junction.TO, triplet.third.toString())
