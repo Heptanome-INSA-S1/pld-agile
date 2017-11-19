@@ -31,7 +31,7 @@
     </top>
     <center>
         <VBox alignment="CENTER" spacing="10">
-            <Button text="Charger map"/>
+            <Button text="Charger map" fx:id="loadPlanButton"/>
         </VBox>
     </center>
 </BorderPane>
