@@ -52,7 +52,7 @@ class PlanFragment : Fragment(){
             }
             button("Zoom -"){
                 action{
-                    X_SIZE -= 10.00
+                    X_SIZE -= 100.00
                     Y_SIZE -= 100.0
                     println("X : "+X_SIZE+" Y: "+Y_SIZE)
                 }
