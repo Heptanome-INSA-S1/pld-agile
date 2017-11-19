@@ -25,6 +25,7 @@
             </Label>
             <!-- The button will launch the method increment of the class view -->
             <Button text="Click to increment" onAction="#increment"/>
+            <Button text="Open PlanView" onAction="#planView"/>
         </VBox>
     </center>
 </BorderPane>
