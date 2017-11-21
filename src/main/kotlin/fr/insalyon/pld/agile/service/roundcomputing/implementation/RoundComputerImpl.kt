@@ -9,8 +9,18 @@ import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1
 import fr.insalyon.pld.agile.service.roundcomputing.api.RoundComputer
 
 class RoundComputerImpl(
+    /**
+     * The plan
+     */
     val plan: Plan,
-    val roundRequest: RoundRequest
+    /**
+     * The round request to compute
+     */
+    val roundRequest: RoundRequest,
+    /**
+     * The truck speed in dm/s
+     */
+    val speed: Speed
 ) : RoundComputer {
 
   private fun getSubPlan(): Graph<Intersection, Path<Intersection, Junction>> {
@@ -31,14 +41,18 @@ class RoundComputerImpl(
 
   private fun compute(): Round {
 
+    val speedInDamSeconds = speed.to(Speed.DistanceUnit.DAM, Speed.DurationUnit.S)
+
     val tsp: TSP = TSP1()
     val subPlan = getSubPlan()
     tsp.findSolution(
         1000,
         roundRequest.intersections.size,
-        subPlan.adjacencyMatrix,
+        subPlan.adjacencyMatrix.map { row -> row.map { it -> it * speedInDamSeconds.value }.toIntArray() }.toTypedArray(),
         roundRequest.durations.map { it.toSeconds() }.toIntArray()
     )
+
+
 
     val intersections = mutableListOf<Intersection>()
     for(i: Int in roundRequest.intersections.indices) {
@@ -49,6 +63,20 @@ class RoundComputerImpl(
     val linkedSetOfDeliveries = linkedSetOf<Delivery>()
     val linkedSetOfPaths = linkedSetOf<Path<Intersection, Junction>>()
 
+    fun addPath(from: Int, to: Int) {
+      linkedSetOfPaths.add(
+          subPlan.outEdgesOf(intersections[from])
+              .first { it.to.element == intersections[to] }
+              .element
+      )
+    }
+
+    fun addDelivery(delivery: Int) {
+      linkedSetOfDeliveries.add(
+          roundRequest.deliveries.first { it.address == intersections[delivery] }
+      )
+    }
+
     linkedSetOfPaths.add(
         subPlan
             .outEdgesOf(roundRequest.warehouse.address)
@@ -57,21 +85,12 @@ class RoundComputerImpl(
     )
 
     for(i in 1 until intersections.size - 1) {
-
-      linkedSetOfDeliveries.add(
-          roundRequest.deliveries.first { it.address == intersections[i] }
-      )
-
-      linkedSetOfPaths.add(
-          subPlan.outEdgesOf(intersections[i])
-              .first { it.to.element == intersections[i+1] }
-              .element
-      )
-
+      addDelivery(i)
+      addPath(i, i + 1)
     }
 
     linkedSetOfDeliveries.add(
-        roundRequest.deliveries.last()
+        roundRequest.deliveries.first { it.address == intersections.last() }
     )
 
     linkedSetOfPaths.add(

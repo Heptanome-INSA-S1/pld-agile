@@ -47,7 +47,7 @@ class RoundComputerImplTest {
   @Test
   fun compute() {
 
-    val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest)
+    val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, 15.km_h)
     val round = roundComputer.round
 
     assertEquals(source, round.warehouse.address)

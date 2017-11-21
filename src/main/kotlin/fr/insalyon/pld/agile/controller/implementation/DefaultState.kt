@@ -3,6 +3,7 @@ package fr.insalyon.pld.agile.controller.implementation
 import com.sun.media.sound.InvalidFormatException
 import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.Config.MAP_XSD
+import fr.insalyon.pld.agile.Config.defaultSpeed
 import fr.insalyon.pld.agile.controller.api.Command
 import fr.insalyon.pld.agile.controller.api.State
 import fr.insalyon.pld.agile.getResource
@@ -88,7 +89,7 @@ abstract class DefaultState<in T> : State<T> {
 
   protected fun defaultCalculateRoundImpl(controller: Controller) {
     try {
-      val round = RoundComputerImpl(controller.plan!!, controller.roundRequest!!).round
+      val round = RoundComputerImpl(controller.plan!!, controller.roundRequest!!, defaultSpeed).round
       controller.changeStateAndInit(controller.CALCULATED_ROUND_STATE, round)
     } catch (e: Exception) {
       controller.manageException(e)
