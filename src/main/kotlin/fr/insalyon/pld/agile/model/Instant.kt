@@ -91,6 +91,15 @@ class Instant private constructor(
     if(alwaysAfter) return "FUTURE"
     return "$hour:$minutes:$seconds"
   }
+   fun toBeautifulString() {
+      if(seconds==0)
+        if(minutes==0)
+          "" + hour + "h"
+        else
+          "" + hour + "h"+ minutes + "m"
+      else
+        "" + hour + "h"+ minutes + "m" + seconds + "s"
+  }
 
 
 }
