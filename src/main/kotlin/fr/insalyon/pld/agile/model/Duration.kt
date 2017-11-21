@@ -37,6 +37,24 @@ class Duration private constructor(
 
   override fun hashCode(): Int = _seconds.hashCode()
 
+  override fun toString():String{
+    var secondes = _seconds
+    if(secondes==0)
+      return "0s"
+    val hours : Int = secondes/3600
+    secondes = secondes - hours*3600
+    val minutes : Int = secondes/60
+    secondes = secondes - minutes*60
+    var res = ""
+    if(hours!=0)
+      res += ""+ hours + "h"
+    if(minutes!=0)
+      res += ""+ minutes + "m"
+    if(secondes!=0)
+      res += ""+ secondes + "s"
+    return res
+  }
+
 }
 
 val Int.hours: Duration get() = Duration(hour = this)
