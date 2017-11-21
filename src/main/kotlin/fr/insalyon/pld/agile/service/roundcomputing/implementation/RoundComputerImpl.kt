@@ -95,7 +95,7 @@ class RoundComputerImpl(
 
     linkedSetOfPaths.add(
         subPlan
-            .outEdgesOf(roundRequest.deliveries.last().address)
+            .outEdgesOf(roundRequest.deliveries.first { it.address == intersections.last() }.address)
             .first { it.to.element == roundRequest.warehouse.address }
             .element
     )
