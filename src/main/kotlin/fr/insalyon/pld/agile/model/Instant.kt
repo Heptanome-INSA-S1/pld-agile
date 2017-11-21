@@ -91,8 +91,8 @@ class Instant private constructor(
     if(alwaysAfter) return "FUTURE"
     return "$hour:$minutes:$seconds"
   }
-   fun toBeautifulString() {
-      if(seconds==0)
+   fun toBeautifulString(): String {
+      return if(seconds==0)
         if(minutes==0)
           "" + hour + "h"
         else
