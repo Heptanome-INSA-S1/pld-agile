@@ -41,7 +41,7 @@ class PlanFragment : Fragment() {
           circle {
             centerX = notNullRound.warehouse.address.x / (plan.width * 1.0) * X_SIZE
             centerY = notNullRound.warehouse.address.y / (plan.height * 1.0) * Y_SIZE
-            radius = SIZE * 4
+            radius = SIZE * 5
             fill = Color.BROWN
           }
           notNullRound.deliveries().forEach {
@@ -50,8 +50,43 @@ class PlanFragment : Fragment() {
             circle {
               centerX = nodeX
               centerY = nodeY
-              radius = SIZE * 4
+              radius = SIZE * 5
               fill = Color.GREEN
+            }
+          }
+          notNullRound.path().forEach{
+
+            var fromX: Double = 0.0
+            var fromY: Double = 0.0
+            var toX: Double = 0.0
+            var toY: Double = 0.0
+            var index: Int = 0
+            it.nodes.forEach{
+              val nodeX: Double = it.x / (plan.width * 1.0) * X_SIZE
+              val nodeY: Double = it.y / (plan.height * 1.0) * Y_SIZE
+              circle {
+                  centerX = nodeX
+                  centerY = nodeY
+                  radius = SIZE * 3
+                  fill = Color.YELLOW
+              }
+              if(index>0){
+                fromX = toX
+                fromY = toY
+                toX = nodeX
+                toY = nodeY
+                line {
+                 startX = fromX
+                 startY = fromY
+                 endX = toX
+                 endY = toY
+                 stroke = Color.ORANGE
+                }
+              } else {
+                toX = nodeX
+                toY = nodeY
+              }
+              index++
             }
           }
         }
@@ -107,28 +142,6 @@ class PlanFragment : Fragment() {
       //replaceWith(find<PlanFragment>(PlanFragment::class, plan))
       //centerVBox.replaceWith(find<PlanFragment>(mapOf(PlanFragment::plan to plan)))
     }
-  }
-
-  fun addDeliveries(round : Round) {
-    val groupy = group{
-      circle {
-        centerX = round.warehouse.address.x / (plan.width * 1.0) * X_SIZE
-        centerY = round.warehouse.address.y / (plan.height * 1.0) * Y_SIZE
-        radius = SIZE
-        fill = Color.BROWN
-      }
-      round.deliveries().forEach {
-        val nodeX: Double = it.address.x / (plan.width * 1.0) * X_SIZE
-        val nodeY: Double = it.address.y / (plan.height * 1.0) * Y_SIZE
-        circle {
-          centerX = nodeX
-          centerY = nodeY
-          radius = SIZE
-          fill = Color.GREEN
-        }
-      }
-    }
-    this.stack.add(groupy)
   }
 
 }
