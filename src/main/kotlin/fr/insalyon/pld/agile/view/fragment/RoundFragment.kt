@@ -1,11 +1,7 @@
-package fr.insalyon.pld.agile.view.fragments
+package fr.insalyon.pld.agile.view.fragment
 
-import com.sun.org.apache.xalan.internal.lib.ExsltStrings.padding
 import fr.insalyon.pld.agile.model.Delivery
-import fr.insalyon.pld.agile.model.Duration
-import fr.insalyon.pld.agile.model.Instant
 import fr.insalyon.pld.agile.model.Round
-import javafx.geometry.Pos
 import javafx.scene.layout.BorderPane
 import javafx.scene.text.FontWeight
 import tornadofx.*
@@ -35,7 +31,7 @@ class RoundFragment : View() {
             }
         }
         for (i in round.deliveries().indices) {
-            label(""+(i+1)+". "+deliveryToText(round.deliveries().elementAt(i)))
+            label(""+(i+1)+" "+deliveryToText(round.deliveries().elementAt(i)))
         }
         label("")
         label("Warehouse") {
@@ -49,8 +45,6 @@ class RoundFragment : View() {
     init {
 
     }
-
-
 
     private fun deliveryToText(d: Delivery): String{
         var res = ""+d.address.id+" ( "+d.duration+" )"
