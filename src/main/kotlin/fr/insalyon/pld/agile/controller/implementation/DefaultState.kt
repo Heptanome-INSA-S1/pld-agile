@@ -24,12 +24,20 @@ abstract class DefaultState<in T> : State<T> {
     return fileChooser.showOpenDialog(null)
   }
 
+  override fun loadPlan(controller: Controller, file: File) {
+    fileLoadPlanImpl(controller, file)
+  }
+
   override fun loadPlan(controller: Controller) {
     defaultLoadPlanImpl(controller)
   }
 
   override fun loadRoundRequest(controller: Controller) {
     println("DefaultState action: Load round request was called")
+  }
+
+  override fun loadRoundRequest(controller: Controller, file: File) {
+    println("DefaultState action: Load round request was called with file")
   }
 
   override fun calculateRound(controller: Controller) {
@@ -66,10 +74,51 @@ abstract class DefaultState<in T> : State<T> {
     }
   }
 
+  protected fun fileLoadPlanImpl(controller: Controller, sourceFile: File) {
+    val validator: XmlValidatorImpl = XmlValidatorImpl()
+    val xsdFile = getResource(MAP_XSD)
+
+    if (!sourceFile.exists()) throw FileNotFoundException("The file ${sourceFile.name} was not found")
+    if (sourceFile.extension != "xml") throw InvalidFormatException("The file ${sourceFile.name} is not a xml file")
+    if (!validator.isValid(sourceFile, xsdFile)) throw InvalidFormatException("The file ${sourceFile.name} does not match the valid pattern")
+
+    val xmlDocument = XmlDocument.open(sourceFile)
+    val intersectionSerializer = IntersectionSerializer(xmlDocument)
+    val junctionSerializer = JunctionSerializer(xmlDocument)
+    val planSerializer = PlanSerializer(xmlDocument, intersectionSerializer, junctionSerializer)
+
+    try {
+      val plan = planSerializer.unserialize(xmlDocument.documentElement)
+      controller.changeStateAndInit(controller.LOADED_PLAN_STATE, plan)
+    } catch (e: Exception) {
+      controller.manageException(RuntimeException("Something went wrong during plan parsing"))
+    }
+  }
+
   protected fun defaultLoadRoundRequestImpl(controller: Controller) {
     val validator: XmlValidatorImpl = XmlValidatorImpl()
     val xsdFile = getResource(Config.DELIVERY_PLANNING_XSD)
     val file = openXmlFileFromDialog() ?: return
+
+    if (file.extension != "xml") throw InvalidFormatException("The file ${file.name} is not a xml file")
+    if (!validator.isValid(file, xsdFile)) throw InvalidFormatException("The file ${file.name} does not match the valid pattern")
+
+    val xmlDocument = XmlDocument.open(file)
+    val deliverySerializer = DeliverySerializer(xmlDocument,controller.plan!!)
+    val warehouseSerializer = WarehouseSerializer(xmlDocument, controller.plan!!)
+    val roundRequestSerializer = RoundRequestSerializer(xmlDocument, deliverySerializer, warehouseSerializer)
+
+    try {
+      val roundRequest = roundRequestSerializer.unserialize(xmlDocument.documentElement)
+      controller.changeStateAndInit(controller.LOADED_DELIVERIES_STATE, roundRequest)
+    } catch (e: Exception) {
+      controller.manageException(RuntimeException("Something went wrong during round request parsing"))
+    }
+  }
+
+  protected fun fileLoadRoundRequestImpl(controller: Controller, file: File) {
+    val validator: XmlValidatorImpl = XmlValidatorImpl()
+    val xsdFile = getResource(Config.DELIVERY_PLANNING_XSD)
 
     if (file.extension != "xml") throw InvalidFormatException("The file ${file.name} is not a xml file")
     if (!validator.isValid(file, xsdFile)) throw InvalidFormatException("The file ${file.name} does not match the valid pattern")

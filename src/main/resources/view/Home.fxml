@@ -25,12 +25,12 @@
         </GridPane>
     </top>
     <center>
-        <VBox alignment="CENTER" spacing="10">
+        <VBox alignment="CENTER" spacing="10" fx:id="centerBox">
             <Button text="Charger map" fx:id="loadPlanButton"/>
         </VBox>
     </center>
     <right>
-        <VBox alignment="CENTER" minWidth="300" maxWidth="300" spacing="10">
+        <VBox alignment="CENTER" minWidth="300" maxWidth="300" spacing="10" fx:id="rightBox">
             <Button text="Charger round request" fx:id="loadRoundRequestButton"/>
         </VBox>
     </right>

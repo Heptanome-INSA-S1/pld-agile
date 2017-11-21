@@ -70,8 +70,8 @@ class Round(
       var currentHour = warehouse.departureHour
 
       for(i: Int in _deliveries.indices) {
-        val destination = deliveryIterator.next()!!
-        val path = pathIterator.next()!!
+        val destination = deliveryIterator.next()
+        val path = pathIterator.next()
 
         if(previousDelivery != null) {
           duration += previousDelivery.duration
@@ -89,7 +89,7 @@ class Round(
 
       }
 
-      val pathToWarehouse = pathIterator.next()!!
+      val pathToWarehouse = pathIterator.next()
       duration += previousDelivery!!.duration
       duration += pathToWarehouse.length.seconds
 
