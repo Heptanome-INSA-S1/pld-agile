@@ -1,9 +1,6 @@
 package fr.insalyon.pld.agile.util.xml.serialization.implementation
 
-import fr.insalyon.pld.agile.model.Instant
-import fr.insalyon.pld.agile.model.Intersection
-import fr.insalyon.pld.agile.model.Warehouse
-import fr.insalyon.pld.agile.model.XmlConfig
+import fr.insalyon.pld.agile.model.*
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.w3c.dom.Element
@@ -14,10 +11,13 @@ import javax.xml.parsers.DocumentBuilderFactory
 class WarehouseSerializerTest {
 
   private val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
-  private val warehouseSerializer: WarehouseSerializer = WarehouseSerializer(document, mapOf(
-      10L to Intersection(10L, 4, 8),
-      12L to Intersection(12L, 9, 10)
-  ))
+
+    private val plan = Plan(
+            setOf(Intersection(10L, 4, 8), Intersection(12L, 9, 10)),
+            setOf()
+    )
+
+  private val warehouseSerializer: WarehouseSerializer = WarehouseSerializer(document, plan)
 
   private val serialiser: LSSerializer by lazy {
     val lsImpl: DOMImplementationLS = document.implementation.getFeature("LS", "3.0") as DOMImplementationLS
@@ -29,7 +29,7 @@ class WarehouseSerializerTest {
   @Test
   fun testSerialize() {
 
-    val warehouse: Warehouse = Warehouse(
+    val warehouse = Warehouse(
       Intersection(10, 4, 20),
       Instant(10, 14, 47)
     )

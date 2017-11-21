@@ -1,5 +1,8 @@
 package fr.insalyon.pld.agile.model
 
+/**
+ * An intersection on the map
+ */
 data class Intersection(
     val id: Long,
     val x: Int = 0,

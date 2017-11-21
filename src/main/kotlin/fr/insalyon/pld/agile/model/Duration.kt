@@ -1,10 +1,16 @@
 package fr.insalyon.pld.agile.model
 
+import fr.insalyon.pld.agile.lib.graph.model.Measurable
+
+/**
+ * A duration between two events
+ */
 class Duration private constructor(
     private val _seconds: Int = 0
-) : Comparable<Duration> {
+) : Comparable<Measurable>, Measurable {
 
-  operator override fun compareTo(other: Duration): Int = toSeconds().compareTo(other.toSeconds())
+  override val length: Int
+    get() = _seconds
 
   constructor(hour: Int = 0, minutes: Int = 0, seconds: Int = 0): this(hour * 3600 + minutes * 60 + seconds)
 
@@ -30,9 +36,6 @@ class Duration private constructor(
   }
 
   override fun hashCode(): Int = _seconds.hashCode()
-
-
-
 
 }
 

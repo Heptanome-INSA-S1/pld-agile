@@ -2,6 +2,11 @@ package fr.insalyon.pld.agile.model
 
 import fr.insalyon.pld.agile.lib.graph.model.Graph
 
+/**
+ * A plan
+ * The width will be the maximum x position minus the minimum x position
+ * The height will be the maximum y position minus the minimum y position
+ */
 class Plan(
     intersections: Set<Intersection>,
     junctions: Set<Triple<Intersection, Junction, Intersection>>
