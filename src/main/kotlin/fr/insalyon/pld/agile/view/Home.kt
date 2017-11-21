@@ -7,6 +7,8 @@ import fr.insalyon.pld.agile.view.fragment.RoundFragment
 import javafx.scene.control.Button
 import javafx.scene.control.MenuItem
 import javafx.scene.layout.BorderPane
+import javafx.scene.layout.VBox
+import javafx.scene.paint.Color
 import tornadofx.*
 
 /**
@@ -18,6 +20,7 @@ class Home : View() {
   private val loadRoundRequestButton: Button by fxid()
   private val loadPlanMenuItem: MenuItem by fxid()
   private val loadRoundRequestMenuItem: MenuItem by fxid()
+  private val centerBox: VBox by fxid()
 
   val controller: Controller = fr.insalyon.pld.agile.controller.implementation.Controller(this)
 
@@ -50,11 +53,17 @@ class Home : View() {
       add(PlanFragment::class, mapOf(
           PlanFragment::parentView to this,
           PlanFragment::plan to controller.plan))
+      style{
+        backgroundColor += Color.GRAY
+      }
     }
+
   }
 
   private fun roundView() {
     root.center {
+      centerBox.style {
+        backgroundColor += Color.GRAY }
       add(PlanFragment::class, mapOf(
           PlanFragment::parentView to this,
           PlanFragment::round to controller.round,

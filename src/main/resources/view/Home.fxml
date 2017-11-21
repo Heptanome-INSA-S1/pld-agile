@@ -25,7 +25,7 @@
         </GridPane>
     </top>
     <center>
-        <VBox alignment="CENTER" spacing="10">
+        <VBox alignment="CENTER" spacing="10" fx:id="centerBox">
             <Button text="Charger map" fx:id="loadPlanButton"/>
         </VBox>
     </center>

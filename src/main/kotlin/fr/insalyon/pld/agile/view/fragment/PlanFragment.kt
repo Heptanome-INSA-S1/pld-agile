@@ -27,16 +27,18 @@ class PlanFragment : Fragment(){
       val nodeX: Double = (it.element.x / (plan.width * 1.0) * MAP_SIZE)
       val nodeY: Double = (it.element.y / (plan.height * 1.0) * MAP_SIZE)
       circle {
-        centerX = nodeX
-        centerY = nodeY
+        centerX = nodeY
+        centerY = nodeX
         radius = SIZE
+        fill = Color.WHITE
       }
       plan.outEdges[it.index].forEach {
         val ligne = line {
-          startX = nodeX
-          startY = nodeY
-          endX = (it.to.element.x / (plan.width * 1.0) * MAP_SIZE)
-          endY = (it.to.element.y / (plan.height * 1.0) * MAP_SIZE)
+          startX = nodeY
+          startY = nodeX
+          endY = (it.to.element.x / (plan.width * 1.0) * MAP_SIZE)
+          endX = (it.to.element.y / (plan.height * 1.0) * MAP_SIZE)
+          stroke = Color.WHITE
         }
       }
     }
@@ -45,8 +47,8 @@ class PlanFragment : Fragment(){
     if(round!=null){
       val notNullRound = round!!
       circle {
-        centerX = notNullRound.warehouse.address.x / (plan.width * 1.0) * MAP_SIZE
-        centerY = notNullRound.warehouse.address.y / (plan.height * 1.0) * MAP_SIZE
+        centerX = notNullRound.warehouse.address.y / (plan.height * 1.0) * MAP_SIZE
+        centerY = notNullRound.warehouse.address.x / (plan.width * 1.0) * MAP_SIZE
         radius = SIZE * 5
         fill = Color.BROWN
       }
@@ -54,8 +56,8 @@ class PlanFragment : Fragment(){
         val nodeX: Double = it.address.x / (plan.width * 1.0) * MAP_SIZE
         val nodeY: Double = it.address.y / (plan.height * 1.0) * MAP_SIZE
         circle {
-          centerX = nodeX
-          centerY = nodeY
+          centerX = nodeY
+          centerY = nodeX
           radius = SIZE * 5
           fill = Color.GREEN
         }
@@ -76,10 +78,10 @@ class PlanFragment : Fragment(){
             toX = nodeX
             toY = nodeY
             line {
-              startX = fromX
-              startY = fromY
-              endX = toX
-              endY = toY
+              startY = fromX
+              startX = fromY
+              endY = toX
+              endX = toY
               stroke = Color.ORANGE
             }
           } else {
@@ -93,6 +95,9 @@ class PlanFragment : Fragment(){
   }
 
   override val root = stackpane {
+    style {
+      backgroundColor += Color.GRAY
+    }
     scrollpane {
       add(shapeGroup)
 
