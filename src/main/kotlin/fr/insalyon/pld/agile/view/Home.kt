@@ -2,7 +2,7 @@ package fr.insalyon.pld.agile.view
 
 
 import fr.insalyon.pld.agile.controller.implementation.Controller
-import fr.insalyon.pld.agile.view.fragments.PlanFragment
+import fr.insalyon.pld.agile.view.fragment.PlanFragment
 import javafx.scene.control.Button
 import javafx.scene.control.MenuItem
 import javafx.scene.layout.BorderPane
