@@ -94,6 +94,8 @@ class PlanFragment : Fragment(){
 
   override val root = stackpane {
     scrollpane {
+
+      style = "-fx-background: #000000;"
       add(shapeGroup)
 
       shortcut("Ctrl+UP",{
