@@ -11,10 +11,12 @@ import javax.xml.parsers.DocumentBuilderFactory
 class DeliverySerializerTest {
 
   private val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
-  private val deliverySerializer: DeliverySerializer = DeliverySerializer(document, mapOf(
-      10L to Intersection(10L, 4, 8),
-      12L to Intersection(12L, 9, 10)
-  ))
+
+    private val plan = Plan(
+            setOf(Intersection(10L, 4, 8), Intersection(12L, 9, 10)),
+            setOf()
+    )
+  private val deliverySerializer: DeliverySerializer = DeliverySerializer(document, plan)
 
   private val serialiser: LSSerializer by lazy {
     val lsImpl: DOMImplementationLS = document.implementation.getFeature("LS", "3.0") as DOMImplementationLS
@@ -30,8 +32,8 @@ class DeliverySerializerTest {
     val deliveryAsString = "<livraison adresse=\"194605312\" debutPlage=\"10:0:0\" duree=\"900\" finPlage=\"12:0:0\"/>"
     val delivery = Delivery(
         Intersection(194605312L, 10, 15),
-        10 H 0 M 0,
-        12 H 0 M 0,
+        10 h 0 m 0,
+        12 h 0 m 0,
         900.seconds
     )
     val deliveryAsElement = deliverySerializer.serialize(delivery)
@@ -50,7 +52,7 @@ class DeliverySerializerTest {
 
     val delivery = deliverySerializer.unserialize(deliveryAsElement)
 
-    assertEquals(10 H 8 M 3, delivery.startTime)
+    assertEquals(10 h 8 m 3, delivery.startTime)
     assertNull(delivery.endTime)
     assertEquals(400.seconds, delivery.duration)
 
