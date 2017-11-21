@@ -96,7 +96,6 @@ class PlanFragment : Fragment(){
       }
     }
   }
-
   val scroll = scrollpane {
       hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
       vbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
