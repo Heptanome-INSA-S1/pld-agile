@@ -3,6 +3,7 @@ package fr.insalyon.pld.agile.view
 
 import fr.insalyon.pld.agile.controller.implementation.Controller
 import fr.insalyon.pld.agile.view.fragments.PlanFragment
+import fr.insalyon.pld.agile.view.fragments.RoundFragment
 import javafx.scene.control.Button
 import javafx.scene.control.MenuItem
 import javafx.scene.layout.BorderPane
@@ -15,10 +16,10 @@ import tornadofx.*
 class Home : View() {
   override val root: BorderPane by fxml("/view/Home.fxml")
   // Map the current view to resources/view/Home.fxml
-  val loadPlanButton: Button by fxid()
-  val loadPlanMenuItem: MenuItem by fxid()
-  val loadRoundRequestMenuItem: MenuItem by fxid()
-  val centerVBox: VBox by fxid()
+  private val loadPlanButton: Button by fxid()
+  private val loadRoundRequestButton: Button by fxid()
+  private val loadPlanMenuItem: MenuItem by fxid()
+  private val loadRoundRequestMenuItem: MenuItem by fxid()
 
   val controller: Controller = fr.insalyon.pld.agile.controller.implementation.Controller(this)
 
@@ -33,12 +34,20 @@ class Home : View() {
       planView()
     }
 
+    loadRoundRequestButton.setOnAction {
+      controller.loadRoundRequest()
+      controller.calculateRound()
+      roundView()
+    }
+
     loadRoundRequestMenuItem.setOnAction {
       controller.loadRoundRequest()
+      controller.calculateRound()
+      roundView()
     }
   }
 
-  fun planView() {
+  private fun planView() {
     root.center {
       add(PlanFragment::class, mapOf(
           PlanFragment::parentView to this,
@@ -46,6 +55,13 @@ class Home : View() {
       //replaceWith(find<PlanFragment>(PlanFragment::class, plan))
       //centerVBox.replaceWith(find<PlanFragment>(mapOf(PlanFragment::plan to plan)))
     }
-    println(root.center)
+  }
+
+  private fun roundView() {
+    root.right {
+      add(RoundFragment::class, mapOf(
+              RoundFragment::parentView to this,
+              RoundFragment::round to controller.round))
+    }
   }
 }
