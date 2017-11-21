@@ -58,6 +58,12 @@ class Home : View() {
   }
 
   private fun roundView() {
+    root.center {
+      add(PlanFragment::class, mapOf(
+          PlanFragment::parentView to this,
+          PlanFragment::round to controller.round,
+          PlanFragment::plan to controller.plan))
+    }
     root.right {
       add(RoundFragment::class, mapOf(
               RoundFragment::parentView to this,
