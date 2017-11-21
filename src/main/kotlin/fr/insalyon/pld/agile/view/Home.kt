@@ -46,5 +46,6 @@ class Home : View() {
       //replaceWith(find<PlanFragment>(PlanFragment::class, plan))
       //centerVBox.replaceWith(find<PlanFragment>(mapOf(PlanFragment::plan to plan)))
     }
+    println(root.center)
   }
 }

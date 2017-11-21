@@ -15,7 +15,7 @@ class PlanFragment : Fragment() {
 
   private val stack = stackpane {
     scrollpane {
-      group {
+      val group = group {
         plan.nodes.forEach {
           val nodeX: Double = it.element.x / (plan.width * 1.0) * X_SIZE
           val nodeY: Double = it.element.y / (plan.height * 1.0) * Y_SIZE
@@ -23,8 +23,6 @@ class PlanFragment : Fragment() {
             centerX = nodeX
             centerY = nodeY
             radius = SIZE
-            if (it.element.id == 1L)
-              fill = Color.RED
           }
           plan.outEdges[it.index].forEach {
             line {
