@@ -51,8 +51,8 @@ class RoundComputerImplTest {
     val round = roundComputer.round
 
     assertEquals(source, round.warehouse.address)
-    assertEquals(node4, round.deliveries.first().address)
-    assertEquals(node5, round.deliveries.last().address)
+    assertEquals(node4, round.deliveries().first().address)
+    assertEquals(node5, round.deliveries().last().address)
 
   }
 

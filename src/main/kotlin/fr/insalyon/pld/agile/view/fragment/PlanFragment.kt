@@ -1,7 +1,9 @@
 package fr.insalyon.pld.agile.view.fragment
 import fr.insalyon.pld.agile.model.Plan
+import fr.insalyon.pld.agile.model.Round
 
 import javafx.scene.layout.BorderPane
+import javafx.scene.paint.Color
 import tornadofx.*
 
 const val UP : Int = 0
@@ -12,6 +14,7 @@ const val LEFT : Int = 3
 class PlanFragment : Fragment(){
   val parentView: BorderPane by param()
   val plan: Plan by param()
+  val round: Round? by param()
 
   val MAP_SIZE: Double by param(800.0)
 
@@ -34,6 +37,62 @@ class PlanFragment : Fragment(){
           startY = nodeY
           endX = (it.to.element.x / (plan.width * 1.0) * MAP_SIZE)
           endY = (it.to.element.y / (plan.height * 1.0) * MAP_SIZE)
+        }
+      }
+    }
+
+
+    if(round!=null){
+      val notNullRound = round!!
+      circle {
+        centerX = notNullRound.warehouse.address.x / (plan.width * 1.0) * MAP_SIZE
+        centerY = notNullRound.warehouse.address.y / (plan.height * 1.0) * MAP_SIZE
+        radius = SIZE * 5
+        fill = Color.BROWN
+      }
+      notNullRound.deliveries().forEach {
+        val nodeX: Double = it.address.x / (plan.width * 1.0) * MAP_SIZE
+        val nodeY: Double = it.address.y / (plan.height * 1.0) * MAP_SIZE
+        circle {
+          centerX = nodeX
+          centerY = nodeY
+          radius = SIZE * 5
+          fill = Color.GREEN
+        }
+      }
+      notNullRound.path().forEach{
+
+        var fromX: Double = 0.0
+        var fromY: Double = 0.0
+        var toX: Double = 0.0
+        var toY: Double = 0.0
+        var index: Int = 0
+        it.nodes.forEach{
+          val nodeX: Double = it.x / (plan.width * 1.0) * MAP_SIZE
+          val nodeY: Double = it.y / (plan.height * 1.0) * MAP_SIZE
+          circle {
+            centerX = nodeX
+            centerY = nodeY
+            radius = SIZE * 3
+            fill = Color.YELLOW
+          }
+          if(index>0){
+            fromX = toX
+            fromY = toY
+            toX = nodeX
+            toY = nodeY
+            line {
+              startX = fromX
+              startY = fromY
+              endX = toX
+              endY = toY
+              stroke = Color.ORANGE
+            }
+          } else {
+            toX = nodeX
+            toY = nodeY
+          }
+          index++
         }
       }
     }
@@ -80,16 +139,16 @@ class PlanFragment : Fragment(){
   fun move(direction: Int){
       when(direction){
         UP -> {
-            shapeGroup.translateY -= OFFSET_SIZE
-        }
-        RIGHT -> {
-            shapeGroup.translateX += OFFSET_SIZE
-        }
-        DOWN -> {
             shapeGroup.translateY += OFFSET_SIZE
         }
-        LEFT -> {
+        RIGHT -> {
             shapeGroup.translateX -= OFFSET_SIZE
+        }
+        DOWN -> {
+            shapeGroup.translateY -= OFFSET_SIZE
+        }
+        LEFT -> {
+            shapeGroup.translateX += OFFSET_SIZE
         }
       }
   }

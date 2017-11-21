@@ -15,16 +15,21 @@ class Round(
 ) : Observable(), Measurable{
 
   private val _deliveries: MutableList<Delivery> = deliveries.toMutableList()
-  val deliveries: LinkedHashSet<Delivery> = _deliveries.toLinkedHashSet()
+  fun deliveries(): LinkedHashSet<Delivery> = _deliveries.toLinkedHashSet()
 
   private val _path: MutableList<Path<Intersection, Junction>> = path.toMutableList()
-  val path: LinkedHashSet<Path<Intersection, Junction>> = _path.toLinkedHashSet()
+  fun path(): LinkedHashSet<Path<Intersection, Junction>> = _path.toLinkedHashSet()
 
   fun addDelivery(subPath: SubPath) {
 
-    val deliveryBefore = _deliveries.first { it.address == subPath.pathFromPreviousDelivery.nodes.first() }
-
-    val index = _deliveries.addAfter(deliveryBefore, subPath.delivery)
+    val index: Int
+    if(warehouse.address == subPath.pathFromPreviousDelivery.nodes.first()) {
+      index = 0
+      _deliveries.add(0, subPath.delivery)
+    } else {
+      val deliveryBefore = _deliveries.first { it.address == subPath.pathFromPreviousDelivery.nodes.first() }
+      index = _deliveries.addAfter(deliveryBefore, subPath.delivery)
+    }
     _path.add(index, subPath.pathToNextDelivery)
     _path.add(index, subPath.pathFromPreviousDelivery)
 
