@@ -70,12 +70,6 @@ class PlanFragment : Fragment(){
         it.nodes.forEach{
           val nodeX: Double = it.x / (plan.width * 1.0) * MAP_SIZE
           val nodeY: Double = it.y / (plan.height * 1.0) * MAP_SIZE
-          circle {
-            centerX = nodeX
-            centerY = nodeY
-            radius = SIZE * 3
-            fill = Color.YELLOW
-          }
           if(index>0){
             fromX = toX
             fromY = toY
