@@ -8,9 +8,10 @@ class ErrorState : DefaultState<Pair<Exception, State<Nothing>>>(){
   var previousState: State<Nothing> = this
 
   override fun init(controller: Controller, element: Pair<Exception, State<Nothing>>) {
+    println("Etat actuelle = ERROR_STATE")
     val exception = element.first
     previousState = element.second
-   // controller.window.counter.value = "Error: ${exception.message}"
+    controller.window.errorPopUp(exception.message)
   }
 
   override fun loadPlan(controller: Controller) {
@@ -31,6 +32,7 @@ class ErrorState : DefaultState<Pair<Exception, State<Nothing>>>(){
 
   override fun ok(controller: Controller) {
    // controller.window.counter.value = ""
+    println("Ok was call from ERROR_STATE")
     controller.changeState(previousState)
   }
 

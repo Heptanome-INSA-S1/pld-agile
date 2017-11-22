@@ -2,6 +2,7 @@ package fr.insalyon.pld.agile.view.fragment
 
 import fr.insalyon.pld.agile.model.Delivery
 import fr.insalyon.pld.agile.model.Round
+import javafx.geometry.Pos
 import javafx.scene.layout.BorderPane
 import javafx.scene.text.FontWeight
 import tornadofx.*
