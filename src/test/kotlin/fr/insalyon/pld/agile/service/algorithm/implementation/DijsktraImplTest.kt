@@ -53,6 +53,10 @@ class DijsktraImplTest {
         Intersection(id = 6)
     ), pathTo6)
 
+    val path = dijkstra.getShortestPath(Intersection(id = 6))
+    assertEquals(3, path.edges.size)
+    assertEquals(4, path.edges.sumBy { it.length })
+
   }
 
 }

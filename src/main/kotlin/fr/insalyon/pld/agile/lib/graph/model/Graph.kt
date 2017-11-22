@@ -75,6 +75,8 @@ open class Graph<N, out E : Measurable>(
 
   fun inEdgesOf(node: N): List<Edge<N, E>> = inEdges[nodes.first { it.element == node }.index]
 
+  fun edgeBetween(from: N, to: N): Edge<N, E>? = outEdges[nodes.first { it.element == from }.index].find { it.to.element == to }
+
   override fun toString(): String = "Graph(nodes=$nodes, internalOutEdges=$internalOutEdges)"
 
 }
