@@ -8,6 +8,8 @@ class LoadedDeliveriesState : DefaultState<RoundRequest>() {
   override fun init(controller: Controller, element: RoundRequest) {
     println("Round request was well loaded")
     controller.roundRequest = element
+    calculateRound(controller)
+    controller.window.roundView()
   }
 
   override fun loadRoundRequest(controller: Controller) {

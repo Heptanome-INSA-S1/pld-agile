@@ -8,10 +8,7 @@ import javafx.scene.control.Button
 import javafx.scene.control.MenuItem
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.VBox
-import javafx.scene.paint.Color
 import tornadofx.*
-import java.io.File
-import javafx.scene.input.Dragboard
 import javafx.scene.input.TransferMode
 
 
@@ -34,7 +31,7 @@ class Home : View() {
     root.setOnDragOver { event ->
       val db = event.dragboard
       if (db.hasFiles() && db.files.size == 1) {
-        event.acceptTransferModes(TransferMode.COPY)
+        event.acceptTransferModes(TransferMode.MOVE)
       } else {
         event.consume()
       }
@@ -46,7 +43,6 @@ class Home : View() {
       if (db.hasFiles()) {
         success = true
         controller.loadPlan(db.files[0])
-        planView()
       }
       event.isDropCompleted = success
       event.consume()
@@ -58,8 +54,6 @@ class Home : View() {
       if (db.hasFiles()) {
         success = true
         controller.loadRoundRequest(db.files[0])
-        controller.calculateRound()
-        roundView()
       }
       event.isDropCompleted = success
       event.consume()
@@ -75,12 +69,10 @@ class Home : View() {
 
     loadRoundRequestButton.setOnAction {
       controller.loadRoundRequest()
-      controller.calculateRound()
     }
 
     loadRoundRequestMenuItem.setOnAction {
       controller.loadRoundRequest()
-      controller.calculateRound()
     }
   }
 
@@ -90,7 +82,7 @@ class Home : View() {
         PlanFragment::parentView to this,
         PlanFragment::plan to controller.plan))
     rightBox.clear()
-    rightBox.add(loadPlanButton)
+    rightBox.add(loadRoundRequestButton)
   }
 
   fun roundView() {
