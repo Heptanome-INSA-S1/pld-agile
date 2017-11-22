@@ -49,6 +49,7 @@ class Controller(val window: Home) {
   fun loadRoundRequest() {
     try {
       currentState.loadRoundRequest(this)
+      calculateRound()
     } catch (e: Exception) {
       e.catchWithErrorState()
     }
@@ -57,6 +58,7 @@ class Controller(val window: Home) {
   fun loadRoundRequest(file: File) {
     try {
       currentState.loadRoundRequest(this, file)
+      calculateRound()
     } catch (e: Exception) {
       e.catchWithErrorState()
     }
