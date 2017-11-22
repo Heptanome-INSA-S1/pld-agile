@@ -8,6 +8,7 @@ class LoadedPlanState : DefaultState<Plan>(){
   override fun init(controller: Controller, element: Plan) {
     println("The plan has been well loaded")
     controller.plan = element
+    controller.window.planView()
   }
 
   override fun loadRoundRequest(controller: Controller) {

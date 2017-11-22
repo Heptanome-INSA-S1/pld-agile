@@ -10,6 +10,7 @@ class CalculatedRoundState : DefaultState<Round>(), State<Round> {
     println("Round was well calculated")
     controller.round = element
     println(controller.round)
+    controller.window.roundView()
   }
 
   override fun loadRoundRequest(controller: Controller) {

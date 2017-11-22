@@ -67,41 +67,33 @@ class Home : View() {
 
     loadPlanButton.setOnAction {
       controller.loadPlan()
-      planView()
     }
 
     loadPlanMenuItem.setOnAction {
       controller.loadPlan()
-      planView()
     }
 
     loadRoundRequestButton.setOnAction {
       controller.loadRoundRequest()
       controller.calculateRound()
-      roundView()
     }
 
     loadRoundRequestMenuItem.setOnAction {
       controller.loadRoundRequest()
       controller.calculateRound()
-      roundView()
     }
   }
 
-  private fun planView() {
+  fun planView() {
     centerBox.clear()
     centerBox.add(PlanFragment::class, mapOf(
         PlanFragment::parentView to this,
         PlanFragment::plan to controller.plan))
-    /*root.center {
-      add(PlanFragment::class, mapOf(
-          PlanFragment::parentView to this,
-          PlanFragment::plan to controller.plan))
-    }*/
-
+    rightBox.clear()
+    rightBox.add(loadPlanButton)
   }
 
-  private fun roundView() {
+  fun roundView() {
     centerBox.clear()
     centerBox.add(PlanFragment::class, mapOf(
           PlanFragment::parentView to this,
