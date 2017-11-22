@@ -17,6 +17,11 @@ import java.io.FileNotFoundException
 
 abstract class DefaultState<in T> : State<T> {
 
+  override fun init(controller: Controller, element: T) {
+    println("Etat actuelle = DEFAULT_STATE")
+    super.init(controller, element)
+  }
+
   protected fun openXmlFileFromDialog(): File? {
     val fileChooser = FileChooser()
     fileChooser.title = "XML Plan"

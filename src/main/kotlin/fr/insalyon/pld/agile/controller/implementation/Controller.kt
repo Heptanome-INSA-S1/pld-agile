@@ -85,8 +85,9 @@ class Controller(val window: Home) {
   }
 
   private fun Exception.catchWithErrorState() {
-    ERROR_STATE.init(this@Controller, Pair(this, currentState))
+    val previousState = currentState
     currentState = ERROR_STATE
+    ERROR_STATE.init(this@Controller, Pair(this, previousState))
   }
 
   fun manageException(e: Exception) {

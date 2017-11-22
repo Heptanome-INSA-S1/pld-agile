@@ -10,6 +10,10 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.layout.VBox
 import tornadofx.*
 import javafx.scene.input.TransferMode
+import javafx.scene.control.Alert.AlertType
+import javafx.scene.control.Alert
+import javafx.scene.control.ButtonType
+import javafx.stage.Modality
 
 
 /**
@@ -96,5 +100,19 @@ class Home : View() {
     rightBox.add(RoundFragment::class, mapOf(
               RoundFragment::parentView to this,
               RoundFragment::round to controller.round))
+  }
+
+  fun errorPopUp(message : String?) {
+    val alert = Alert(AlertType.ERROR)
+    alert.title = "Erreur"
+    alert.headerText = "Une erreur est survenu :"
+    alert.contentText = message
+    alert.initOwner(this.currentWindow)
+    alert.initModality(Modality.APPLICATION_MODAL)
+
+    alert.showAndWait()
+    if (alert.getResult() == ButtonType.OK){
+      controller.ok()
+    }
   }
 }
