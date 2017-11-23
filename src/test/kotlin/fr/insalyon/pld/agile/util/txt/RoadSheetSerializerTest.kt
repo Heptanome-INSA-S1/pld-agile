@@ -58,8 +58,8 @@ class RoadSheetSerializerTest(){
                 deliveries
         )
 
-        val round: Round = RoundComputerImpl(plan, roundRequest).round
-        assert(round.deliveries.size==2)
+        val round: Round = RoundComputerImpl(plan, roundRequest,15.km_h).round
+        assert(round.deliveries().size==2)
 
         RoadSheetSerializer().serialize(round)
     }

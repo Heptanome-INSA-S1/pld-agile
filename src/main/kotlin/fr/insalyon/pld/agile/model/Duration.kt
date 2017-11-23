@@ -47,11 +47,11 @@ class Duration private constructor(
     secondes = secondes - minutes*60
     var res = ""
     if(hours!=0)
-      res += ""+ hours + "h"
+      res += ""+ hours + " h"
     if(minutes!=0)
-      res += ""+ minutes + "m"
+      res += ""+ minutes + " min"
     if(secondes!=0)
-      res += ""+ secondes + "s"
+      res += ""+ secondes + " s"
     return res
   }
 
