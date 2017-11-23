@@ -11,7 +11,17 @@ import fr.insalyon.pld.agile.service.roundcomputing.implementation.RoundComputer
 import fr.insalyon.pld.agile.util.xml.XmlDocument
 import fr.insalyon.pld.agile.util.xml.serialization.implementation.*
 import fr.insalyon.pld.agile.util.xml.validator.implementation.XmlValidatorImpl
+import javafx.geometry.Pos
+import javafx.scene.Group
+import javafx.scene.Scene
+import javafx.scene.control.Label
+import javafx.scene.control.ProgressBar
+import javafx.scene.control.ProgressIndicator
+import javafx.scene.layout.HBox
 import javafx.stage.FileChooser
+import javafx.stage.Stage
+import tornadofx.*
+import java.awt.Dialog
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -80,6 +90,7 @@ abstract class DefaultState<in T> : State<T> {
   }
 
   protected fun fileLoadPlanImpl(controller: Controller, sourceFile: File) {
+
     val validator: XmlValidatorImpl = XmlValidatorImpl()
     val xsdFile = getResource(MAP_XSD)
 
@@ -97,6 +108,8 @@ abstract class DefaultState<in T> : State<T> {
       controller.changeStateAndInit(controller.LOADED_PLAN_STATE, plan)
     } catch (e: Exception) {
       controller.manageException(RuntimeException("Something went wrong during plan parsing"))
+    } finally {
+      //dialog.close()
     }
   }
 
