@@ -6,6 +6,7 @@ import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.model.RoundRequest
 import fr.insalyon.pld.agile.view.Home
+import java.io.File
 
 class Controller(val window: Home) {
 
@@ -30,6 +31,13 @@ class Controller(val window: Home) {
 
   private var currentState: State<Nothing> = INIT_STATE
 
+  fun loadPlan(file: File){
+    try {
+      currentState.loadPlan(this, file)
+    } catch (e: Exception) {
+      e.catchWithErrorState()
+    }
+  }
   fun loadPlan() {
     try {
       currentState.loadPlan(this)
@@ -41,6 +49,16 @@ class Controller(val window: Home) {
   fun loadRoundRequest() {
     try {
       currentState.loadRoundRequest(this)
+      calculateRound()
+    } catch (e: Exception) {
+      e.catchWithErrorState()
+    }
+  }
+
+  fun loadRoundRequest(file: File) {
+    try {
+      currentState.loadRoundRequest(this, file)
+      calculateRound()
     } catch (e: Exception) {
       e.catchWithErrorState()
     }
@@ -67,8 +85,9 @@ class Controller(val window: Home) {
   }
 
   private fun Exception.catchWithErrorState() {
-    ERROR_STATE.init(this@Controller, Pair(this, currentState))
+    val previousState = currentState
     currentState = ERROR_STATE
+    ERROR_STATE.init(this@Controller, Pair(this, previousState))
   }
 
   fun manageException(e: Exception) {

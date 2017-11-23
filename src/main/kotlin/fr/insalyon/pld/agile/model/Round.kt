@@ -15,21 +15,33 @@ class Round(
 ) : Observable(), Measurable{
 
   private val _deliveries: MutableList<Delivery> = deliveries.toMutableList()
-  val deliveries: LinkedHashSet<Delivery> = _deliveries.toLinkedHashSet()
+  fun deliveries(): LinkedHashSet<Delivery> = _deliveries.toLinkedHashSet()
 
   private val _path: MutableList<Path<Intersection, Junction>> = path.toMutableList()
-  val path: LinkedHashSet<Path<Intersection, Junction>> = _path.toLinkedHashSet()
+  fun path(): LinkedHashSet<Path<Intersection, Junction>> = _path.toLinkedHashSet()
 
   fun addDelivery(subPath: SubPath) {
 
-    val deliveryBefore = _deliveries.first { it.address == subPath.pathFromPreviousDelivery.nodes.first() }
-
-    val index = _deliveries.addAfter(deliveryBefore, subPath.delivery)
+    val index: Int
+    if(warehouse.address == subPath.pathFromPreviousDelivery.nodes.first()) {
+      index = 0
+      _deliveries.add(0, subPath.delivery)
+    } else {
+      val deliveryBefore = _deliveries.first { it.address == subPath.pathFromPreviousDelivery.nodes.first() }
+      index = _deliveries.addAfter(deliveryBefore, subPath.delivery)
+    }
     _path.add(index, subPath.pathToNextDelivery)
     _path.add(index, subPath.pathFromPreviousDelivery)
 
     setChanged()
     notifyObservers()
+  }
+
+  fun modify(delivery: Delivery, startTime: Instant?, endTime: Instant?, duration: Duration) {
+    val newDelivery = delivery.copy(startTime = startTime, endTime = endTime, duration = duration)
+    val index = _deliveries.indexOf(delivery)
+    _deliveries.removeAt(index)
+    _deliveries.add(index, newDelivery)
   }
 
   fun removeDelivery(delivery: Delivery, pathToReplaceWith: Path<Intersection, Junction>) {
@@ -58,8 +70,8 @@ class Round(
       var currentHour = warehouse.departureHour
 
       for(i: Int in _deliveries.indices) {
-        val destination = deliveryIterator.next()!!
-        val path = pathIterator.next()!!
+        val destination = deliveryIterator.next()
+        val path = pathIterator.next()
 
         if(previousDelivery != null) {
           duration += previousDelivery.duration
@@ -77,7 +89,7 @@ class Round(
 
       }
 
-      val pathToWarehouse = pathIterator.next()!!
+      val pathToWarehouse = pathIterator.next()
       duration += previousDelivery!!.duration
       duration += pathToWarehouse.length.seconds
 
