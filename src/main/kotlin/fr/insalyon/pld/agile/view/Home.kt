@@ -4,15 +4,14 @@ package fr.insalyon.pld.agile.view
 import fr.insalyon.pld.agile.controller.implementation.Controller
 import fr.insalyon.pld.agile.view.fragment.PlanFragment
 import fr.insalyon.pld.agile.view.fragment.RoundFragment
-import javafx.scene.control.Button
-import javafx.scene.control.MenuItem
+import javafx.scene.Node
+import javafx.scene.control.*
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.VBox
 import tornadofx.*
 import javafx.scene.input.TransferMode
 import javafx.scene.control.Alert.AlertType
-import javafx.scene.control.Alert
-import javafx.scene.control.ButtonType
+import javafx.scene.layout.Pane
 import javafx.stage.Modality
 
 
@@ -114,5 +113,15 @@ class Home : View() {
     if (alert.getResult() == ButtonType.OK){
       controller.ok()
     }
+  }
+
+  fun loadingPlan(){
+    centerBox.clear()
+    centerBox.add(ProgressIndicator())
+  }
+
+  fun loadingRound(){
+    rightBox.clear()
+    rightBox.add(ProgressIndicator())
   }
 }
