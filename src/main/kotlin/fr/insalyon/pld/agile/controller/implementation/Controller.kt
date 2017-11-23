@@ -49,6 +49,7 @@ class Controller(val window: Home) {
   fun loadRoundRequest() {
     try {
       currentState.loadRoundRequest(this)
+      calculateRound()
     } catch (e: Exception) {
       e.catchWithErrorState()
     }
@@ -57,6 +58,7 @@ class Controller(val window: Home) {
   fun loadRoundRequest(file: File) {
     try {
       currentState.loadRoundRequest(this, file)
+      calculateRound()
     } catch (e: Exception) {
       e.catchWithErrorState()
     }
@@ -83,8 +85,9 @@ class Controller(val window: Home) {
   }
 
   private fun Exception.catchWithErrorState() {
-    ERROR_STATE.init(this@Controller, Pair(this, currentState))
+    val previousState = currentState
     currentState = ERROR_STATE
+    ERROR_STATE.init(this@Controller, Pair(this, previousState))
   }
 
   fun manageException(e: Exception) {

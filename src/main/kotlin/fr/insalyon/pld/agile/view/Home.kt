@@ -8,11 +8,12 @@ import javafx.scene.control.Button
 import javafx.scene.control.MenuItem
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.VBox
-import javafx.scene.paint.Color
 import tornadofx.*
-import java.io.File
-import javafx.scene.input.Dragboard
 import javafx.scene.input.TransferMode
+import javafx.scene.control.Alert.AlertType
+import javafx.scene.control.Alert
+import javafx.scene.control.ButtonType
+import javafx.stage.Modality
 
 
 /**
@@ -34,7 +35,7 @@ class Home : View() {
     root.setOnDragOver { event ->
       val db = event.dragboard
       if (db.hasFiles() && db.files.size == 1) {
-        event.acceptTransferModes(TransferMode.COPY)
+        event.acceptTransferModes(TransferMode.MOVE)
       } else {
         event.consume()
       }
@@ -46,7 +47,6 @@ class Home : View() {
       if (db.hasFiles()) {
         success = true
         controller.loadPlan(db.files[0])
-        planView()
       }
       event.isDropCompleted = success
       event.consume()
@@ -58,8 +58,6 @@ class Home : View() {
       if (db.hasFiles()) {
         success = true
         controller.loadRoundRequest(db.files[0])
-        controller.calculateRound()
-        roundView()
       }
       event.isDropCompleted = success
       event.consume()
@@ -67,41 +65,31 @@ class Home : View() {
 
     loadPlanButton.setOnAction {
       controller.loadPlan()
-      planView()
     }
 
     loadPlanMenuItem.setOnAction {
       controller.loadPlan()
-      planView()
     }
 
     loadRoundRequestButton.setOnAction {
       controller.loadRoundRequest()
-      controller.calculateRound()
-      roundView()
     }
 
     loadRoundRequestMenuItem.setOnAction {
       controller.loadRoundRequest()
-      controller.calculateRound()
-      roundView()
     }
   }
 
-  private fun planView() {
+  fun planView() {
     centerBox.clear()
     centerBox.add(PlanFragment::class, mapOf(
         PlanFragment::parentView to this,
         PlanFragment::plan to controller.plan))
-    /*root.center {
-      add(PlanFragment::class, mapOf(
-          PlanFragment::parentView to this,
-          PlanFragment::plan to controller.plan))
-    }*/
-
+    rightBox.clear()
+    rightBox.add(loadRoundRequestButton)
   }
 
-  private fun roundView() {
+  fun roundView() {
     centerBox.clear()
     centerBox.add(PlanFragment::class, mapOf(
           PlanFragment::parentView to this,
@@ -112,5 +100,19 @@ class Home : View() {
     rightBox.add(RoundFragment::class, mapOf(
               RoundFragment::parentView to this,
               RoundFragment::round to controller.round))
+  }
+
+  fun errorPopUp(message : String?) {
+    val alert = Alert(AlertType.ERROR)
+    alert.title = "Erreur"
+    alert.headerText = "Une erreur est survenu :"
+    alert.contentText = message
+    alert.initOwner(this.currentWindow)
+    alert.initModality(Modality.APPLICATION_MODAL)
+
+    alert.showAndWait()
+    if (alert.getResult() == ButtonType.OK){
+      controller.ok()
+    }
   }
 }

@@ -4,6 +4,7 @@ import fr.insalyon.pld.agile.model.Delivery
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
+import javafx.geometry.Pos
 import javafx.scene.layout.BorderPane
 import javafx.scene.text.FontWeight
 import tornadofx.*
