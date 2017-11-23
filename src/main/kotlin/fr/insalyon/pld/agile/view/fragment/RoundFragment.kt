@@ -1,7 +1,9 @@
 package fr.insalyon.pld.agile.view.fragment
 
 import fr.insalyon.pld.agile.model.Delivery
+import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
+import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import javafx.geometry.Pos
 import javafx.scene.layout.BorderPane
 import javafx.scene.text.FontWeight
@@ -23,7 +25,20 @@ class RoundFragment : View() {
                 fontWeight = FontWeight.BOLD
             }
         }
-        label(""+round.warehouse.address.id+" : "+ round.warehouse.departureHour.toBeautifulString())
+        hbox {
+            paddingTop=2
+            label ("1. "){
+                paddingTop=4
+            }
+            button(""+round.warehouse.address.id){
+                action{
+                    fire(HighlightLocationEvent(""+round.warehouse.address.id,true))
+                }
+            }
+            label (" : "+ round.warehouse.departureHour.toBeautifulString()){
+                paddingTop=4
+            }
+        }
         label("")
         label("Deliveries") {
             paddingLeft=30.0
@@ -32,7 +47,20 @@ class RoundFragment : View() {
             }
         }
         for (i in round.deliveries().indices) {
-            label(""+(i+1)+" "+deliveryToText(round.deliveries().elementAt(i)))
+            hbox {round.deliveries().elementAt(i).address.id
+                paddingTop=2
+                label (""+(i+2)+". "){
+                    paddingTop=4
+                }
+                button(""+round.deliveries().elementAt(i).address.id){
+                    action{
+                        fire(HighlightLocationEvent(""+round.deliveries().elementAt(i).address.id,false))
+                    }
+                }
+                label (deliveryToText(round.deliveries().elementAt(i))){
+                    paddingTop=4
+                }
+            }
         }
         label("")
         label("Warehouse") {
@@ -41,14 +69,24 @@ class RoundFragment : View() {
                 fontWeight = FontWeight.BOLD
             }
         }
-        label(""+round.warehouse.address.id)
+        hbox {
+            paddingTop=2
+            label (""+(round.deliveries().size+2)+". "){
+                paddingTop=4
+            }
+            button(""+round.warehouse.address.id){
+                action{
+                    fire(HighlightLocationEvent(""+round.warehouse.address.id,true))
+                }
+            }
+        }
     }
     init {
 
     }
 
     private fun deliveryToText(d: Delivery): String{
-        var res = ""+d.address.id+" ( "+d.duration+" )"
+        var res = " ( "+d.duration+" )"
         if(d.startTime !=null && d.endTime !=null) {
             res += " : " + d.startTime.toBeautifulString() + "-"+ d.endTime.toBeautifulString()
         }
