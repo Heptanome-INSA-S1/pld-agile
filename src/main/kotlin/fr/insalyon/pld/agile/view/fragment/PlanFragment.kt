@@ -1,6 +1,7 @@
 package fr.insalyon.pld.agile.view.fragment
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
+import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import javafx.scene.control.ScrollPane
 
 import javafx.scene.layout.BorderPane
@@ -54,6 +55,8 @@ class PlanFragment : Fragment(){
         centerY = notNullRound.warehouse.address.x / (plan.width * 1.0) * MAP_SIZE *-1.0
         radius = SIZE * 5
         fill = Color.BROWN
+        id = ""+notNullRound.warehouse.address.id
+
       }
       notNullRound.deliveries().forEach {
         val nodeX: Double = it.address.x / (plan.width * 1.0) * MAP_SIZE
@@ -63,15 +66,16 @@ class PlanFragment : Fragment(){
           centerY = nodeX*-1.0
           radius = SIZE * 5
           fill = Color.GREEN
+          id = ""+it.address.id
         }
       }
       notNullRound.path().forEach{
 
         var fromX: Double
         var fromY: Double
-        var toX: Double = 0.0
-        var toY: Double = 0.0
-        var index: Int = 0
+        var toX = 0.0
+        var toY = 0.0
+        var index = 0
         it.nodes.forEach{
           val nodeX: Double = it.x / (plan.width * 1.0) * MAP_SIZE
           val nodeY: Double = it.y / (plan.height * 1.0) * MAP_SIZE
@@ -183,5 +187,42 @@ class PlanFragment : Fragment(){
     println(" S_X : " + shapeGroup.scaleX)
     println(" S_Y : " + shapeGroup.scaleY)
   }
+
+    init {
+        subscribe<HighlightLocationEvent> {
+            event -> highlightLocation(event.id,event.isWarehouse)
+        }
+    }
+
+
+    var idHighlight: String? =null
+    var colorHighlight:Color =Color.GREEN
+
+    private fun highlightLocation(id:String, isWarehouse:Boolean){
+        println("highlight : "+id)
+        shapeGroup.children
+                .filter { it.id!=null && it.id.equals(id) }
+                .forEach {
+                    colorHighlight= if(isWarehouse) Color.GREEN else Color.RED
+                    it.scaleX = 3.0
+                    it.scaleY = 3.0
+                    it.style {
+                        fill = Color.CYAN
+                    }
+                }
+        if(idHighlight!=null) {
+            println("lowlight : "+idHighlight)
+            shapeGroup.children
+                    .filter { it.id!=null && it.id.equals(idHighlight) }
+                    .forEach {
+                        it.scaleX = 1.0
+                        it.scaleY = 1.0
+                        it.style {
+                            fill = colorHighlight
+                        }
+                    }
+        }
+        idHighlight=id
+    }
 
 }
