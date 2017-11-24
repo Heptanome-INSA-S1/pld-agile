@@ -56,28 +56,6 @@ class PlanFragment : Fragment(){
 
     if(round!=null){
       val notNullRound = round!!
-      val (warehouseXPos, warehouseYPos) = transform(notNullRound.warehouse.address.x, notNullRound.warehouse.address.y)
-      circle {
-        centerX = warehouseXPos
-        centerY = warehouseYPos
-        radius = SIZE * 5
-        fill = Color.BROWN
-        id = notNullRound.warehouse.address.id.toString()
-        onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTCORAL)) }
-        setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
-      }
-      notNullRound.deliveries().forEach {
-        val (nodeX, nodeY) = transform(it.address.x, it.address.y)
-        circle {
-          centerX = nodeX
-          centerY = nodeY
-          radius = SIZE * 5
-          fill = Color.GREEN
-          id = it.address.id.toString()
-          onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
-          setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
-        }
-      }
 
       notNullRound.path().forEach{
         var fromX: Double
@@ -104,6 +82,29 @@ class PlanFragment : Fragment(){
             toY = nodeY
           }
           index++
+        }
+      }
+
+      val (warehouseXPos, warehouseYPos) = transform(notNullRound.warehouse.address.x, notNullRound.warehouse.address.y)
+      circle {
+        centerX = warehouseXPos
+        centerY = warehouseYPos
+        radius = SIZE * 5
+        fill = Color.BROWN
+        id = notNullRound.warehouse.address.id.toString()
+        onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTCORAL)) }
+        setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
+      }
+      notNullRound.deliveries().forEach {
+        val (nodeX, nodeY) = transform(it.address.x, it.address.y)
+        circle {
+          centerX = nodeX
+          centerY = nodeY
+          radius = SIZE * 5
+          fill = Color.GREEN
+          id = it.address.id.toString()
+          onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
+          setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
         }
       }
     }
