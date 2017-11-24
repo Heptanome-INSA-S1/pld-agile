@@ -18,7 +18,7 @@ import java.io.FileNotFoundException
 abstract class DefaultState<in T> : State<T> {
 
   override fun init(controller: Controller, element: T) {
-    println("Etat actuelle = DEFAULT_STATE")
+    println("Etat actuel = DEFAULT_STATE")
     super.init(controller, element)
   }
 

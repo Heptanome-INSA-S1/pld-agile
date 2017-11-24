@@ -91,14 +91,14 @@ class Instant private constructor(
     if(alwaysAfter) return "FUTURE"
     return "$hour:$minutes:$seconds"
   }
-   fun toBeautifulString(): String {
+   fun toFormattedString(): String {
       return if(seconds==0)
         if(minutes==0)
-          "" + hour + "h"
+          "$hour h"
         else
-          "" + hour + "h"+ minutes + "m"
+          "$hour h $minutes m"
       else
-        "" + hour + "h"+ minutes + "m" + seconds + "s"
+        "$hour h $minutes m $seconds s"
   }
 
 
