@@ -2,6 +2,7 @@ package fr.insalyon.pld.agile.view.fragment
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
+import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
 import javafx.scene.control.ScrollPane
 
 import javafx.scene.layout.BorderPane
@@ -53,10 +54,11 @@ class PlanFragment : Fragment(){
       circle {
         centerX = notNullRound.warehouse.address.y / (plan.height * 1.0) * MAP_SIZE
         centerY = notNullRound.warehouse.address.x / (plan.width * 1.0) * MAP_SIZE *-1.0
-        radius = SIZE * 5
+        radius = SIZE * 7
         fill = Color.BROWN
         id = ""+notNullRound.warehouse.address.id
-
+        onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
+        setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
       }
       notNullRound.deliveries().forEach {
         val nodeX: Double = it.address.x / (plan.width * 1.0) * MAP_SIZE
@@ -64,9 +66,11 @@ class PlanFragment : Fragment(){
         circle {
           centerX = nodeY
           centerY = nodeX*-1.0
-          radius = SIZE * 5
+          radius = SIZE * 7
           fill = Color.GREEN
           id = ""+it.address.id
+          onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
+          setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
         }
       }
       notNullRound.path().forEach{
@@ -203,7 +207,6 @@ class PlanFragment : Fragment(){
         shapeGroup.children
                 .filter { it.id!=null && it.id.equals(id) }
                 .forEach {
-                    colorHighlight= if(isWarehouse) Color.GREEN else Color.RED
                     it.scaleX = 3.0
                     it.scaleY = 3.0
                     it.style {
@@ -223,6 +226,7 @@ class PlanFragment : Fragment(){
                     }
         }
         idHighlight=id
+        colorHighlight= if(isWarehouse) Color.RED else Color.GREEN
     }
 
 }
