@@ -57,7 +57,7 @@ class PlanFragment : Fragment(){
         radius = SIZE * 7
         fill = Color.BROWN
         id = ""+notNullRound.warehouse.address.id
-        onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
+        onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTCORAL)) }
         setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
       }
       notNullRound.deliveries().forEach {
@@ -204,15 +204,16 @@ class PlanFragment : Fragment(){
 
     private fun highlightLocation(id:String, isWarehouse:Boolean){
         println("highlight : "+id)
-        shapeGroup.children
-                .filter { it.id!=null && it.id.equals(id) }
-                .forEach {
-                    it.scaleX = 3.0
-                    it.scaleY = 3.0
-                    it.style {
-                        fill = Color.CYAN
+        if(idHighlight!=id)
+            shapeGroup.children
+                    .filter { it.id!=null && it.id.equals(id) }
+                    .forEach {
+                        it.scaleX = 3.0
+                        it.scaleY = 3.0
+                        it.style {
+                            fill = Color.CYAN
+                        }
                     }
-                }
         if(idHighlight!=null) {
             println("lowlight : "+idHighlight)
             shapeGroup.children
@@ -225,8 +226,12 @@ class PlanFragment : Fragment(){
                         }
                     }
         }
-        idHighlight=id
-        colorHighlight= if(isWarehouse) Color.RED else Color.GREEN
+        if(idHighlight!=id) {
+            idHighlight = id
+            colorHighlight = if (isWarehouse) Color.RED else Color.GREEN
+        }else{
+            idHighlight=null
+        }
     }
 
 }

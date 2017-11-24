@@ -15,9 +15,8 @@ class RoundFragment : View() {
     val parentView: BorderPane by param()
     val round: Round by param()
 
-    override val root = vbox {
+    val list = vbox {
         vboxConstraints {
-            paddingTop=60.0
             paddingLeft=30.0
             minWidth=250.0
         }
@@ -96,6 +95,10 @@ class RoundFragment : View() {
         }
     }
 
+    override val root = scrollpane {
+        add(list)
+    }
+
     private fun deliveryToText(d: Delivery): String{
         var res = " ( "+d.duration+" )"
         if(d.startTime !=null && d.endTime !=null) {
@@ -111,7 +114,7 @@ class RoundFragment : View() {
     }
 
     private fun highlightLocation(id:String,color:Color){
-        root.children
+        list.children
                 .filter { it is HBox }
                 .forEach {
                     it.getChildList()!!
