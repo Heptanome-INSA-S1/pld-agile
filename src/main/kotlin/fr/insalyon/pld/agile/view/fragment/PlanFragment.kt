@@ -235,7 +235,7 @@ class PlanFragment : Fragment(){
         }
         if(idHighlight!=id) {
             idHighlight = id
-            colorHighlight = if (isWarehouse) Color.RED else Color.GREEN
+            colorHighlight = if (isWarehouse) Color.BROWN else Color.GREEN
         }else{
             idHighlight=null
         }
