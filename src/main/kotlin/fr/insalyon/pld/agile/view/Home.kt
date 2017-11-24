@@ -27,7 +27,7 @@ class Home : View() {
   private val centerBox: VBox by fxid()
   private val rightBox: VBox by fxid()
 
-  val controller: Controller = fr.insalyon.pld.agile.controller.implementation.Controller(this)
+  val controller: Controller = Controller(this)
 
   init {
 
