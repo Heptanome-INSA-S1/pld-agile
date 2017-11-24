@@ -23,7 +23,7 @@ class RoundComputerImpl(
     val speed: Speed
 ) : RoundComputer {
 
-  private fun getSubPlan(): Graph<Intersection, Path<Intersection, Junction>> {
+  fun getSubPlan(): Graph<Intersection, Path<Intersection, Junction>> {
     val nodes = mutableSetOf<Intersection>()
     val roads = mutableSetOf<Triple<Intersection, Path<Intersection, Junction>, Intersection>>()
 
@@ -46,62 +46,50 @@ class RoundComputerImpl(
     val tsp: TSP = TSP1()
     val subPlan = getSubPlan()
     tsp.findSolution(
-        1000,
+        10_000,
         roundRequest.intersections.size,
         subPlan.adjacencyMatrix.map { row -> row.map { it -> it * speedInDamSeconds.value }.toIntArray() }.toTypedArray(),
         roundRequest.durations.map { it.toSeconds() }.toIntArray()
     )
 
-
-
-    val intersections = mutableListOf<Intersection>()
-    for(i: Int in roundRequest.intersections.indices) {
-      val currentNode = tsp.getBestSolution(i)
-      intersections += roundRequest.intersections[currentNode]
-    }
-
-    val linkedSetOfDeliveries = linkedSetOf<Delivery>()
-    val linkedSetOfPaths = linkedSetOf<Path<Intersection, Junction>>()
-
-    fun addPath(from: Int, to: Int) {
-      linkedSetOfPaths.add(
-          subPlan.outEdgesOf(intersections[from])
-              .first { it.to.element == intersections[to] }
-              .element
-      )
-    }
-
-    fun addDelivery(delivery: Int) {
-      linkedSetOfDeliveries.add(
-          roundRequest.deliveries.first { it.address == intersections[delivery] }
-      )
-    }
-
-    linkedSetOfPaths.add(
-        subPlan
-            .outEdgesOf(roundRequest.warehouse.address)
-            .first{ it.to.element == intersections[1]}
-            .element
-    )
-
-    for(i in 1 until intersections.size - 1) {
-      addDelivery(i)
-      addPath(i, i + 1)
-    }
-
-    linkedSetOfDeliveries.add(
-        roundRequest.deliveries.first { it.address == intersections.last() }
-    )
-
-    linkedSetOfPaths.add(
-        subPlan
-            .outEdgesOf(roundRequest.deliveries.first { it.address == intersections.last() }.address)
-            .first { it.to.element == roundRequest.warehouse.address }
-            .element
-    )
+    val intersections = buildIntersections(tsp)
+    val linkedSetOfDeliveries = buildDeliveries(intersections)
+    val linkedSetOfPaths = buildPath(intersections, subPlan)
 
     return Round(roundRequest.warehouse, linkedSetOfDeliveries, linkedSetOfPaths)
 
+  }
+
+  private fun buildIntersections(tsp: TSP): List<Intersection> {
+    val result = mutableListOf<Intersection>()
+    roundRequest.intersections.indices
+        .map { index -> tsp.getBestSolution(index) }
+        .forEach { nodeIndex -> result += roundRequest.intersections[nodeIndex] }
+    return result
+  }
+
+  private fun buildDeliveries(intersections: List<Intersection>): LinkedHashSet<Delivery> {
+    return intersections.filterIndexed{ i, _ -> i != 0 }.map { intersection -> roundRequest.deliveries.first { it.address == intersection } }.toLinkedHashSet()
+  }
+
+  private fun buildPath(intersections: List<Intersection>, subPlan: Graph<Intersection, Path<Intersection, Junction>>): LinkedHashSet<Path<Intersection, Junction>> {
+    val result = LinkedHashSet<Path<Intersection, Junction>>()
+    result.add(subPlan.edgeBetween(roundRequest.warehouse.address, intersections[1])!!.element)
+
+    for(i in 1 until intersections.size - 1) {
+      result.add(
+          subPlan.edgeBetween(intersections[i], intersections[i+1])!!.element
+      )
+    }
+
+    result.add(subPlan.outEdgesOf(intersections.last()).find { it.to.element == roundRequest.warehouse.address }!!.element)
+    return result
+  }
+
+  fun <E> List<E>.toLinkedHashSet(): LinkedHashSet<E> {
+    val linkedHashSet = linkedSetOf<E>()
+    this.forEach { linkedHashSet.add(it) }
+    return linkedHashSet
   }
 
   override val round: Round

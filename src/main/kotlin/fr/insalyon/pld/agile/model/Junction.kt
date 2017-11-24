@@ -9,4 +9,8 @@ class Junction(
     override val length: Int,
     val name: String
 ) : Measurable {
+
+  override fun toString(): String {
+    return "Junction(length=$length, name='$name')"
+  }
 }

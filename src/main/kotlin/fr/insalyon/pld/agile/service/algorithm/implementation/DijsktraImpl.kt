@@ -7,15 +7,15 @@ import fr.insalyon.pld.agile.lib.graph.model.Path
 import fr.insalyon.pld.agile.service.algorithm.api.Dijkstra
 import java.util.*
 
-class DijsktraImpl<Node, out E : Measurable>(
-    private val graph: Graph<Node, E>,
-    override val source: Node,
-    visitor: ((Node) -> Unit)? = null
-) : Dijkstra<Node, E> {
+class DijsktraImpl<N, out E : Measurable>(
+    private val graph: Graph<N, E>,
+    override val source: N,
+    visitor: ((N) -> Unit)? = null
+) : Dijkstra<N, E> {
 
   private val internalSourceNode = graph.nodes.first { n -> n.element == source }
   private val parent = MutableList<Int?>(graph.nodes.size, { _ -> null })
-  private val parentEdge = MutableList<Edge<Node, E>?>(graph.nodes.size, { _ -> null })
+  private val parentEdge = MutableList<Edge<N, E>?>(graph.nodes.size, { _ -> null })
 
   init {
     if (visitor != null) {
@@ -62,7 +62,7 @@ class DijsktraImpl<Node, out E : Measurable>(
     }
   }
 
-  private fun computeWithVisitor(visitor: (Node) -> Unit) {
+  private fun computeWithVisitor(visitor: (N) -> Unit) {
     parent[internalSourceNode.index] = internalSourceNode.index
     parent[internalSourceNode.index] = null
 
@@ -101,13 +101,13 @@ class DijsktraImpl<Node, out E : Measurable>(
     }
   }
 
-  override fun getShortestPathNodes(destination: Node): List<Node> {
+  override fun getShortestPathNodes(destination: N): List<N> {
     val nodeIndex: Int = graph.nodes.find { n -> n.element == destination }!!.index
 
     var current: Int? = nodeIndex
     var previous: Int? = parent[nodeIndex]
 
-    val path = mutableListOf<Node>()
+    val path = mutableListOf<N>()
     while (previous != null && previous != current) {
 
       val p = graph.nodes[previous]
@@ -125,10 +125,10 @@ class DijsktraImpl<Node, out E : Measurable>(
 
   }
 
-  override fun getShortestPathEdges(destination: Node): List<E> {
+  override fun getShortestPathEdges(destination: N): List<E> {
     val nodeIndex: Int = graph.nodes.find { n -> n.element == destination }!!.index
 
-    var previous: Edge<Node, E>? = parentEdge[nodeIndex]
+    var previous: Edge<N, E>? = parentEdge[nodeIndex]
 
     val path = mutableListOf<E>()
     while (previous != null) {
@@ -142,7 +142,7 @@ class DijsktraImpl<Node, out E : Measurable>(
 
   }
 
-  override fun getShortestPath(destination: Node): Path<Node, E> {
+  override fun getShortestPath(destination: N): Path<N, E> {
     val nodes = getShortestPathNodes(destination)
     val edges = getShortestPathEdges(destination)
     return if (nodes.isEmpty()) Path.NO_WAY else Path(nodes, edges)
