@@ -13,7 +13,7 @@ import tornadofx.*
 
 class RoundFragment : Fragment() {
     val parentView: BorderPane by param()
-    val round: Round by param()
+    val round: Round? by param()
 
     val list = vbox {
         vboxConstraints {
@@ -34,13 +34,13 @@ class RoundFragment : Fragment() {
             button(""+round.warehouse.address.id){
                 id=""+round.warehouse.address.id
                 action{
-                    fire(HighlightLocationEvent(""+round.warehouse.address.id,true))
+                    fire(HighlightLocationEvent(""+round!!.warehouse.address.id,true))
                 }
                 style{
                     baseColor=Color.WHITE
                 }
             }
-            label (" : "+ round.warehouse.departureHour.toFormattedString()){
+            label (" : "+ round!!.warehouse.departureHour.toFormattedString()){
                 paddingTop=4
             }
         }
@@ -60,13 +60,13 @@ class RoundFragment : Fragment() {
                 button(""+round.deliveries().elementAt(i).address.id){
                     id = ""+round.deliveries().elementAt(i).address.id
                     action{
-                        fire(HighlightLocationEvent(""+round.deliveries().elementAt(i).address.id,false))
+                        fire(HighlightLocationEvent(""+round!!.deliveries().elementAt(i).address.id,false))
                     }
                     style{
                         baseColor=Color.WHITE
                     }
                 }
-                label (deliveryToText(round.deliveries().elementAt(i))){
+                label (deliveryToText(round!!.deliveries().elementAt(i))){
                     paddingTop=4
                 }
             }
@@ -86,7 +86,7 @@ class RoundFragment : Fragment() {
             button(""+round.warehouse.address.id){
                 id=""+round.warehouse.address.id
                 action{
-                    fire(HighlightLocationEvent(""+round.warehouse.address.id,true))
+                    fire(HighlightLocationEvent(""+round!!.warehouse.address.id,true))
                 }
                 style{
                     baseColor=Color.WHITE

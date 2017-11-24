@@ -94,11 +94,10 @@ class Home : View() {
           PlanFragment::parentView to this,
           PlanFragment::round to controller.round,
           PlanFragment::plan to controller.plan))
-
     rightBox.clear()
     rightBox.add(RoundFragment::class, mapOf(
-              RoundFragment::parentView to this,
-              RoundFragment::round to controller.round))
+        RoundFragment::parentView to this,
+        RoundFragment::round to controller.round))
   }
 
   fun errorPopUp(message : String?) {

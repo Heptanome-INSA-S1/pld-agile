@@ -215,10 +215,11 @@ class PlanFragment : Fragment(){
                         }
                     }
         if(idHighlight!=null) {
-            println("lowlight : "+idHighlight)
+            //println("lowlight : "+idHighlight)
             shapeGroup.children
                     .filter { it.id!=null && it.id.equals(idHighlight) }
                     .forEach {
+                      //colorHighlight= if(isWarehouse) Color.BROWN else Color.GREEN
                         it.scaleX = 1.0
                         it.scaleY = 1.0
                         it.style {
