@@ -6,17 +6,17 @@ package fr.insalyon.pld.agile.model
  * If the instant is before the current day it will be threaten as "PAST"
  */
 class Instant private constructor(
-    private val _seconds: Int = 0,
+    private val _seconds: Long = 0L,
     private val alwaysAfter: Boolean = false,
     private val alwaysBefore: Boolean = false
 ) : Comparable<Instant> {
 
   companion object {
-    private val SECONDS_PER_MINUTES = 60
-    private val SECONDS_PER_HOUR = 3600
-    private val SECONDS_PER_DAY = 86_000
-    val FUTURE = Instant(Int.MAX_VALUE, alwaysAfter = true)
-    val PAST = Instant(Int.MIN_VALUE, alwaysBefore = true)
+    private val SECONDS_PER_MINUTES = 60L
+    private val SECONDS_PER_HOUR = 3600L
+    private val SECONDS_PER_DAY = 86_000L
+    val FUTURE = Instant(Long.MAX_VALUE, alwaysAfter = true)
+    val PAST = Instant(Long.MAX_VALUE, alwaysBefore = true)
   }
 
   /**
@@ -34,7 +34,7 @@ class Instant private constructor(
    */
   val seconds by lazy { _seconds % SECONDS_PER_MINUTES }
 
-  constructor(hour: Int = 0, minutes: Int = 0, seconds: Int = 0): this(hour * SECONDS_PER_HOUR + minutes * SECONDS_PER_MINUTES + seconds, false, false)
+  constructor(hour: Int = 0, minutes: Int = 0, seconds: Int = 0): this(hour.toLong() * SECONDS_PER_HOUR + minutes.toLong() * SECONDS_PER_MINUTES + seconds.toLong(), false, false)
 
   override fun compareTo(other: Instant): Int {
     if(alwaysAfter && other.alwaysAfter) return 0
@@ -46,8 +46,8 @@ class Instant private constructor(
     return toSeconds().compareTo(other.toSeconds())
   }
 
-  private fun fromSeconds(seconds: Int): Instant {
-    if(seconds < 0) return PAST
+  private fun fromSeconds(seconds: Long): Instant {
+    if(seconds < 0L) return PAST
     if(seconds >= SECONDS_PER_DAY) return FUTURE
     return Instant(seconds, alwaysAfter, alwaysBefore)
   }
@@ -58,7 +58,7 @@ class Instant private constructor(
 
   operator fun minus(instant: Instant): Duration = (_seconds - instant._seconds).seconds
 
-  fun toSeconds(): Int = _seconds
+  fun toSeconds(): Long = _seconds
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -92,8 +92,8 @@ class Instant private constructor(
     return "$hour:$minutes:$seconds"
   }
    fun toFormattedString(): String {
-      return if(seconds==0)
-        if(minutes==0)
+      return if(seconds==0L)
+        if(minutes==0L)
           "$hour h"
         else
           "$hour h $minutes m"

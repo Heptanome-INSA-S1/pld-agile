@@ -59,7 +59,7 @@ class Round(
     notifyObservers()
   }
 
-  override val length: Int
+  override val length: Long
     get() {
       var duration = Duration()
 

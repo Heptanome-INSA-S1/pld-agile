@@ -15,7 +15,7 @@ public interface TSP {
    * @param coast         : coast[i][j] = duree pour aller de i a j, avec 0 <= i < numberOfNodes et 0 <= j < numberOfNodes
    * @param durations     : durations[i] = durations pour visiter le sommet i, avec 0 <= i < nbSommets
    */
-  void findSolution(int timeLimitInMs, int numberOfNodes, int[][] coast, int[] durations);
+  void findSolution(int timeLimitInMs, int numberOfNodes, long[][] coast, long[] durations);
 
   /**
    * @param i
@@ -26,5 +26,5 @@ public interface TSP {
   /**
    * @return la duree de la solution calculee par findSolution
    */
-  int getBestSolutionCoast();
+  long getBestSolutionCoast();
 }

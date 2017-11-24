@@ -26,6 +26,6 @@ data class Delivery(
      */
     val duration: Duration
 ) : Measurable {
-  override val length: Int
+  override val length: Long
     get() = duration.toSeconds()
 }
