@@ -8,7 +8,7 @@ class RoadSheetSerializer(){
     lateinit var roadSheet: File
 
     private fun append(text: String){
-        roadSheet.appendText(text )//printWriter().use { out -> out.println(text) }
+        roadSheet.appendText(text )
     }
 
     private fun getStartTime(sT: Instant?):String{
@@ -29,7 +29,6 @@ class RoadSheetSerializer(){
         var warehouseDescription: String = "You have to leave the warehouse (x:${round.warehouse.address.x}, y:${round.warehouse.address.y}) at ${round.warehouse.departureHour.toBeautifulString()} "
         append(warehouseDescription+"\r\n________________________________________________________________________\r\n")
 
-        //round.deliveries.forEach { d -> append("Delivery : x = ${d.address.x} y = ${d.address.y} Start Time = ${d.startTime} End Time = ${d.endTime} Duration = ${d.duration.length}") }
         var j=0
         for(i in 0 until round.deliveries().size){
             append("You have to : \n\n")
@@ -44,6 +43,6 @@ class RoadSheetSerializer(){
             append("\r\n________________________________________________________________________\r\n")
         }
         append("It's nearly finished, to come back at the warehouse : \n\n")
-        round.path().elementAt(j).edges.forEach { e -> append("\t|Take ${e.name} during ${e.length}\r\n")}
+        round.path().elementAt(j).edges.forEach { e -> append("\t|Take ${e.name} during e.length.dam.to(Distance.DistanceUnit.M).value} m\r\n")}
     }
 }
