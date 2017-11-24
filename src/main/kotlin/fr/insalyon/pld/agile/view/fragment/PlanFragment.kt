@@ -2,6 +2,7 @@ package fr.insalyon.pld.agile.view.fragment
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
+import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
 import javafx.scene.control.ScrollPane
 
 import javafx.scene.layout.BorderPane
@@ -62,7 +63,8 @@ class PlanFragment : Fragment(){
         radius = SIZE * 5
         fill = Color.BROWN
         id = notNullRound.warehouse.address.id.toString()
-
+        onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTCORAL)) }
+        setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
       }
       notNullRound.deliveries().forEach {
         val (nodeX, nodeY) = transform(it.address.x, it.address.y)
@@ -72,6 +74,8 @@ class PlanFragment : Fragment(){
           radius = SIZE * 5
           fill = Color.GREEN
           id = it.address.id.toString()
+          onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
+          setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
         }
       }
 
@@ -206,21 +210,22 @@ class PlanFragment : Fragment(){
 
     private fun highlightLocation(id:String, isWarehouse:Boolean){
         println("highlight : "+id)
-        shapeGroup.children
-                .filter { it.id!=null && it.id.equals(id) }
-                .forEach {
-                    colorHighlight= if(isWarehouse) Color.GREEN else Color.RED
-                    it.scaleX = 3.0
-                    it.scaleY = 3.0
-                    it.style {
-                        fill = Color.CYAN
+        if(idHighlight!=id)
+            shapeGroup.children
+                    .filter { it.id!=null && it.id.equals(id) }
+                    .forEach {
+                        it.scaleX = 3.0
+                        it.scaleY = 3.0
+                        it.style {
+                            fill = Color.CYAN
+                        }
                     }
-                }
         if(idHighlight!=null) {
-            println("lowlight : "+idHighlight)
+            //println("lowlight : "+idHighlight)
             shapeGroup.children
                     .filter { it.id!=null && it.id.equals(idHighlight) }
                     .forEach {
+                      //colorHighlight= if(isWarehouse) Color.BROWN else Color.GREEN
                         it.scaleX = 1.0
                         it.scaleY = 1.0
                         it.style {
@@ -228,7 +233,12 @@ class PlanFragment : Fragment(){
                         }
                     }
         }
-        idHighlight=id
+        if(idHighlight!=id) {
+            idHighlight = id
+            colorHighlight = if (isWarehouse) Color.RED else Color.GREEN
+        }else{
+            idHighlight=null
+        }
     }
 
 }

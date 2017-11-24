@@ -25,7 +25,7 @@ class Home : View() {
   private val centerBox: VBox by fxid()
   private val rightBox: VBox by fxid()
 
-  val controller: Controller = fr.insalyon.pld.agile.controller.implementation.Controller(this)
+  val controller: Controller = Controller(this)
 
   init {
 
@@ -89,18 +89,13 @@ class Home : View() {
   fun refreshRound() {
     centerBox.clear()
     centerBox.add(PlanFragment::class, mapOf(
-        PlanFragment::parentView to this,
-        PlanFragment::round to controller.round,
-        PlanFragment::plan to controller.plan
-    )
-    )
-
+          PlanFragment::parentView to this,
+          PlanFragment::round to controller.round,
+          PlanFragment::plan to controller.plan))
     rightBox.clear()
     rightBox.add(RoundFragment::class, mapOf(
         RoundFragment::parentView to this,
-        RoundFragment::round to controller.round
-    )
-    )
+        RoundFragment::round to controller.round))
   }
 
   fun errorPopUp(message: String?) {

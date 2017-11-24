@@ -7,7 +7,7 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.text.FontWeight
 import tornadofx.*
 
-class RoundFragment : View() {
+class RoundFragment : Fragment() {
   val parentView: BorderPane by param()
   val round: Round by param()
 
