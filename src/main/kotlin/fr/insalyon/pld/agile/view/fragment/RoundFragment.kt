@@ -31,8 +31,8 @@ class RoundFragment : Fragment() {
             label ("1.  "){
                 paddingTop=4
             }
-            button(""+round.warehouse.address.id){
-                id=""+round.warehouse.address.id
+            button(""+round!!.warehouse.address.id){
+                id=""+round!!.warehouse.address.id
                 action{
                     fire(HighlightLocationEvent(""+round!!.warehouse.address.id,true))
                 }
@@ -51,14 +51,14 @@ class RoundFragment : Fragment() {
                 fontWeight = FontWeight.BOLD
             }
         }
-        for (i in round.deliveries().indices) {
+        for (i in round!!.deliveries().indices) {
             hbox {
                 paddingTop=2
                 label ("${i+2}.${if(i+2<10) "  " else ""}"){
                     paddingTop=4
                 }
-                button(""+round.deliveries().elementAt(i).address.id){
-                    id = ""+round.deliveries().elementAt(i).address.id
+                button(""+round!!.deliveries().elementAt(i).address.id){
+                    id = ""+round!!.deliveries().elementAt(i).address.id
                     action{
                         fire(HighlightLocationEvent(""+round!!.deliveries().elementAt(i).address.id,false))
                     }
@@ -80,11 +80,11 @@ class RoundFragment : Fragment() {
         }
         hbox {
             paddingTop=2
-            label ("${round.deliveries().size+2}.${if(round.deliveries().size+2<10) "  " else ""}"){
+            label ("${round!!.deliveries().size+2}.${if(round!!.deliveries().size+2<10) "  " else ""}"){
                 paddingTop=4
             }
-            button(""+round.warehouse.address.id){
-                id=""+round.warehouse.address.id
+            button(""+round!!.warehouse.address.id){
+                id=""+round!!.warehouse.address.id
                 action{
                     fire(HighlightLocationEvent(""+round!!.warehouse.address.id,true))
                 }
