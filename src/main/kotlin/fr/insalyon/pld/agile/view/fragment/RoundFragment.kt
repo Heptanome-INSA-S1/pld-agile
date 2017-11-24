@@ -33,7 +33,7 @@ class RoundFragment : View() {
                     fire(HighlightLocationEvent(""+round.warehouse.address.id,true))
                 }
             }
-            label (" : "+ round.warehouse.departureHour.toBeautifulString()){
+            label (" : "+ round.warehouse.departureHour.toFormattedString()){
                 paddingTop=4
             }
         }
@@ -86,7 +86,7 @@ class RoundFragment : View() {
     private fun deliveryToText(d: Delivery): String{
         var res = " ( "+d.duration+" )"
         if(d.startTime !=null && d.endTime !=null) {
-            res += " : " + d.startTime.toBeautifulString() + "-"+ d.endTime.toBeautifulString()
+            res += " : " + d.startTime.toFormattedString() + "-"+ d.endTime.toFormattedString()
         }
         return res
     }
