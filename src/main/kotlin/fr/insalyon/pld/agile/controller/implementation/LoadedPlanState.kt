@@ -9,7 +9,7 @@ class LoadedPlanState : DefaultState<Plan>(){
     println("Etat actuel = LOADED_PLAN_STATE")
     println("The plan has been well loaded")
     controller.plan = element
-    controller.window.planView()
+    controller.window.refreshPlan()
   }
 
   override fun loadRoundRequest(controller: Controller) {

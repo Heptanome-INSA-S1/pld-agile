@@ -4,15 +4,13 @@ package fr.insalyon.pld.agile.view
 import fr.insalyon.pld.agile.controller.implementation.Controller
 import fr.insalyon.pld.agile.view.fragment.PlanFragment
 import fr.insalyon.pld.agile.view.fragment.RoundFragment
-import javafx.scene.Node
 import javafx.scene.control.*
+import javafx.scene.control.Alert.AlertType
+import javafx.scene.input.TransferMode
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.VBox
-import tornadofx.*
-import javafx.scene.input.TransferMode
-import javafx.scene.control.Alert.AlertType
-import javafx.scene.layout.Pane
 import javafx.stage.Modality
+import tornadofx.*
 
 
 /**
@@ -79,7 +77,7 @@ class Home : View() {
     }
   }
 
-  fun planView() {
+  fun refreshPlan() {
     centerBox.clear()
     centerBox.add(PlanFragment::class, mapOf(
         PlanFragment::parentView to this,
@@ -88,20 +86,24 @@ class Home : View() {
     rightBox.add(loadRoundRequestButton)
   }
 
-  fun roundView() {
+  fun refreshRound() {
     centerBox.clear()
     centerBox.add(PlanFragment::class, mapOf(
-          PlanFragment::parentView to this,
-          PlanFragment::round to controller.round,
-          PlanFragment::plan to controller.plan))
+        PlanFragment::parentView to this,
+        PlanFragment::round to controller.round,
+        PlanFragment::plan to controller.plan
+    )
+    )
 
     rightBox.clear()
     rightBox.add(RoundFragment::class, mapOf(
-              RoundFragment::parentView to this,
-              RoundFragment::round to controller.round))
+        RoundFragment::parentView to this,
+        RoundFragment::round to controller.round
+    )
+    )
   }
 
-  fun errorPopUp(message : String?) {
+  fun errorPopUp(message: String?) {
     val alert = Alert(AlertType.ERROR)
     alert.title = "Erreur"
     alert.headerText = "Une erreur est survenu :"
@@ -110,17 +112,17 @@ class Home : View() {
     alert.initModality(Modality.APPLICATION_MODAL)
 
     alert.showAndWait()
-    if (alert.getResult() == ButtonType.OK){
+    if (alert.result == ButtonType.OK) {
       controller.ok()
     }
   }
 
-  fun loadingPlan(){
+  fun loadingPlan() {
     centerBox.clear()
     centerBox.add(ProgressIndicator())
   }
 
-  fun loadingRound(){
+  fun loadingRound() {
     rightBox.clear()
     rightBox.add(ProgressIndicator())
   }
