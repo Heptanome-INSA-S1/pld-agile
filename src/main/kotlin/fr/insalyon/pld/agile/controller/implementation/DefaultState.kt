@@ -11,19 +11,10 @@ import fr.insalyon.pld.agile.service.roundcomputing.implementation.RoundComputer
 import fr.insalyon.pld.agile.util.xml.XmlDocument
 import fr.insalyon.pld.agile.util.xml.serialization.implementation.*
 import fr.insalyon.pld.agile.util.xml.validator.implementation.XmlValidatorImpl
-import javafx.geometry.Pos
-import javafx.scene.Group
-import javafx.scene.Scene
-import javafx.scene.control.Label
-import javafx.scene.control.ProgressBar
-import javafx.scene.control.ProgressIndicator
-import javafx.scene.layout.HBox
 import javafx.stage.FileChooser
-import javafx.stage.Stage
-import tornadofx.*
-import java.awt.Dialog
 import java.io.File
 import java.io.FileNotFoundException
+
 
 abstract class DefaultState<in T> : State<T> {
 
@@ -67,7 +58,7 @@ abstract class DefaultState<in T> : State<T> {
 
   override fun redo(controller: Controller, commands: List<Command>) {}
 
-  protected fun defaultLoadPlanImpl(controller: Controller) {
+  protected fun defaultLoadPlanImpl(controller: Controller){
     val validator: XmlValidatorImpl = XmlValidatorImpl()
     val xsdFile = getResource(MAP_XSD)
     val sourceFile = openXmlFileFromDialog() ?: return
@@ -83,6 +74,7 @@ abstract class DefaultState<in T> : State<T> {
     val planSerializer = PlanSerializer(xmlDocument, intersectionSerializer, junctionSerializer)
 
     try {
+
       val plan = planSerializer.unserialize(xmlDocument.documentElement)
       controller.changeStateAndInit(controller.LOADED_PLAN_STATE, plan)
     } catch (e: Exception) {
@@ -91,14 +83,12 @@ abstract class DefaultState<in T> : State<T> {
   }
 
   protected fun fileLoadPlanImpl(controller: Controller, sourceFile: File) {
-
     val validator: XmlValidatorImpl = XmlValidatorImpl()
     val xsdFile = getResource(MAP_XSD)
 
     if (!sourceFile.exists()) throw FileNotFoundException("The file ${sourceFile.name} was not found")
     if (sourceFile.extension != "xml") throw InvalidFormatException("The file ${sourceFile.name} is not a xml file")
     if (!validator.isValid(sourceFile, xsdFile)) throw InvalidFormatException("The file ${sourceFile.name} does not match the valid pattern")
-
     controller.window.loadingPlan()
 
     val xmlDocument = XmlDocument.open(sourceFile)
@@ -107,16 +97,18 @@ abstract class DefaultState<in T> : State<T> {
     val planSerializer = PlanSerializer(xmlDocument, intersectionSerializer, junctionSerializer)
 
     try {
-      val plan = planSerializer.unserialize(xmlDocument.documentElement)
-      controller.changeStateAndInit(controller.LOADED_PLAN_STATE, plan)
+        val plan = planSerializer.unserialize(xmlDocument.documentElement)
+        controller.changeStateAndInit(controller.LOADED_PLAN_STATE, plan)
+
     } catch (e: Exception) {
+      System.err.println(e.localizedMessage)
       controller.manageException(RuntimeException("Something went wrong during plan parsing"))
     } finally {
       //dialog.close()
     }
   }
 
-  protected fun defaultLoadRoundRequestImpl(controller: Controller) {
+  protected fun defaultLoadRoundRequestImpl(controller: Controller){
     val validator: XmlValidatorImpl = XmlValidatorImpl()
     val xsdFile = getResource(Config.DELIVERY_PLANNING_XSD)
     val file = openXmlFileFromDialog() ?: return
@@ -135,7 +127,8 @@ abstract class DefaultState<in T> : State<T> {
     try {
       val roundRequest = roundRequestSerializer.unserialize(xmlDocument.documentElement)
       controller.changeStateAndInit(controller.LOADED_DELIVERIES_STATE, roundRequest)
-    } catch (e: Exception) {
+    }
+    catch (e: Exception) {
       controller.manageException(RuntimeException("Something went wrong during round request parsing"))
     }
   }
@@ -148,15 +141,16 @@ abstract class DefaultState<in T> : State<T> {
     if (!validator.isValid(file, xsdFile)) throw InvalidFormatException("The file ${file.name} does not match the valid pattern")
 
     controller.window.loadingRound()
-
     val xmlDocument = XmlDocument.open(file)
     val deliverySerializer = DeliverySerializer(xmlDocument,controller.plan!!)
     val warehouseSerializer = WarehouseSerializer(xmlDocument, controller.plan!!)
     val roundRequestSerializer = RoundRequestSerializer(xmlDocument, deliverySerializer, warehouseSerializer)
 
     try {
+
       val roundRequest = roundRequestSerializer.unserialize(xmlDocument.documentElement)
       controller.changeStateAndInit(controller.LOADED_DELIVERIES_STATE, roundRequest)
+
     } catch (e: Exception) {
       controller.manageException(RuntimeException("Something went wrong during round request parsing"))
     }
