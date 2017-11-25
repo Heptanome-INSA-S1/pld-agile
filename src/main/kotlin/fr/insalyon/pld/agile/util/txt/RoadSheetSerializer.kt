@@ -26,7 +26,7 @@ class RoadSheetSerializer(){
         roadSheet = File(getResource("RoadSheet.txt").path)
 
         append("Beginning of the round ! \n")
-        var warehouseDescription: String = "You have to leave the warehouse (x:${round.warehouse.address.x}, y:${round.warehouse.address.y}) at ${round.warehouse.departureHour.toBeautifulString()} "
+        var warehouseDescription: String = "You have to leave the warehouse (x:${round.warehouse.address.x}, y:${round.warehouse.address.y}) at ${round.warehouse.departureHour.toFormattedString()} "
         append(warehouseDescription+"\r\n________________________________________________________________________\r\n")
 
         var j=0
