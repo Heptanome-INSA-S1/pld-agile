@@ -48,8 +48,8 @@ class RoundComputerImpl(
     tsp.findSolution(
         10_000,
         roundRequest.intersections.size,
-        subPlan.adjacencyMatrix.map { row -> row.map { it -> it * speedInDamSeconds.value }.toIntArray() }.toTypedArray(),
-        roundRequest.durations.map { it.toSeconds() }.toIntArray()
+        subPlan.adjacencyMatrix.map { row -> row.map { it -> it * speedInDamSeconds.value }.toLongArray() }.toTypedArray(),
+        roundRequest.durations.map { it.toSeconds() }.toLongArray()
     )
 
     val intersections = buildIntersections(tsp)

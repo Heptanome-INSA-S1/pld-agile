@@ -5,5 +5,5 @@ interface Kruskal {
   /**
    * Return the length of the minimum spanning tree
    */
-  fun getLength(): Int
+  fun getLength(): Long
 }

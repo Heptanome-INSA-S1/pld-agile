@@ -1,6 +1,7 @@
 package fr.insalyon.pld.agile.lib.graph.model
 
 import fr.insalyon.pld.agile.POSITIVE_INFINITY
+import fr.insalyon.pld.agile.sumLongBy
 
 /**
  * A path from the nodes nodes.first() to the nodes.nodes.last() using all the intermediate nodes
@@ -24,8 +25,8 @@ data class Path<out N, out E : Measurable>(
     }
   }
 
-  override val length: Int by lazy {
-    if (edges.isEmpty()) Int.POSITIVE_INFINITY else edges.sumBy { it.length }
+  override val length: Long by lazy {
+    if (edges.isEmpty()) Long.POSITIVE_INFINITY else edges.sumLongBy { it.length }
   }
 
   override fun toString(): String {

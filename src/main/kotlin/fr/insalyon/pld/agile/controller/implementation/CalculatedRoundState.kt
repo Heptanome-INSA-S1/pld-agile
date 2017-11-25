@@ -8,8 +8,7 @@ class CalculatedRoundState : DefaultState<Round>(), State<Round> {
 
   override fun init(controller: Controller, element: Round) {
     controller.round = element
-    println(controller.round)
-    controller.window.roundView()
+    controller.window.refreshRound()
   }
 
   override fun loadRoundRequest(controller: Controller) {
