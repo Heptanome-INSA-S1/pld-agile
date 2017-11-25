@@ -193,6 +193,13 @@ class PlanFragment : Fragment(){
       onMouseEntered = EventHandler {  mouseEvent ->
           cursor = Cursor.HAND
       }
+      onMouseClicked = EventHandler {  mouseEvent ->
+          if(mouseEvent.clickCount==2){
+              println(""+shapeGroup.translateX+" "+mouseEvent.sceneX)
+              shapeGroup.translateX += 400-mouseEvent.sceneX
+              shapeGroup.translateY += 400- mouseEvent.sceneY
+          }
+      }
       setOnKeyPressed { event ->
           println(event.character)
       }
