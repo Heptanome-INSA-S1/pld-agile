@@ -7,28 +7,13 @@ import fr.insalyon.pld.agile.Config.defaultSpeed
 import fr.insalyon.pld.agile.controller.api.Command
 import fr.insalyon.pld.agile.controller.api.State
 import fr.insalyon.pld.agile.getResource
-import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.service.roundcomputing.implementation.RoundComputerImpl
 import fr.insalyon.pld.agile.util.xml.XmlDocument
 import fr.insalyon.pld.agile.util.xml.serialization.implementation.*
 import fr.insalyon.pld.agile.util.xml.validator.implementation.XmlValidatorImpl
-import javafx.scene.Group
 import javafx.stage.FileChooser
-import kotlinx.coroutines.experimental.Deferred
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.runBlocking
-import tornadofx.*
 import java.io.File
 import java.io.FileNotFoundException
-import kotlin.concurrent.thread
-import javafx.scene.Scene
-import javafx.stage.Stage
-import com.sun.javafx.robot.impl.FXRobotHelper.getChildren
-import java.util.Collections.addAll
-import javafx.geometry.Pos
-import javafx.scene.control.ProgressIndicator
-import javafx.scene.layout.HBox
-import org.w3c.dom.Document
 
 
 abstract class DefaultState<in T> : State<T> {
@@ -97,7 +82,7 @@ abstract class DefaultState<in T> : State<T> {
     }
   }
 
-  protected fun fileLoadPlanImpl(controller: Controller, sourceFile: File){
+  protected fun fileLoadPlanImpl(controller: Controller, sourceFile: File) {
     val validator: XmlValidatorImpl = XmlValidatorImpl()
     val xsdFile = getResource(MAP_XSD)
 
@@ -118,6 +103,8 @@ abstract class DefaultState<in T> : State<T> {
     } catch (e: Exception) {
       System.err.println(e.localizedMessage)
       controller.manageException(RuntimeException("Something went wrong during plan parsing"))
+    } finally {
+      //dialog.close()
     }
   }
 
