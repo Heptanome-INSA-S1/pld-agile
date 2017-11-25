@@ -3,6 +3,7 @@ import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
+import javafx.geometry.Pos
 import javafx.scene.control.ScrollPane
 
 import javafx.scene.layout.BorderPane
@@ -95,17 +96,32 @@ class PlanFragment : Fragment(){
         onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTCORAL)) }
         setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
       }
-      notNullRound.deliveries().forEach {
+      notNullRound.deliveries().forEachIndexed { index, it ->
         val (nodeX, nodeY) = transform(it.address.x, it.address.y)
         circle {
           centerX = nodeX
           centerY = nodeY
-          radius = SIZE * 5
+          radius = SIZE * 7
           fill = Color.GREEN
-          id = it.address.id.toString()
-          onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
-          setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
-        }
+                      id = it.address.id.toString()
+              onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
+              setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
+          }
+
+          label(""+(index+2)){
+              if(index+2>9) {
+                  layoutX = nodeX - 4
+                  layoutY = nodeY - 5.5
+              }else{
+                  layoutX = nodeX - 2
+                  layoutY = nodeY - 5.5
+              }
+              alignment= Pos.CENTER
+              style{
+                  fontSize=7. px
+                  textFill=Color.LIGHTGREEN
+              }
+          }
       }
     }
   }
@@ -218,7 +234,7 @@ class PlanFragment : Fragment(){
                         it.scaleX = 3.0
                         it.scaleY = 3.0
                         it.style {
-                            fill = Color.CYAN
+                            fill = Color.DARKBLUE
                         }
                     }
         if(idHighlight!=null) {
