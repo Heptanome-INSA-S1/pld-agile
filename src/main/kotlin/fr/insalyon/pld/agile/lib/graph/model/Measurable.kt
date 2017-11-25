@@ -5,7 +5,7 @@ package fr.insalyon.pld.agile.lib.graph.model
  */
 interface Measurable : Comparable<Measurable> {
 
-  val length: Int
+  val length: Long
 
   override operator fun compareTo(other: Measurable): Int = length.compareTo(other.length)
 }

@@ -6,8 +6,6 @@ import java.io.File
 class LoadedDeliveriesState : DefaultState<RoundRequest>() {
 
   override fun init(controller: Controller, element: RoundRequest) {
-    println("Etat actuelle = LOADED_DELIVERIES_STATE")
-    println("Round request was well loaded")
     controller.roundRequest = element
   }
 

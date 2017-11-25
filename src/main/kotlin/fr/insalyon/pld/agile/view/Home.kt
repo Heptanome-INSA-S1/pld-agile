@@ -7,10 +7,10 @@ import fr.insalyon.pld.agile.view.fragment.RoundFragment
 import javafx.scene.control.*
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.VBox
+import javafx.stage.Modality
 import tornadofx.*
 import javafx.scene.input.TransferMode
 import javafx.scene.control.Alert.AlertType
-import javafx.stage.Modality
 
 
 /**
@@ -25,7 +25,7 @@ class Home : View() {
   private val centerBox: VBox by fxid()
   private val rightBox: VBox by fxid()
 
-  val controller: Controller = fr.insalyon.pld.agile.controller.implementation.Controller(this)
+  val controller: Controller = Controller(this)
 
   init {
 
@@ -77,7 +77,7 @@ class Home : View() {
     }
   }
 
-  fun planView() {
+  fun refreshPlan() {
     centerBox.clear()
     centerBox.add(PlanFragment::class, mapOf(
         PlanFragment::parentView to this,
@@ -86,20 +86,19 @@ class Home : View() {
     rightBox.add(loadRoundRequestButton)
   }
 
-  fun roundView() {
+  fun refreshRound() {
     centerBox.clear()
     centerBox.add(PlanFragment::class, mapOf(
           PlanFragment::parentView to this,
           PlanFragment::round to controller.round,
           PlanFragment::plan to controller.plan))
-
     rightBox.clear()
     rightBox.add(RoundFragment::class, mapOf(
-              RoundFragment::parentView to this,
-              RoundFragment::round to controller.round))
+        RoundFragment::parentView to this,
+        RoundFragment::round to controller.round))
   }
 
-  fun errorPopUp(message : String?) {
+  fun errorPopUp(message: String?) {
     val alert = Alert(AlertType.ERROR)
     alert.title = "Erreur"
     alert.headerText = "Une erreur est survenu :"
@@ -108,8 +107,18 @@ class Home : View() {
     alert.initModality(Modality.APPLICATION_MODAL)
 
     alert.showAndWait()
-    if (alert.getResult() == ButtonType.OK){
+    if (alert.result == ButtonType.OK) {
       controller.ok()
     }
+  }
+
+  fun loadingPlan() {
+    centerBox.clear()
+    centerBox.add(ProgressIndicator())
+  }
+
+  fun loadingRound() {
+    rightBox.clear()
+    rightBox.add(ProgressIndicator())
   }
 }

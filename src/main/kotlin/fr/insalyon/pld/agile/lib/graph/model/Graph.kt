@@ -9,7 +9,7 @@ import fr.insalyon.pld.agile.POSITIVE_INFINITY
 open class Graph<N, out E : Measurable>(
     elements: Set<N> = emptySet(),
     edges: Set<Triple<N, E, N>> = emptySet(),
-    worstLength: Int = Int.POSITIVE_INFINITY
+    worstLength: Long = Long.POSITIVE_INFINITY
 ) {
   private val internalOutEdges = mutableListOf<MutableList<Edge<N, E>>>()
   private val internalInEdges = mutableListOf<MutableList<Edge<N, E>>>()
@@ -34,9 +34,9 @@ open class Graph<N, out E : Measurable>(
   /**
    * Return the adjacencyMatrix of the graph
    */
-  val adjacencyMatrix: Array<IntArray> by lazy {
+  val adjacencyMatrix: Array<LongArray> by lazy {
 
-    val matrix = Array<IntArray>(nodes.size, { _ -> IntArray(nodes.size, { _ -> worstLength }) })
+    val matrix = Array<LongArray>(nodes.size, { _ -> LongArray(nodes.size, { _ -> worstLength }) })
 
     for (i: Int in nodes.indices) {
       for(edge: Edge<N,E> in outEdges[i]) {
@@ -74,6 +74,8 @@ open class Graph<N, out E : Measurable>(
   fun outEdgesOf(node: N): List<Edge<N, E>> = outEdges[nodes.first { it.element == node }.index]
 
   fun inEdgesOf(node: N): List<Edge<N, E>> = inEdges[nodes.first { it.element == node }.index]
+
+  fun edgeBetween(from: N, to: N): Edge<N, E>? = outEdges[nodes.first { it.element == from }.index].find { it.to.element == to }
 
   override fun toString(): String = "Graph(nodes=$nodes, internalOutEdges=$internalOutEdges)"
 

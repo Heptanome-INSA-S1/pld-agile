@@ -1,6 +1,8 @@
 package fr.insalyon.pld.agile.view.fragment
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
+import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
+import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
 import javafx.scene.control.ScrollPane
 
 import javafx.scene.layout.BorderPane
@@ -14,6 +16,7 @@ const val LEFT : Int = 3
 const val CENTER : Int = 4
 
 class PlanFragment : Fragment(){
+
   val parentView: BorderPane by param()
   val plan: Plan by param()
   val round: Round? by param()
@@ -22,26 +25,30 @@ class PlanFragment : Fragment(){
 
   var SIZE = 1.0
 
+  private fun transform(x: Number, y: Number): Pair<Double, Double> {
+    val transformedX = (y.toDouble() / (plan.height.toDouble()) * MAP_SIZE)
+    val transformedY = (x.toDouble() / (plan.width.toDouble()) * MAP_SIZE) * -1.0
+    return Pair(transformedX, transformedY)
+  }
+
   val OFFSET_SIZE : Double = MAP_SIZE/10.0
 
   val shapeGroup = group {
     plan.nodes.forEach {
-      val nodeX: Double = (it.element.x / (plan.width * 1.0) * MAP_SIZE)
-      val nodeY: Double = (it.element.y / (plan.height * 1.0) * MAP_SIZE)
+      val (nodeX, nodeY) = transform(it.element.x, it.element.y)
       circle {
-        centerX = nodeY
-        centerY = -1.0*nodeX
+        centerX = nodeX
+        centerY = nodeY
         radius = SIZE
         fill = Color.WHITE
       }
       plan.outEdges[it.index].forEach {
-        val endNodeX: Double = (it.to.element.x / (plan.width * 1.0) * MAP_SIZE)
-        val endNodeY: Double = (it.to.element.y / (plan.height * 1.0) * MAP_SIZE)
+        val (endNodeX,endNodeY: Double) = transform(it.to.element.x, it.to.element.y)
         line {
-          startX = nodeY
-          startY = nodeX*-1.0
-          endX = endNodeY
-          endY = endNodeX*-1.0
+          startX = nodeX
+          startY = nodeY
+          endX = endNodeX
+          endY = endNodeY
           stroke = Color.WHITE
         }
       }
@@ -49,42 +56,47 @@ class PlanFragment : Fragment(){
 
     if(round!=null){
       val notNullRound = round!!
+      val (warehouseXPos, warehouseYPos) = transform(notNullRound.warehouse.address.x, notNullRound.warehouse.address.y)
       circle {
-        centerX = notNullRound.warehouse.address.y / (plan.height * 1.0) * MAP_SIZE
-        centerY = notNullRound.warehouse.address.x / (plan.width * 1.0) * MAP_SIZE *-1.0
+        centerX = warehouseXPos
+        centerY = warehouseYPos
         radius = SIZE * 5
         fill = Color.BROWN
+        id = notNullRound.warehouse.address.id.toString()
+        onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTCORAL)) }
+        setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
       }
       notNullRound.deliveries().forEach {
-        val nodeX: Double = it.address.x / (plan.width * 1.0) * MAP_SIZE
-        val nodeY: Double = it.address.y / (plan.height * 1.0) * MAP_SIZE
+        val (nodeX, nodeY) = transform(it.address.x, it.address.y)
         circle {
-          centerX = nodeY
-          centerY = nodeX*-1.0
+          centerX = nodeX
+          centerY = nodeY
           radius = SIZE * 5
           fill = Color.GREEN
+          id = it.address.id.toString()
+          onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
+          setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
         }
       }
-      notNullRound.path().forEach{
 
+      notNullRound.path().forEach{
         var fromX: Double
         var fromY: Double
-        var toX: Double = 0.0
-        var toY: Double = 0.0
-        var index: Int = 0
+        var toX = 0.0
+        var toY = 0.0
+        var index = 0
         it.nodes.forEach{
-          val nodeX: Double = it.x / (plan.width * 1.0) * MAP_SIZE
-          val nodeY: Double = it.y / (plan.height * 1.0) * MAP_SIZE
+          val (nodeX, nodeY) = transform(it.x, it.y)
           if(index>0){
             fromX = toX
             fromY = toY
             toX = nodeX
             toY = nodeY
             line {
-              startY = fromX*-1.0
-              startX = fromY
-              endY = toX*-1.0
-              endX = toY
+              startY = fromY
+              startX = fromX
+              endY = toY
+              endX = toX
               stroke = Color.ORANGE
             }
           } else {
@@ -96,6 +108,7 @@ class PlanFragment : Fragment(){
       }
     }
   }
+
   val scroll = scrollpane {
       hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
       vbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
@@ -131,6 +144,7 @@ class PlanFragment : Fragment(){
   override val root = stackpane {
     add(scroll)
   }
+
 
   fun zoomIn() {
     shapeGroup.scaleX += 0.25
@@ -183,5 +197,48 @@ class PlanFragment : Fragment(){
     println(" S_X : " + shapeGroup.scaleX)
     println(" S_Y : " + shapeGroup.scaleY)
   }
+
+    init {
+        subscribe<HighlightLocationEvent> {
+            event -> highlightLocation(event.id,event.isWarehouse)
+        }
+    }
+
+
+    var idHighlight: String? =null
+    var colorHighlight:Color =Color.GREEN
+
+    private fun highlightLocation(id:String, isWarehouse:Boolean){
+        println("highlight : "+id)
+        if(idHighlight!=id)
+            shapeGroup.children
+                    .filter { it.id!=null && it.id.equals(id) }
+                    .forEach {
+                        it.scaleX = 3.0
+                        it.scaleY = 3.0
+                        it.style {
+                            fill = Color.CYAN
+                        }
+                    }
+        if(idHighlight!=null) {
+            //println("lowlight : "+idHighlight)
+            shapeGroup.children
+                    .filter { it.id!=null && it.id.equals(idHighlight) }
+                    .forEach {
+                      //colorHighlight= if(isWarehouse) Color.BROWN else Color.GREEN
+                        it.scaleX = 1.0
+                        it.scaleY = 1.0
+                        it.style {
+                            fill = colorHighlight
+                        }
+                    }
+        }
+        if(idHighlight!=id) {
+            idHighlight = id
+            colorHighlight = if (isWarehouse) Color.BROWN else Color.GREEN
+        }else{
+            idHighlight=null
+        }
+    }
 
 }

@@ -7,11 +7,8 @@ import java.io.File
 class CalculatedRoundState : DefaultState<Round>(), State<Round> {
 
   override fun init(controller: Controller, element: Round) {
-    println("Etat actuelle = CALCULATED_ROUND_STATE")
-    println("Round was well calculated")
     controller.round = element
-    println(controller.round)
-    controller.window.roundView()
+    controller.window.refreshRound()
   }
 
   override fun loadRoundRequest(controller: Controller) {

@@ -6,10 +6,10 @@ import java.io.File
 class LoadedPlanState : DefaultState<Plan>(){
 
   override fun init(controller: Controller, element: Plan) {
-    println("Etat actuelle = LOADED_PLAN_STATE")
+    println("Etat actuel = LOADED_PLAN_STATE")
     println("The plan has been well loaded")
     controller.plan = element
-    controller.window.planView()
+    controller.window.refreshPlan()
   }
 
   override fun loadRoundRequest(controller: Controller) {
