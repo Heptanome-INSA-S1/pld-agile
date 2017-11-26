@@ -5,12 +5,12 @@ import fr.insalyon.pld.agile.controller.implementation.Controller
 import fr.insalyon.pld.agile.view.fragment.PlanFragment
 import fr.insalyon.pld.agile.view.fragment.RoundFragment
 import javafx.scene.control.*
-import javafx.scene.control.Alert.AlertType
-import javafx.scene.input.TransferMode
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.VBox
-import javafx.stage.Modality
 import tornadofx.*
+import javafx.scene.input.TransferMode
+import javafx.stage.Modality
+import javafx.scene.control.Alert.AlertType
 
 
 /**
@@ -24,6 +24,7 @@ class Home : View() {
   private val loadRoundRequestMenuItem: MenuItem by fxid()
   private val centerBox: VBox by fxid()
   private val rightBox: VBox by fxid()
+  private val progressIndicator = ProgressIndicator()
 
   val controller: Controller = Controller(this)
 
@@ -79,6 +80,7 @@ class Home : View() {
 
   fun refreshPlan() {
     centerBox.clear()
+    println("Plan is printed")
     centerBox.add(PlanFragment::class, mapOf(
         PlanFragment::parentView to this,
         PlanFragment::plan to controller.plan))
@@ -114,11 +116,11 @@ class Home : View() {
 
   fun loadingPlan() {
     centerBox.clear()
-    centerBox.add(ProgressIndicator())
+    centerBox.add(progressIndicator)
   }
 
   fun loadingRound() {
     rightBox.clear()
-    rightBox.add(ProgressIndicator())
+    rightBox.add(progressIndicator)
   }
 }
