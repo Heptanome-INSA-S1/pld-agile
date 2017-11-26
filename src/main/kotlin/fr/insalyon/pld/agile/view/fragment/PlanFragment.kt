@@ -14,7 +14,9 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.paint.Color
 import tornadofx.*
 import javafx.scene.input.ScrollEvent
-
+import java.lang.Math.abs
+import javafx.animation.TranslateTransition
+import javafx.util.Duration
 
 
 const val UP : Int = 0
@@ -187,13 +189,21 @@ class PlanFragment : Fragment(){
           cursor = Cursor.HAND
       }
       onMouseDragOver=EventHandler { mouseEvent ->
-          shapeGroup.translateX = mouseEvent.sceneX + dragDelta.x
-          shapeGroup.translateY = mouseEvent.sceneY + dragDelta.y
+          //println(""+ (mouseEvent.sceneX + dragDelta.x)+" "+shapeGroup.scaleX+" "+400*(1-shapeGroup.scaleX))
+          if(abs(mouseEvent.sceneX + dragDelta.x)<400*abs(1-shapeGroup.scaleX)+50)
+            shapeGroup.translateX = mouseEvent.sceneX + dragDelta.x
+          if(abs(mouseEvent.sceneY + dragDelta.y)<400*abs(1-shapeGroup.scaleY)+50)
+            shapeGroup.translateY = mouseEvent.sceneY + dragDelta.y
       }
-      onMouseClicked = EventHandler {  mouseEvent ->
-          if(mouseEvent.clickCount==2){
-              shapeGroup.translateX += 400-mouseEvent.sceneX
-              shapeGroup.translateY += 400- mouseEvent.sceneY
+      onMouseClicked = EventHandler { mouseEvent ->
+          if (mouseEvent.clickCount == 2) {
+              if(abs(shapeGroup.translateX +400 - mouseEvent.sceneX)<400*abs(1-shapeGroup.scaleX)+50
+                      && abs(shapeGroup.translateY +400 - mouseEvent.sceneY)<400*abs(1-shapeGroup.scaleY)+50){
+                  val tt = TranslateTransition(Duration.millis(500.0), shapeGroup)
+                  tt.toX =  shapeGroup.translateX + 400 - mouseEvent.sceneX
+                  tt.toY = shapeGroup.translateY + 400 - mouseEvent.sceneY
+                  tt.play()
+              }
           }
       }
       setOnKeyPressed { event ->
