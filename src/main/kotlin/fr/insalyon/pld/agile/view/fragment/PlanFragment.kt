@@ -197,13 +197,16 @@ class PlanFragment : Fragment(){
       }
       onMouseClicked = EventHandler { mouseEvent ->
           if (mouseEvent.clickCount == 2) {
-              if(abs(shapeGroup.translateX +400 - mouseEvent.sceneX)<400*abs(1-shapeGroup.scaleX)+50
-                      && abs(shapeGroup.translateY +400 - mouseEvent.sceneY)<400*abs(1-shapeGroup.scaleY)+50){
-                  val tt = TranslateTransition(Duration.millis(500.0), shapeGroup)
+              val tt = TranslateTransition(Duration.millis(500.0), shapeGroup)
+              if(abs(shapeGroup.translateX +400 - mouseEvent.sceneX)<400*abs(1-shapeGroup.scaleX)+50 )
                   tt.toX =  shapeGroup.translateX + 400 - mouseEvent.sceneX
+              else
+                  tt.toX = (400*abs(1-shapeGroup.scaleX)+50)*(400-mouseEvent.sceneX)/abs(400-mouseEvent.sceneX) //TODO chercher comment avoir le signe
+              if(abs(shapeGroup.translateY +400 - mouseEvent.sceneY)<400*abs(1-shapeGroup.scaleY)+50)
                   tt.toY = shapeGroup.translateY + 400 - mouseEvent.sceneY
-                  tt.play()
-              }
+              else
+                  tt.toY = (400*abs(1-shapeGroup.scaleY)+50)*(400-mouseEvent.sceneY)/abs(400-mouseEvent.sceneY)
+              tt.play()
           }
       }
       setOnKeyPressed { event ->
