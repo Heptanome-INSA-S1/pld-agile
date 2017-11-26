@@ -173,25 +173,22 @@ class PlanFragment : Fragment(){
           var y: Double = 0.toDouble()
       }
       val dragDelta = Delta()
+      onDragDetected=EventHandler {
+          println("onDragDetected")
+          startFullDrag()
+      }
       onMousePressed = EventHandler { mouseEvent ->
           // record a delta distance for the drag and drop operation.
           cursor = Cursor.MOVE
-          dragDelta.x = getLayoutX() - mouseEvent.getSceneX();
-          dragDelta.y = getLayoutY() - mouseEvent.getSceneY();
+          dragDelta.x = layoutX +shapeGroup.translateX - mouseEvent.sceneX
+          dragDelta.y = layoutY + shapeGroup.translateY- mouseEvent.sceneY
       }
       onMouseReleased = EventHandler { mouseEvent ->
-          shapeGroup.translateX += mouseEvent.sceneX + dragDelta.x;
-          shapeGroup.translateY += mouseEvent.sceneY + dragDelta.y;
           cursor = Cursor.HAND
       }
-      onMouseDragged = EventHandler { mouseEvent ->
-          //event pas appelé = pas d'animation
-          //TODO
-          shapeGroup.translateX += mouseEvent.sceneX + dragDelta.x;
-          shapeGroup.translateY += mouseEvent.sceneY + dragDelta.y;
-      }
-      onMouseEntered = EventHandler {  mouseEvent ->
-          cursor = Cursor.HAND
+      onMouseDragOver=EventHandler { mouseEvent ->
+          shapeGroup.translateX = mouseEvent.sceneX + dragDelta.x
+          shapeGroup.translateY = mouseEvent.sceneY + dragDelta.y
       }
       onMouseClicked = EventHandler {  mouseEvent ->
           if(mouseEvent.clickCount==2){
