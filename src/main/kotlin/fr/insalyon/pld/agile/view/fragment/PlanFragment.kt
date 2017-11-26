@@ -195,7 +195,6 @@ class PlanFragment : Fragment(){
       }
       onMouseClicked = EventHandler {  mouseEvent ->
           if(mouseEvent.clickCount==2){
-              println(""+shapeGroup.translateX+" "+mouseEvent.sceneX)
               shapeGroup.translateX += 400-mouseEvent.sceneX
               shapeGroup.translateY += 400- mouseEvent.sceneY
           }
@@ -225,8 +224,10 @@ class PlanFragment : Fragment(){
   }
 
   fun zoomOut() {
-    shapeGroup.scaleX -= 0.25
-    shapeGroup.scaleY -= 0.25
+      if(shapeGroup.scaleX>0.75&&shapeGroup.scaleY>0.75) {
+          shapeGroup.scaleX -= 0.25
+          shapeGroup.scaleY -= 0.25
+      }
   }
 
   fun move(direction: Int){
