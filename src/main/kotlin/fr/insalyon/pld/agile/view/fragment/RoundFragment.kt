@@ -18,7 +18,6 @@ class RoundFragment : Fragment() {
   val list = vbox {
     vboxConstraints {
       paddingLeft=30.0
-      minWidth=250.0
     }
     label("Warehouse"){
       paddingLeft=30.0

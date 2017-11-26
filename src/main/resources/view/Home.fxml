@@ -6,7 +6,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
-<BorderPane xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" minHeight="800" minWidth="1200">
+<BorderPane xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" >
     <top>
         <GridPane>
             <children>
@@ -25,12 +25,12 @@
         </GridPane>
     </top>
     <center>
-        <VBox alignment="CENTER" spacing="10" fx:id="centerBox">
+        <VBox alignment="CENTER" spacing="10" fx:id="centerBox" minWidth="800" minHeight="800" >
             <Button text="Charger map" fx:id="loadPlanButton"/>
         </VBox>
     </center>
     <right>
-        <VBox alignment="CENTER" minWidth="300" maxWidth="300" spacing="10" fx:id="rightBox">
+        <VBox alignment="CENTER" minWidth="250" maxWidth="300" spacing="10" fx:id="rightBox">
             <Button text="Charger round request" fx:id="loadRoundRequestButton"/>
         </VBox>
     </right>

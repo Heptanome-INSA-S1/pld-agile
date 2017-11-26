@@ -14,7 +14,9 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.paint.Color
 import tornadofx.*
 import javafx.scene.input.ScrollEvent
-
+import java.lang.Math.abs
+import javafx.animation.TranslateTransition
+import javafx.util.Duration
 
 
 const val UP : Int = 0
@@ -173,31 +175,38 @@ class PlanFragment : Fragment(){
           var y: Double = 0.toDouble()
       }
       val dragDelta = Delta()
+      onDragDetected=EventHandler {
+          println("onDragDetected")
+          startFullDrag()
+      }
       onMousePressed = EventHandler { mouseEvent ->
           // record a delta distance for the drag and drop operation.
           cursor = Cursor.MOVE
-          dragDelta.x = getLayoutX() - mouseEvent.getSceneX();
-          dragDelta.y = getLayoutY() - mouseEvent.getSceneY();
+          dragDelta.x = layoutX +shapeGroup.translateX - mouseEvent.sceneX
+          dragDelta.y = layoutY + shapeGroup.translateY- mouseEvent.sceneY
       }
       onMouseReleased = EventHandler { mouseEvent ->
-          shapeGroup.translateX += mouseEvent.sceneX + dragDelta.x;
-          shapeGroup.translateY += mouseEvent.sceneY + dragDelta.y;
           cursor = Cursor.HAND
       }
-      onMouseDragged = EventHandler { mouseEvent ->
-          //event pas appelé = pas d'animation
-          //TODO
-          shapeGroup.translateX += mouseEvent.sceneX + dragDelta.x;
-          shapeGroup.translateY += mouseEvent.sceneY + dragDelta.y;
+      onMouseDragOver=EventHandler { mouseEvent ->
+          //println(""+ (mouseEvent.sceneX + dragDelta.x)+" "+shapeGroup.scaleX+" "+400*(1-shapeGroup.scaleX))
+          if(abs(mouseEvent.sceneX + dragDelta.x)<400*abs(1-shapeGroup.scaleX)+50)
+            shapeGroup.translateX = mouseEvent.sceneX + dragDelta.x
+          if(abs(mouseEvent.sceneY + dragDelta.y)<400*abs(1-shapeGroup.scaleY)+50)
+            shapeGroup.translateY = mouseEvent.sceneY + dragDelta.y
       }
-      onMouseEntered = EventHandler {  mouseEvent ->
-          cursor = Cursor.HAND
-      }
-      onMouseClicked = EventHandler {  mouseEvent ->
-          if(mouseEvent.clickCount==2){
-              println(""+shapeGroup.translateX+" "+mouseEvent.sceneX)
-              shapeGroup.translateX += 400-mouseEvent.sceneX
-              shapeGroup.translateY += 400- mouseEvent.sceneY
+      onMouseClicked = EventHandler { mouseEvent ->
+          if (mouseEvent.clickCount == 2) {
+              val tt = TranslateTransition(Duration.millis(500.0), shapeGroup)
+              if(abs(shapeGroup.translateX +400 - mouseEvent.sceneX)<400*abs(1-shapeGroup.scaleX)+50 )
+                  tt.toX =  shapeGroup.translateX + 400 - mouseEvent.sceneX
+              else
+                  tt.toX = (400*abs(1-shapeGroup.scaleX)+50)*(400-mouseEvent.sceneX)/abs(400-mouseEvent.sceneX) //TODO chercher comment avoir le signe
+              if(abs(shapeGroup.translateY +400 - mouseEvent.sceneY)<400*abs(1-shapeGroup.scaleY)+50)
+                  tt.toY = shapeGroup.translateY + 400 - mouseEvent.sceneY
+              else
+                  tt.toY = (400*abs(1-shapeGroup.scaleY)+50)*(400-mouseEvent.sceneY)/abs(400-mouseEvent.sceneY)
+              tt.play()
           }
       }
       setOnKeyPressed { event ->
@@ -225,26 +234,14 @@ class PlanFragment : Fragment(){
   }
 
   fun zoomOut() {
-    shapeGroup.scaleX -= 0.25
-    shapeGroup.scaleY -= 0.25
+      if(shapeGroup.scaleX>0.75&&shapeGroup.scaleY>0.75) {
+          shapeGroup.scaleX -= 0.25
+          shapeGroup.scaleY -= 0.25
+      }
   }
 
   fun move(direction: Int){
-    println("Before -> ")
-    println(" T_Y : "+ shapeGroup.translateY)
-    println(" T_X : " + shapeGroup.translateX)
-    println(" S_X : " + shapeGroup.scaleX)
-    println(" S_Y : " + shapeGroup.scaleY)
-    println(" Layout X " + shapeGroup.layoutX)
-    println(" Layout Y " + shapeGroup.layoutY)
-    println(scroll.viewportBounds)
-    println(scroll.layoutBounds)
-    println(scroll.boundsInLocal)
-    println(scroll.boundsInParent)
-    println("--------")
-    println(shapeGroup.boundsInParent)
-    println(shapeGroup.boundsInLocal)
-    println(shapeGroup.layoutBounds)
+
     when(direction){
       UP -> {
         shapeGroup.translateY += OFFSET_SIZE
@@ -263,12 +260,6 @@ class PlanFragment : Fragment(){
         shapeGroup.translateY = 0.0
       }
     }
-
-    println("After -> ")
-    println(" T_Y : "+ shapeGroup.translateY)
-    println(" T_X : " + shapeGroup.translateX)
-    println(" S_X : " + shapeGroup.scaleX)
-    println(" S_Y : " + shapeGroup.scaleY)
   }
 
     init {
