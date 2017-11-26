@@ -241,21 +241,7 @@ class PlanFragment : Fragment(){
   }
 
   fun move(direction: Int){
-    println("Before -> ")
-    println(" T_Y : "+ shapeGroup.translateY)
-    println(" T_X : " + shapeGroup.translateX)
-    println(" S_X : " + shapeGroup.scaleX)
-    println(" S_Y : " + shapeGroup.scaleY)
-    println(" Layout X " + shapeGroup.layoutX)
-    println(" Layout Y " + shapeGroup.layoutY)
-    println(scroll.viewportBounds)
-    println(scroll.layoutBounds)
-    println(scroll.boundsInLocal)
-    println(scroll.boundsInParent)
-    println("--------")
-    println(shapeGroup.boundsInParent)
-    println(shapeGroup.boundsInLocal)
-    println(shapeGroup.layoutBounds)
+
     when(direction){
       UP -> {
         shapeGroup.translateY += OFFSET_SIZE
@@ -274,12 +260,6 @@ class PlanFragment : Fragment(){
         shapeGroup.translateY = 0.0
       }
     }
-
-    println("After -> ")
-    println(" T_Y : "+ shapeGroup.translateY)
-    println(" T_X : " + shapeGroup.translateX)
-    println(" S_X : " + shapeGroup.scaleX)
-    println(" S_Y : " + shapeGroup.scaleY)
   }
 
     init {
