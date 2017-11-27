@@ -10,7 +10,8 @@ class ErrorState : DefaultState<Pair<Exception, State<Nothing>>>(){
   override fun init(controller: Controller, element: Pair<Exception, State<Nothing>>) {
     val exception = element.first
     previousState = element.second
-    controller.window.errorPopUp(exception.message)
+    exception.printStackTrace()
+    controller.window.errorPopUp(exception.localizedMessage)
   }
 
   override fun loadPlan(controller: Controller) {

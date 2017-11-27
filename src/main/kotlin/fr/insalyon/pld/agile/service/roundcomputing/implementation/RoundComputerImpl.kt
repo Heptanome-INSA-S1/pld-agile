@@ -1,11 +1,12 @@
 package fr.insalyon.pld.agile.service.roundcomputing.implementation
 
+import fr.insalyon.pld.agile.benchmark
 import fr.insalyon.pld.agile.lib.graph.model.Graph
 import fr.insalyon.pld.agile.lib.graph.model.Path
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.service.algorithm.api.TSP
 import fr.insalyon.pld.agile.service.algorithm.implementation.DijsktraImpl
-import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1
+import fr.insalyon.pld.agile.service.algorithm.implementation.TSP2
 import fr.insalyon.pld.agile.service.roundcomputing.api.RoundComputer
 
 class RoundComputerImpl(
@@ -16,11 +17,11 @@ class RoundComputerImpl(
     /**
      * The round request to compute
      */
-    val roundRequest: RoundRequest,
+    private val roundRequest: RoundRequest,
     /**
-     * The truck speed in dm/s
+     * The truck speed
      */
-    val speed: Speed
+    private val speed: Speed
 ) : RoundComputer {
 
   fun getSubPlan(): Graph<Intersection, Path<Intersection, Junction>> {
@@ -43,14 +44,16 @@ class RoundComputerImpl(
 
     val speedInDamSeconds = speed.to(Speed.DistanceUnit.DAM, Speed.DurationUnit.S)
 
-    val tsp: TSP = TSP1()
+    val tsp: TSP = TSP2()
     val subPlan = getSubPlan()
-    tsp.findSolution(
-        10_000,
-        roundRequest.intersections.size,
-        subPlan.adjacencyMatrix.map { row -> row.map { it -> it * speedInDamSeconds.value }.toLongArray() }.toTypedArray(),
-        roundRequest.durations.map { it.toSeconds() }.toLongArray()
-    )
+    benchmark {
+      tsp.findSolution(
+          15.minutes.toMillis().toInt(),
+          roundRequest.intersections.size,
+          subPlan.adjacencyMatrix.map { row -> row.map { it -> (it * speedInDamSeconds.value).toLong() }.toLongArray() }.toTypedArray(),
+          roundRequest.durations.map { it.toSeconds() }.toLongArray()
+      )
+    }
 
     val intersections = buildIntersections(tsp)
     val linkedSetOfDeliveries = buildDeliveries(intersections)

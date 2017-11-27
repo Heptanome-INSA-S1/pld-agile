@@ -1,7 +1,7 @@
 package fr.insalyon.pld.agile.model
 
 class Speed constructor(
-    val value: Int,
+    val value: Double,
     val distanceUnit: DistanceUnit,
     val durationUnit: DurationUnit
 ){
@@ -19,13 +19,17 @@ class Speed constructor(
 
   fun to(distanceUnit: DistanceUnit, durationUnit: DurationUnit): Speed {
 
-    val coef = (this.distanceUnit.coef / distanceUnit.coef) * (this.durationUnit.coef / durationUnit.coef)
-
-    return Speed((value * coef).toInt(), distanceUnit, durationUnit)
+    val coefDistance = this.distanceUnit.coef / distanceUnit.coef
+    val coefTime = this.durationUnit.coef / durationUnit.coef
+    return Speed(value * coefDistance / coefTime, distanceUnit, durationUnit)
 
   }
 
-  
+  override fun toString(): String {
+    return "$value $distanceUnit/$durationUnit"
+  }
+
+
 }
 
-public val Int.km_h: Speed get() = Speed(this, Speed.DistanceUnit.KM, Speed.DurationUnit.H)
+val Number.km_h: Speed get() = Speed(this.toDouble(), Speed.DistanceUnit.KM, Speed.DurationUnit.H)

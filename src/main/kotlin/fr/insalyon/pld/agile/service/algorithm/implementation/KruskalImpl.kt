@@ -13,22 +13,21 @@ class KruskalImpl(
     val noEdgeValue: Long = Long.POSITIVE_INFINITY
 ) : Kruskal {
 
-  val edges = List<List<Triple<Node, Length, Node>>>(nodes.size, { departure ->
+  val edges = List<List<Triple<Node, Length, Node>>>(nodes.size, { departureIndex ->
     val outEdges = mutableListOf<Triple<Node, Length, Node>>()
     nodes
-        .filter { destination -> departure != destination && edges[departure][destination] != noEdgeValue }
-        .forEach { destination -> outEdges += Triple(departure, edges[departure][destination], destination) }
+        .filter {  destinationIndex -> departureIndex != destinationIndex && edges[departureIndex][destinationIndex] != noEdgeValue }
+        .forEach { destination -> outEdges += Triple(departureIndex, edges[departureIndex][nodes.indexOf(destination)], nodes.indexOf(destination)) }
     outEdges
   })
 
   private val parent = Array<Node?>(nodes.size, { _ -> null})
+  private val rank = Array<Int>(nodes.size, { _ -> 0 })
 
-  private fun find(x: Node): Node {
-    return if(parent[x] == null) {
-      x
-    } else {
-      find(parent[x]!!)
-    }
+  private fun find(node: Node): Node {
+    var current: Node? = node
+    while(parent[current!!] != null) current = parent[current]
+    return current!!
   }
 
   private fun union(x: Node, y: Node) {
@@ -37,7 +36,14 @@ class KruskalImpl(
     val yRoot = find(y)
 
     if(xRoot != yRoot) {
-      parent[xRoot] = yRoot
+      if(rank[xRoot] < rank[yRoot]) {
+        parent[xRoot] = yRoot
+      } else {
+        parent[yRoot] = xRoot
+        if(rank[xRoot] == rank[yRoot]) {
+          rank[xRoot] += 1
+        }
+      }
     }
 
   }
