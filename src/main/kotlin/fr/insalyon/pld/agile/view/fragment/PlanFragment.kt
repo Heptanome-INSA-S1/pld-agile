@@ -1,23 +1,23 @@
 package fr.insalyon.pld.agile.view.fragment
+
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
+import javafx.animation.TranslateTransition
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.Cursor
+import javafx.scene.Group
 import javafx.scene.control.ScrollPane
-
+import javafx.scene.input.ScrollEvent
 import javafx.scene.layout.BorderPane
 import javafx.scene.paint.Color
-import tornadofx.*
-import javafx.scene.input.ScrollEvent
-import java.lang.Math.abs
-import javafx.animation.TranslateTransition
-import javafx.scene.Group
 import javafx.scene.shape.Circle
 import javafx.scene.shape.Line
 import javafx.util.Duration
+import tornadofx.*
+import java.lang.Math.abs
 
 
 const val UP : Int = 0
@@ -75,7 +75,7 @@ class PlanFragment : Fragment(){
     if(round!=null){
       val notNullRound = round!!
 
-      notNullRound.durationPathInSeconds().forEach{
+      notNullRound.distancePathInMeters().forEach{
         var fromX: Double
         var fromY: Double
         var toX = 0.0

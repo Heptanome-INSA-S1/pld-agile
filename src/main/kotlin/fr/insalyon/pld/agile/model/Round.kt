@@ -3,8 +3,8 @@ package fr.insalyon.pld.agile.model
 import com.sun.javaws.exceptions.InvalidArgumentException
 import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
+import fr.insalyon.pld.agile.sumLongBy
 import java.util.*
-import kotlin.collections.LinkedHashSet
 
 /**
  * A round is a computed round request
@@ -12,15 +12,15 @@ import kotlin.collections.LinkedHashSet
 class Round(
     val warehouse: Warehouse,
     deliveries: LinkedHashSet<Delivery>,
-    durationPath: LinkedHashSet<Path<Intersection, Junction>>,
+    durationPath: LinkedHashSet<Measurable>,
     distancePath: LinkedHashSet<Path<Intersection, Junction>>
 ) : Observable(), Measurable{
 
   private val _deliveries: MutableList<Delivery> = deliveries.toMutableList()
   fun deliveries(): LinkedHashSet<Delivery> = _deliveries.toLinkedHashSet()
 
-  private val _durationPath: MutableList<Path<Intersection, Junction>> = durationPath.toMutableList()
-  fun durationPathInSeconds(): LinkedHashSet<Path<Intersection, Junction>> = _durationPath.toLinkedHashSet()
+  private val _durationPath: MutableList<Measurable> = durationPath.toMutableList()
+  fun durationPathInSeconds(): LinkedHashSet<Measurable> = _durationPath.toLinkedHashSet()
 
   private val _distancePath: MutableList<Path<Intersection, Junction>> = distancePath.toMutableList()
   fun distancePathInMeters(): LinkedHashSet<Path<Intersection, Junction>> = _distancePath.toLinkedHashSet()
@@ -63,6 +63,8 @@ class Round(
     setChanged()
     notifyObservers()
   }
+
+  val distance: Long = _distancePath.sumLongBy { it.length }
 
   override val length: Long
     get() {

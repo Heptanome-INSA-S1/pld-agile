@@ -1,14 +1,14 @@
 package fr.insalyon.pld.agile.service.roundcomputing.implementation
 
-import fr.insalyon.pld.agile.Config
-import fr.insalyon.pld.agile.benchmark
 import fr.insalyon.pld.agile.lib.graph.model.Graph
+import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.service.algorithm.api.TSP
 import fr.insalyon.pld.agile.service.algorithm.implementation.DijsktraImpl
 import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1
 import fr.insalyon.pld.agile.service.roundcomputing.api.RoundComputer
+import java.util.*
 
 class RoundComputerImpl(
     /**
@@ -26,23 +26,7 @@ class RoundComputerImpl(
     private val speed: Speed
 ) : RoundComputer {
 
-  fun getSubPlanInSeconds(): Graph<Intersection, Path<Intersection, Junction>> {
-    val nodes = mutableSetOf<Intersection>()
-    val roads = mutableSetOf<Triple<Intersection, Path<Intersection, Junction>, Intersection>>()
-
-    for(source: Intersection in roundRequest.intersections) {
-      val dijsktra = DijsktraImpl<Intersection, Junction>(plan.scale(Config.defaultSpeed.to(Speed.DistanceUnit.DAM, Speed.DurationUnit.S).value), source)
-      val destinations = roundRequest.intersections.filter { it != source }
-      for(destination: Intersection in destinations) {
-        nodes.add(source)
-        nodes.add(destination)
-        roads.add(Triple(source, dijsktra.getShortestPath(destination), destination))
-      }
-    }
-    return Graph(nodes, roads)
-  }
-
-  fun getSubPlanInMeter(): Graph<Intersection, Path<Intersection, Junction>> {
+  fun getSubPlan(): Graph<Intersection, Path<Intersection, Junction>> {
     val nodes = mutableSetOf<Intersection>()
     val roads = mutableSetOf<Triple<Intersection, Path<Intersection, Junction>, Intersection>>()
 
@@ -59,10 +43,13 @@ class RoundComputerImpl(
   }
 
   private fun compute(): Round {
-    val subPlanInSeconds = getSubPlanInSeconds()
-    val subPlanInDam = getSubPlanInMeter()
+    val subPlanInMeters = getSubPlan()
+    val subPlanInSeconds = subPlanInMeters.rescale(speed.to(Speed.DistanceUnit.M, Speed.DurationUnit.S).value)
+
+    println(Arrays.deepToString(subPlanInSeconds.adjacencyMatrix))
+
     tsp.findSolution(
-        10_000,
+        10.minutes.toMillis().toInt(),
         roundRequest.intersections.size,
         subPlanInSeconds.adjacencyMatrix,
         roundRequest.durations.map { it.toSeconds() }.toLongArray()
@@ -70,8 +57,8 @@ class RoundComputerImpl(
 
     val intersections = buildIntersections(tsp)
     val linkedSetOfDeliveries = buildDeliveries(intersections)
-    val linkedSetOfDurationPaths = buildPath(intersections, subPlanInSeconds)
-    val linkedSetOfDistancePaths = buildPath(intersections, subPlanInDam)
+    val linkedSetOfDurationPaths = buildDurationPath(intersections, subPlanInSeconds)
+    val linkedSetOfDistancePaths = buildDistancePath(intersections, subPlanInMeters)
 
     return Round(roundRequest.warehouse, linkedSetOfDeliveries, linkedSetOfDurationPaths, linkedSetOfDistancePaths)
 
@@ -89,10 +76,25 @@ class RoundComputerImpl(
     return intersections.filterIndexed{ i, _ -> i != 0 }.map { intersection -> roundRequest.deliveries.first { it.address == intersection } }.toLinkedHashSet()
   }
 
-  private fun buildPath(intersections: List<Intersection>, subPlan: Graph<Intersection, Path<Intersection, Junction>>): LinkedHashSet<Path<Intersection, Junction>> {
+  private fun buildDistancePath(intersections: List<Intersection>, subPlan: Graph<Intersection, Path<Intersection, Junction>>): LinkedHashSet<Path<Intersection, Junction>> {
     val result = LinkedHashSet<Path<Intersection, Junction>>()
     result.add(subPlan.edgeBetween(roundRequest.warehouse.address, intersections[1])!!.element)
 
+
+    for(i in 1 until intersections.size - 1) {
+      result.add(
+          subPlan.edgeBetween(intersections[i], intersections[i+1])!!.element
+      )
+    }
+
+    result.add(subPlan.outEdgesOf(intersections.last()).find { it.to.element == roundRequest.warehouse.address }!!.element)
+    return result
+  }
+
+  private fun buildDurationPath(intersections: List<Intersection>, subPlan: Graph<Intersection, Measurable>): LinkedHashSet<Measurable> {
+    val result = LinkedHashSet<Measurable>()
+
+    result += subPlan.edgeBetween(roundRequest.warehouse.address, intersections[1])!!.element
 
     for(i in 1 until intersections.size - 1) {
       result.add(

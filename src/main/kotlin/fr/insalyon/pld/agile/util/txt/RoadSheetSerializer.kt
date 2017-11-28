@@ -2,9 +2,9 @@ package fr.insalyon.pld.agile.util.txt
 
 import fr.insalyon.pld.agile.getResource
 import fr.insalyon.pld.agile.model.*
-import java.io.File
 import org.apache.commons.io.FileUtils
 import java.awt.Desktop
+import java.io.File
 
 class RoadSheetSerializer(){
     lateinit var roadSheet: File
@@ -34,8 +34,8 @@ class RoadSheetSerializer(){
         var j=0
         for(i in 0 until round.deliveries().size){
             append("You have to : \n\n")
-            while(j<round.durationPathInSeconds().size && round.deliveries().elementAt(i).address != round.durationPathInSeconds().elementAt(j).nodes[0]) {
-                round.durationPathInSeconds().elementAt(j).edges.forEach { e -> append("\t|Take ${e.name} during ${e.length.dam.to(Distance.DistanceUnit.M).value} m\r\n")}
+            while(j<round.distancePathInMeters().size && round.deliveries().elementAt(i).address != round.distancePathInMeters().elementAt(j).nodes[0]) {
+                round.distancePathInMeters().elementAt(j).edges.forEach { e -> append("\t|Take ${e.name} during ${e.length.dam.to(Distance.DistanceUnit.M).value} m\r\n")}
                 j++
             }
             append("\r\n\tIt's now time to do the delivery $i (x:${round.deliveries().elementAt(i).address.x}, y:${round.deliveries().elementAt(i).address.y}) - Details:")
@@ -45,7 +45,7 @@ class RoadSheetSerializer(){
             append("\r\n________________________________________________________________________\r\n")
         }
         append("It's nearly finished, to come back at the warehouse : \n\n")
-        round.durationPathInSeconds().elementAt(j).edges.forEach { e -> append("\t|Take ${e.name} during e.length.dam.to(Distance.DistanceUnit.M).value} m\r\n")}
+        round.distancePathInMeters().elementAt(j).edges.forEach { e -> append("\t|Take ${e.name} during e.length.dam.to(Distance.DistanceUnit.M).value} m\r\n")}
     }
 
     fun serializeHTML(round: Round) {
@@ -76,12 +76,12 @@ class RoadSheetSerializer(){
             }
             var infoLivraison : String = "Livraison au point("+round.deliveries().elementAt(i).address.x!!+","+round.deliveries().elementAt(i).address.y+")<br><br>"
             var j=0
-            while(j<round.durationPathInSeconds().size && round.deliveries().elementAt(i).address != round.durationPathInSeconds().elementAt(j).nodes[0]) {
+            while(j<round.distancePathInMeters().size && round.deliveries().elementAt(i).address != round.distancePathInMeters().elementAt(j).nodes[0]) {
                 var distance = 0.0
                 var oldName =""
                 round.distancePathInMeters().elementAt(j).edges.forEachIndexed { index, it ->
                     distance += it.length.toDouble()
-                    if (!(index + 1 < round.durationPathInSeconds().elementAt(j).edges.size && it.name.equals(round.durationPathInSeconds().elementAt(j).edges.elementAt(index + 1).name))) {
+                    if (!(index + 1 < round.distancePathInMeters().elementAt(j).edges.size && it.name.equals(round.distancePathInMeters().elementAt(j).edges.elementAt(index + 1).name))) {
                         infoLivraison += "\t Prends  ${it.name} sur ${distance} km<br>"
                         distance = 0.0
                     }

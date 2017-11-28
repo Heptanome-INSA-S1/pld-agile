@@ -55,7 +55,7 @@ class TemplateTSPWithTimeSlotTest {
   }
 
   fun computeTour(plan: Plan, roundRequest: RoundRequest): Round {
-    val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, TSP1WithTimeSlot(roundRequest), 60.km_h)
+    val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, TSP1WithTimeSlot(roundRequest), 1.m_s)
     return roundComputer.round
   }
 

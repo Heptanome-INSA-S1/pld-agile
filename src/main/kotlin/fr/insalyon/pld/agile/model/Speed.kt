@@ -33,3 +33,4 @@ class Speed constructor(
 }
 
 val Number.km_h: Speed get() = Speed(this.toDouble(), Speed.DistanceUnit.KM, Speed.DurationUnit.H)
+val Number.m_s: Speed get() = Speed(this.toDouble(), Speed.DistanceUnit.M, Speed.DurationUnit.S)
