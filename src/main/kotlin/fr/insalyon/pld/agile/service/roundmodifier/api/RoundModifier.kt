@@ -7,7 +7,7 @@ import fr.insalyon.pld.agile.model.SubPath
 interface RoundModifier {
 
     fun addDelivery(delivery: Delivery, round:Round)
-    fun removeDelivery(delivery: Delivery, round:Round)
-    fun modifyDelivery(delivery: Delivery, round:Round)
+    fun removeDelivery(delivery: Delivery, round:Round, i:Int)
+    fun modifyDelivery(delivery: Delivery, round:Round, i:Int)
 
 }
