@@ -201,9 +201,9 @@ class PlanFragment : Fragment(){
       }
       onMouseDragOver=EventHandler { mouseEvent ->
           //println(""+ (mouseEvent.sceneX + dragDelta.x)+" "+shapeGroup.scaleX+" "+400*(1-shapeGroup.scaleX))
-          if(abs(mouseEvent.sceneX + dragDelta.x)<400*abs(1-shapeGroup.scaleX)+50)
+          if(abs(mouseEvent.sceneX + dragDelta.x)<400*abs(1-shapeGroup.scaleX)+50||abs(mouseEvent.sceneX + dragDelta.x)<abs(shapeGroup.translateX))
             shapeGroup.translateX = mouseEvent.sceneX + dragDelta.x
-          if(abs(mouseEvent.sceneY + dragDelta.y)<400*abs(1-shapeGroup.scaleY)+50)
+          if(abs(mouseEvent.sceneY + dragDelta.y)<400*abs(1-shapeGroup.scaleY)+50||abs(mouseEvent.sceneY + dragDelta.y)<abs(shapeGroup.translateY))
             shapeGroup.translateY = mouseEvent.sceneY + dragDelta.y
       }
       onMouseClicked = EventHandler { mouseEvent ->
