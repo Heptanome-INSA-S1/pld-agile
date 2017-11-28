@@ -7,6 +7,7 @@ import fr.insalyon.pld.agile.Config.defaultSpeed
 import fr.insalyon.pld.agile.controller.api.Command
 import fr.insalyon.pld.agile.controller.api.State
 import fr.insalyon.pld.agile.getResource
+import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1WithTimeSlot
 import fr.insalyon.pld.agile.service.roundcomputing.implementation.RoundComputerImpl
 import fr.insalyon.pld.agile.util.xml.XmlDocument
 import fr.insalyon.pld.agile.util.xml.serialization.implementation.*
@@ -157,12 +158,8 @@ abstract class DefaultState<in T> : State<T> {
   }
 
   protected fun defaultCalculateRoundImpl(controller: Controller) {
-    try {
-      val round = RoundComputerImpl(controller.plan!!, controller.roundRequest!!, defaultSpeed).round
+      val round = RoundComputerImpl(plan = controller.plan!!, roundRequest = controller.roundRequest!!, tsp = TSP1WithTimeSlot(controller.roundRequest!!), speed = defaultSpeed).round
       controller.changeStateAndInit(controller.CALCULATED_ROUND_STATE, round)
-    } catch (e: Exception) {
-      controller.manageException(e)
-    }
   }
 
 }

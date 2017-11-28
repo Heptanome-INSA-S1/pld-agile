@@ -19,6 +19,11 @@ class LoadedDeliveriesState : DefaultState<RoundRequest>() {
 
   override fun calculateRound(controller: Controller) {
     println("Calculate round was called")
-    defaultCalculateRoundImpl(controller)
+    try {
+      defaultCalculateRoundImpl(controller)
+    } catch (e: Exception) {
+      controller.changeStateAndInit(controller.LOADED_PLAN_STATE, controller.plan!!)
+      controller.manageException(e)
+    }
   }
 }

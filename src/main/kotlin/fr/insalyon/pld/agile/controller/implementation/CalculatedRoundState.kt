@@ -20,6 +20,11 @@ class CalculatedRoundState : DefaultState<Round>(), State<Round> {
   }
 
   override fun calculateRound(controller: Controller) {
-    defaultCalculateRoundImpl(controller)
+    try {
+      defaultCalculateRoundImpl(controller)
+    } catch (e: Exception) {
+      controller.manageException(e)
+    }
+
   }
 }

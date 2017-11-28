@@ -7,13 +7,13 @@ import org.junit.Test
 
 class RoundComputerImplTest {
 
-  val source = Intersection(2,0,0)
+  val source = Intersection(2, 0, 0)
 
-  val node1 = Intersection(1,0,0)
-  val node3 = Intersection(3,0,0)
-  val node4 = Intersection(4,0,0)
-  val node5 = Intersection(5,0,0)
-  val node6 = Intersection(6,0,0)
+  val node1 = Intersection(1, 0, 0)
+  val node3 = Intersection(3, 0, 0)
+  val node4 = Intersection(4, 0, 0)
+  val node5 = Intersection(5, 0, 0)
+  val node6 = Intersection(6, 0, 0)
 
   val plan by lazy {
 
@@ -47,7 +47,7 @@ class RoundComputerImplTest {
   @Test
   fun compute() {
 
-    val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, 15.km_h)
+    val roundComputer: RoundComputer = RoundComputerImpl(plan = plan,roundRequest =  roundRequest,speed = 15.km_h)
     val round = roundComputer.round
 
     assertEquals(source, round.warehouse.address)

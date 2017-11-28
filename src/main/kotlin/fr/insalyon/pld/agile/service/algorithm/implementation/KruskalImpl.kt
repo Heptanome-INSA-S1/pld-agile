@@ -49,26 +49,25 @@ class KruskalImpl(
   }
 
   override fun getLength(): Long {
-
-    val set = Set(nodes.size, { _ -> false})
     // Sort all the edges by length (it.second)
     val edges = edges.flatten().sortedBy { it.second }.iterator()
     var length = 0L
 
     // Create subset is already done
-
-    edges.forEach { edge ->
+    var usedEdge = 0
+    while(usedEdge != nodes.size - 1) {
+      val edge = edges.next()
       if(find(edge.first) != find(edge.third)) {
         length += edge.second
         union(edge.first, edge.third)
+        usedEdge += 1
       }
     }
-
     return length
 
   }
 
-  fun Set.isNotFull() = any { !it }
+  fun Set.isFull() = all{ it }
 
   fun Set.add(node: Node) {
     this[node] = true

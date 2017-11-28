@@ -6,7 +6,7 @@ import fr.insalyon.pld.agile.lib.graph.model.Path
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.service.algorithm.api.TSP
 import fr.insalyon.pld.agile.service.algorithm.implementation.DijsktraImpl
-import fr.insalyon.pld.agile.service.algorithm.implementation.TSP2
+import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1
 import fr.insalyon.pld.agile.service.roundcomputing.api.RoundComputer
 
 class RoundComputerImpl(
@@ -18,6 +18,7 @@ class RoundComputerImpl(
      * The round request to compute
      */
     private val roundRequest: RoundRequest,
+    private val tsp: TSP = TSP1(),
     /**
      * The truck speed
      */
@@ -44,7 +45,6 @@ class RoundComputerImpl(
 
     val speedInDamSeconds = speed.to(Speed.DistanceUnit.DAM, Speed.DurationUnit.S)
 
-    val tsp: TSP = TSP2()
     val subPlan = getSubPlan()
     benchmark {
       tsp.findSolution(
@@ -66,7 +66,7 @@ class RoundComputerImpl(
   private fun buildIntersections(tsp: TSP): List<Intersection> {
     val result = mutableListOf<Intersection>()
     roundRequest.intersections.indices
-        .map { index -> tsp.getBestSolution(index) }
+        .map { index -> tsp.getBestSolution(index) ?: throw RuntimeException("Cannot compute this round.") }
         .forEach { nodeIndex -> result += roundRequest.intersections[nodeIndex] }
     return result
   }

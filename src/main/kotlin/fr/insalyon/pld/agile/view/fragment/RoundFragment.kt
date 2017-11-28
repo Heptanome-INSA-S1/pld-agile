@@ -95,7 +95,9 @@ class RoundFragment : Fragment() {
   }
 
   override val root = scrollpane {
-    add(list)
+    if(round != null) {
+      add(list)
+    }
   }
 
   private fun deliveryToText(d: Delivery): String{

@@ -5,12 +5,12 @@ import fr.insalyon.pld.agile.controller.implementation.Controller
 import fr.insalyon.pld.agile.view.fragment.PlanFragment
 import fr.insalyon.pld.agile.view.fragment.RoundFragment
 import javafx.scene.control.*
+import javafx.scene.control.Alert.AlertType
+import javafx.scene.input.TransferMode
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.VBox
-import tornadofx.*
-import javafx.scene.input.TransferMode
 import javafx.stage.Modality
-import javafx.scene.control.Alert.AlertType
+import tornadofx.*
 
 
 /**

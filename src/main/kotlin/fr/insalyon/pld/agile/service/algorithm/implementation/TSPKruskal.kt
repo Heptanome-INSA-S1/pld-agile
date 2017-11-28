@@ -5,11 +5,11 @@ import fr.insalyon.pld.agile.service.algorithm.api.Kruskal
 import fr.insalyon.pld.agile.service.algorithm.api.TSP
 import java.util.*
 
-class TSP2(
+class TSPKruskal(
     private val departure: Instant? = null,
     private val startTimes: LongArray? = null,
     private val endTimes: LongArray? = null
-): TemplateTSP(), TSP {
+) : TemplateTSP(), TSP {
 
   override fun branchAndBound(sommetCrt: Int, nonVus: ArrayList<Int>?, vus: ArrayList<Int>?, coutVus: Long, cout: Array<out LongArray>?, duree: LongArray?, tpsDebut: Long, tpsLimite: Int) {
     if (System.currentTimeMillis() - tpsDebut > tpsLimite) {
@@ -46,7 +46,7 @@ class TSP2(
     val endTimes = endTimes ?: LongArray(duree!!.size, { _ -> -1L })
 
     val coastWithTimeWindow: Array<out LongArray>
-    if(departure == null) {
+    if (departure == null) {
       coastWithTimeWindow = cout!!
     } else {
       coastWithTimeWindow = cout!!
