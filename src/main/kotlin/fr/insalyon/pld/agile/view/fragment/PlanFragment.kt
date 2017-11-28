@@ -25,6 +25,13 @@ const val CENTER : Int = 4
 
 class PlanFragment : Fragment(){
 
+    private val colorLine :Color = Color.ORANGE
+    private val colorDelivery:Color = Color.GREEN
+    private val colorWarehouse:Color = Color.BROWN
+    private val colorLabelCircle :Color = Color.LIGHTGREEN
+    private val colorLineHighlight :Color = Color.RED
+    private val colorCircleHighlight :Color = Color.DARKBLUE
+
   val parentView: BorderPane by param()
   val plan: Plan by param()
   val round: Round? by param()
@@ -83,7 +90,7 @@ class PlanFragment : Fragment(){
               startX = fromX
               endY = toY
               endX = toX
-              stroke = Color.ORANGE
+              stroke = colorLine
             }
           } else {
             toX = nodeX
@@ -98,7 +105,7 @@ class PlanFragment : Fragment(){
         centerX = warehouseXPos
         centerY = warehouseYPos
         radius = SIZE * 7
-        fill = Color.BROWN
+        fill = colorWarehouse
         id = notNullRound.warehouse.address.id.toString()
         onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTCORAL)) }
         setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
@@ -109,7 +116,7 @@ class PlanFragment : Fragment(){
           centerX = nodeX
           centerY = nodeY
           radius = SIZE * 7
-          fill = Color.GREEN
+          fill = colorDelivery
           id = it.address.id.toString()
           onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
           setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
@@ -126,7 +133,7 @@ class PlanFragment : Fragment(){
               alignment= Pos.CENTER
               style{
                   fontSize=7. px
-                  textFill=Color.LIGHTGREEN
+                  textFill=colorLabelCircle
               }
               val id = it.address.id.toString()
               //à optimiser ? deux events : un pour le cercle, un pour le label
@@ -294,10 +301,10 @@ class PlanFragment : Fragment(){
             shapeGroup.children
                     .filter { it.id != null && it.id.equals(idToHighlight) }
                     .forEach {
-                        it.scaleX = 2.0
-                        it.scaleY = 2.0
+                        it.scaleX = 1.5
+                        it.scaleY = 1.5
                         it.style {
-                            fill = Color.DARKBLUE
+                            fill = colorCircleHighlight
                         }
                     }
             var pathHighlight = group {
@@ -322,7 +329,7 @@ class PlanFragment : Fragment(){
                                 startX = fromX
                                 endY = toY
                                 endX = toX
-                                stroke = Color.RED
+                                stroke = colorLineHighlight
                             }
                         } else {
                             toX = nodeX
@@ -337,7 +344,7 @@ class PlanFragment : Fragment(){
         }
         if(idHighlight!= idToHighlight) {
             idHighlight = idToHighlight
-            colorHighlight = if (isWarehouse) Color.BROWN else Color.GREEN
+            colorHighlight = if (isWarehouse) colorWarehouse else colorDelivery
         }else{
             idHighlight=null
         }
