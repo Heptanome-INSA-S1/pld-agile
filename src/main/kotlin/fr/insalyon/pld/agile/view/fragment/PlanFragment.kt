@@ -14,6 +14,9 @@ import tornadofx.*
 import javafx.scene.input.ScrollEvent
 import java.lang.Math.abs
 import javafx.animation.TranslateTransition
+import javafx.scene.Group
+import javafx.scene.shape.Circle
+import javafx.scene.shape.Line
 import javafx.util.Duration
 
 
@@ -78,26 +81,29 @@ class PlanFragment : Fragment(){
         var toX = 0.0
         var toY = 0.0
         var index = 0
-        it.nodes.forEach{
-          val (nodeX, nodeY) = transform(it.x, it.y)
-          if(index>0){
-            fromX = toX
-            fromY = toY
-            toX = nodeX
-            toY = nodeY
-            line {
-              startY = fromY
-              startX = fromX
-              endY = toY
-              endX = toX
-              stroke = colorLine
-            }
-          } else {
-            toX = nodeX
-            toY = nodeY
+          group{
+              id=it.nodes.first().id.toString()
+              it.nodes.forEach{
+                  val (nodeX, nodeY) = transform(it.x, it.y)
+                  if(index>0){
+                      fromX = toX
+                      fromY = toY
+                      toX = nodeX
+                      toY = nodeY
+                      line {
+                          startY = fromY
+                          startX = fromX
+                          endY = toY
+                          endX = toX
+                          stroke = colorLine
+                      }
+                  } else {
+                      toX = nodeX
+                      toY = nodeY
+                  }
+                  index++
+              }
           }
-          index++
-        }
       }
 
       val (warehouseXPos, warehouseYPos) = transform(notNullRound.warehouse.address.x, notNullRound.warehouse.address.y)
@@ -281,9 +287,11 @@ class PlanFragment : Fragment(){
         if(idHighlight!=null) {
             //println("lowlight : "+idHighlight)
             shapeGroup.children
-                    .filter { it.id!=null && it.id == "pathHighlighted" }
+                    .filter { it.id != null && it is Group && it.id ==idHighlight }
                     .forEach {
-                        it.removeFromParent()
+                        it.getChildList()!!.forEach {
+                            (it as Line).stroke = colorLine
+                        }
                     }
             shapeGroup.children
                     .filter { it.id!=null && it.id==idHighlight }
@@ -299,7 +307,7 @@ class PlanFragment : Fragment(){
         println("highlight : "+ idToHighlight)
         if(idHighlight!= idToHighlight) {
             shapeGroup.children
-                    .filter { it.id != null && it.id.equals(idToHighlight) }
+                    .filter { it.id != null && it is Circle && it.id ==idToHighlight }
                     .forEach {
                         it.scaleX = 1.5
                         it.scaleY = 1.5
@@ -307,40 +315,13 @@ class PlanFragment : Fragment(){
                             fill = colorCircleHighlight
                         }
                     }
-            var pathHighlight = group {
-                id ="pathHighlighted"
-                for(item in round!!.path()){
-                    var fromX: Double
-                    var fromY: Double
-                    var toX = 0.0
-                    var toY = 0.0
-                    var index = 0
-                    if(item.nodes.first().id.toString()!=idToHighlight)
-                        continue
-                    item.nodes.forEach{
-                        val (nodeX, nodeY) = transform(it.x, it.y)
-                        if(index>0){
-                            fromX = toX
-                            fromY = toY
-                            toX = nodeX
-                            toY = nodeY
-                            line {
-                                startY = fromY
-                                startX = fromX
-                                endY = toY
-                                endX = toX
-                                stroke = colorLineHighlight
-                            }
-                        } else {
-                            toX = nodeX
-                            toY = nodeY
+            shapeGroup.children
+                    .filter { it.id != null && it is Group && it.id ==idToHighlight }
+                    .forEach {
+                        it.getChildList()!!.forEach {
+                            (it as Line).stroke = colorLineHighlight
                         }
-                        index++
                     }
-                    break
-                }
-            }
-            shapeGroup.add(pathHighlight)
         }
         if(idHighlight!= idToHighlight) {
             idHighlight = idToHighlight
