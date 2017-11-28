@@ -1,5 +1,6 @@
 package fr.insalyon.pld.agile.service.roundcomputing.implementation
 
+import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.benchmark
 import fr.insalyon.pld.agile.lib.graph.model.Graph
 import fr.insalyon.pld.agile.lib.graph.model.Path
@@ -25,7 +26,23 @@ class RoundComputerImpl(
     private val speed: Speed
 ) : RoundComputer {
 
-  fun getSubPlan(): Graph<Intersection, Path<Intersection, Junction>> {
+  fun getSubPlanInSeconds(): Graph<Intersection, Path<Intersection, Junction>> {
+    val nodes = mutableSetOf<Intersection>()
+    val roads = mutableSetOf<Triple<Intersection, Path<Intersection, Junction>, Intersection>>()
+
+    for(source: Intersection in roundRequest.intersections) {
+      val dijsktra = DijsktraImpl<Intersection, Junction>(plan.scale(Config.defaultSpeed.to(Speed.DistanceUnit.DAM, Speed.DurationUnit.S).value), source)
+      val destinations = roundRequest.intersections.filter { it != source }
+      for(destination: Intersection in destinations) {
+        nodes.add(source)
+        nodes.add(destination)
+        roads.add(Triple(source, dijsktra.getShortestPath(destination), destination))
+      }
+    }
+    return Graph(nodes, roads)
+  }
+
+  fun getSubPlanInMeter(): Graph<Intersection, Path<Intersection, Junction>> {
     val nodes = mutableSetOf<Intersection>()
     val roads = mutableSetOf<Triple<Intersection, Path<Intersection, Junction>, Intersection>>()
 
@@ -42,24 +59,21 @@ class RoundComputerImpl(
   }
 
   private fun compute(): Round {
-
-    val speedInDamSeconds = speed.to(Speed.DistanceUnit.DAM, Speed.DurationUnit.S)
-
-    val subPlan = getSubPlan()
-    benchmark {
-      tsp.findSolution(
-          15.minutes.toMillis().toInt(),
-          roundRequest.intersections.size,
-          subPlan.adjacencyMatrix.map { row -> row.map { it -> (it * speedInDamSeconds.value).toLong() }.toLongArray() }.toTypedArray(),
-          roundRequest.durations.map { it.toSeconds() }.toLongArray()
-      )
-    }
+    val subPlanInSeconds = getSubPlanInSeconds()
+    val subPlanInDam = getSubPlanInMeter()
+    tsp.findSolution(
+        10_000,
+        roundRequest.intersections.size,
+        subPlanInSeconds.adjacencyMatrix,
+        roundRequest.durations.map { it.toSeconds() }.toLongArray()
+    )
 
     val intersections = buildIntersections(tsp)
     val linkedSetOfDeliveries = buildDeliveries(intersections)
-    val linkedSetOfPaths = buildPath(intersections, subPlan)
+    val linkedSetOfDurationPaths = buildPath(intersections, subPlanInSeconds)
+    val linkedSetOfDistancePaths = buildPath(intersections, subPlanInDam)
 
-    return Round(roundRequest.warehouse, linkedSetOfDeliveries, linkedSetOfPaths)
+    return Round(roundRequest.warehouse, linkedSetOfDeliveries, linkedSetOfDurationPaths, linkedSetOfDistancePaths)
 
   }
 
@@ -78,6 +92,7 @@ class RoundComputerImpl(
   private fun buildPath(intersections: List<Intersection>, subPlan: Graph<Intersection, Path<Intersection, Junction>>): LinkedHashSet<Path<Intersection, Junction>> {
     val result = LinkedHashSet<Path<Intersection, Junction>>()
     result.add(subPlan.edgeBetween(roundRequest.warehouse.address, intersections[1])!!.element)
+
 
     for(i in 1 until intersections.size - 1) {
       result.add(
