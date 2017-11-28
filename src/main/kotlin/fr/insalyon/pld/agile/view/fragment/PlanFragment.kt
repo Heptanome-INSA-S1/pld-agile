@@ -6,9 +6,7 @@ import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.Cursor
-import javafx.scene.Node
 import javafx.scene.control.ScrollPane
-import javafx.scene.input.MouseEvent
 
 import javafx.scene.layout.BorderPane
 import javafx.scene.paint.Color
@@ -26,6 +24,13 @@ const val LEFT : Int = 3
 const val CENTER : Int = 4
 
 class PlanFragment : Fragment(){
+
+    private val colorLine :Color = Color.ORANGE
+    private val colorDelivery:Color = Color.GREEN
+    private val colorWarehouse:Color = Color.BROWN
+    private val colorLabelCircle :Color = Color.LIGHTGREEN
+    private val colorLineHighlight :Color = Color.RED
+    private val colorCircleHighlight :Color = Color.DARKBLUE
 
   val parentView: BorderPane by param()
   val plan: Plan by param()
@@ -85,7 +90,7 @@ class PlanFragment : Fragment(){
               startX = fromX
               endY = toY
               endX = toX
-              stroke = Color.ORANGE
+              stroke = colorLine
             }
           } else {
             toX = nodeX
@@ -100,7 +105,7 @@ class PlanFragment : Fragment(){
         centerX = warehouseXPos
         centerY = warehouseYPos
         radius = SIZE * 7
-        fill = Color.BROWN
+        fill = colorWarehouse
         id = notNullRound.warehouse.address.id.toString()
         onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTCORAL)) }
         setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
@@ -111,7 +116,7 @@ class PlanFragment : Fragment(){
           centerX = nodeX
           centerY = nodeY
           radius = SIZE * 7
-          fill = Color.GREEN
+          fill = colorDelivery
           id = it.address.id.toString()
           onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
           setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
@@ -128,7 +133,7 @@ class PlanFragment : Fragment(){
               alignment= Pos.CENTER
               style{
                   fontSize=7. px
-                  textFill=Color.LIGHTGREEN
+                  textFill=colorLabelCircle
               }
               val id = it.address.id.toString()
               //à optimiser ? deux events : un pour le cercle, un pour le label
@@ -272,24 +277,18 @@ class PlanFragment : Fragment(){
     var idHighlight: String? =null
     var colorHighlight:Color =Color.GREEN
 
-    private fun highlightLocation(id:String, isWarehouse:Boolean){
-        println("highlight : "+id)
-        if(idHighlight!=id)
-            shapeGroup.children
-                    .filter { it.id!=null && it.id.equals(id) }
-                    .forEach {
-                        it.scaleX = 3.0
-                        it.scaleY = 3.0
-                        it.style {
-                            fill = Color.DARKBLUE
-                        }
-                    }
+    private fun highlightLocation(idToHighlight:String, isWarehouse:Boolean){
         if(idHighlight!=null) {
             //println("lowlight : "+idHighlight)
             shapeGroup.children
-                    .filter { it.id!=null && it.id.equals(idHighlight) }
+                    .filter { it.id!=null && it.id == "pathHighlighted" }
                     .forEach {
-                      //colorHighlight= if(isWarehouse) Color.BROWN else Color.GREEN
+                        it.removeFromParent()
+                    }
+            shapeGroup.children
+                    .filter { it.id!=null && it.id==idHighlight }
+                    .forEach {
+                        //colorHighlight= if(isWarehouse) Color.BROWN else Color.GREEN
                         it.scaleX = 1.0
                         it.scaleY = 1.0
                         it.style {
@@ -297,9 +296,55 @@ class PlanFragment : Fragment(){
                         }
                     }
         }
-        if(idHighlight!=id) {
-            idHighlight = id
-            colorHighlight = if (isWarehouse) Color.BROWN else Color.GREEN
+        println("highlight : "+ idToHighlight)
+        if(idHighlight!= idToHighlight) {
+            shapeGroup.children
+                    .filter { it.id != null && it.id.equals(idToHighlight) }
+                    .forEach {
+                        it.scaleX = 1.5
+                        it.scaleY = 1.5
+                        it.style {
+                            fill = colorCircleHighlight
+                        }
+                    }
+            var pathHighlight = group {
+                id ="pathHighlighted"
+                for(item in round!!.path()){
+                    var fromX: Double
+                    var fromY: Double
+                    var toX = 0.0
+                    var toY = 0.0
+                    var index = 0
+                    if(item.nodes.first().id.toString()!=idToHighlight)
+                        continue
+                    item.nodes.forEach{
+                        val (nodeX, nodeY) = transform(it.x, it.y)
+                        if(index>0){
+                            fromX = toX
+                            fromY = toY
+                            toX = nodeX
+                            toY = nodeY
+                            line {
+                                startY = fromY
+                                startX = fromX
+                                endY = toY
+                                endX = toX
+                                stroke = colorLineHighlight
+                            }
+                        } else {
+                            toX = nodeX
+                            toY = nodeY
+                        }
+                        index++
+                    }
+                    break
+                }
+            }
+            shapeGroup.add(pathHighlight)
+        }
+        if(idHighlight!= idToHighlight) {
+            idHighlight = idToHighlight
+            colorHighlight = if (isWarehouse) colorWarehouse else colorDelivery
         }else{
             idHighlight=null
         }
