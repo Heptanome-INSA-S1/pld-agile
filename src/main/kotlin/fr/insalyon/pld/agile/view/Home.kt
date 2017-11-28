@@ -10,7 +10,8 @@ import javafx.scene.input.TransferMode
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.VBox
 import javafx.stage.Modality
-import tornadofx.*
+import javafx.scene.control.Alert.AlertType
+import javafx.scene.image.Image
 
 
 /**
@@ -29,7 +30,7 @@ class Home : View() {
   val controller: Controller = Controller(this)
 
   init {
-
+    primaryStage.icons.add(Image("/image/app-icon.png"))
     root.setOnDragOver { event ->
       val db = event.dragboard
       if (db.hasFiles() && db.files.size == 1) {
