@@ -20,10 +20,14 @@ class Round(
   fun deliveries(): LinkedHashSet<Delivery> = _deliveries.toLinkedHashSet()
 
   private val _durationPath: MutableList<Measurable> = durationPath.toMutableList()
-  fun durationPathInSeconds(): LinkedHashSet<Measurable> = _durationPath.toLinkedHashSet()
+  fun durationPathInSeconds(): LinkedHashSet<Duration> {
+    return _durationPath.map { it.length.seconds }.toLinkedHashSet()
+  }
 
   private val _distancePath: MutableList<Path<Intersection, Junction>> = distancePath.toMutableList()
-  fun distancePathInMeters(): LinkedHashSet<Path<Intersection, Junction>> = _distancePath.toLinkedHashSet()
+  fun distancePathInMeters(): LinkedHashSet<Path<Intersection, Junction>> {
+    return _distancePath.toLinkedHashSet()
+  }
 
   fun addDelivery(subPath: SubPath) {
 
@@ -115,7 +119,38 @@ class Round(
     return stringBuilder.toString()
   }
 
-  private fun <E> MutableList<E>.toLinkedHashSet(): LinkedHashSet<E> {
+  fun toTrace(): String {
+
+    val stringBuilder = StringBuilder()
+
+    stringBuilder.appendln("Departure: ${warehouse.departureHour}")
+    stringBuilder.appendln("Warehouse at ${warehouse.address.id}")
+    var time = warehouse.departureHour
+    deliveries().forEachIndexed{index, delivery ->
+      time += _durationPath[index].length.seconds
+      var waitingTime = 0.seconds
+      if(delivery.startTime != null && time < delivery.startTime) {
+        waitingTime = delivery.startTime - time
+      }
+
+      stringBuilder.appendln("Travel time: ${_durationPath[index].length.seconds}")
+
+      stringBuilder.appendln("Delivery: ${delivery.address.id}")
+      stringBuilder.appendln("Arrival at $time - Waiting time: $waitingTime - StartTime: ${delivery.startTime} - Duration: ${delivery.duration} - EndTime: ${delivery.endTime} - DepartureTime: ${time + waitingTime + delivery.duration}")
+      time += waitingTime
+      time += delivery.duration
+    }
+
+    stringBuilder.appendln("Travel time: ${_durationPath.last().length.seconds}")
+    time += _durationPath.last().length.seconds
+    stringBuilder.appendln("Arrival at $time")
+    stringBuilder.appendln("Warehouse at ${warehouse.address.id}")
+
+    return stringBuilder.toString()
+
+  }
+
+  private fun <E> List<E>.toLinkedHashSet(): LinkedHashSet<E> {
     val linkedHashSet = linkedSetOf<E>()
     linkedHashSet.addAll(this)
     return linkedHashSet

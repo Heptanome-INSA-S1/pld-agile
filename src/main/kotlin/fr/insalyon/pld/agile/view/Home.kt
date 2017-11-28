@@ -2,6 +2,7 @@ package fr.insalyon.pld.agile.view
 
 
 import fr.insalyon.pld.agile.controller.implementation.Controller
+import fr.insalyon.pld.agile.util.Logger
 import fr.insalyon.pld.agile.view.fragment.PlanFragment
 import fr.insalyon.pld.agile.view.fragment.RoundFragment
 import javafx.scene.control.*
@@ -81,7 +82,7 @@ class Home : View() {
 
   fun refreshPlan() {
     centerBox.clear()
-    println("Plan is printed")
+    Logger.info("Plan is printed")
     centerBox.add(PlanFragment::class, mapOf(
         PlanFragment::parentView to this,
         PlanFragment::plan to controller.plan))

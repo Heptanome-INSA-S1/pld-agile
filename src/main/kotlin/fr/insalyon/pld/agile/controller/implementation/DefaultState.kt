@@ -7,8 +7,9 @@ import fr.insalyon.pld.agile.Config.defaultSpeed
 import fr.insalyon.pld.agile.controller.api.Command
 import fr.insalyon.pld.agile.controller.api.State
 import fr.insalyon.pld.agile.getResource
-import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1WithTimeSlot
+import fr.insalyon.pld.agile.service.algorithm.implementation.TSPSumMin
 import fr.insalyon.pld.agile.service.roundcomputing.implementation.RoundComputerImpl
+import fr.insalyon.pld.agile.util.Logger
 import fr.insalyon.pld.agile.util.xml.XmlDocument
 import fr.insalyon.pld.agile.util.xml.serialization.implementation.*
 import fr.insalyon.pld.agile.util.xml.validator.implementation.XmlValidatorImpl
@@ -20,7 +21,7 @@ import java.io.FileNotFoundException
 abstract class DefaultState<in T> : State<T> {
 
   override fun init(controller: Controller, element: T) {
-    println("Etat actuel = DEFAULT_STATE")
+    Logger.info("Etat actuel = DEFAULT_STATE")
     super.init(controller, element)
   }
 
@@ -40,26 +41,26 @@ abstract class DefaultState<in T> : State<T> {
   }
 
   override fun loadRoundRequest(controller: Controller) {
-    println("DefaultState action: Load round request was called")
+    Logger.warn("DefaultState action: Load round request was called")
   }
 
   override fun loadRoundRequest(controller: Controller, file: File) {
-    println("DefaultState action: Load round request was called with file")
+    Logger.warn("DefaultState action: Load round request was called with file")
   }
 
   override fun calculateRound(controller: Controller) {
-    println("DefaultState action: Calculate round was called")
+    Logger.warn("DefaultState action: Calculate round was called")
   }
 
   override fun ok(controller: Controller) {
-    println("Ok was called")
+    Logger.warn("Ok was called")
   }
 
   override fun undo(controller: Controller, commands: List<Command>) {}
 
   override fun redo(controller: Controller, commands: List<Command>) {}
 
-  protected fun defaultLoadPlanImpl(controller: Controller){
+  protected fun defaultLoadPlanImpl(controller: Controller) {
     val validator: XmlValidatorImpl = XmlValidatorImpl()
     val xsdFile = getResource(MAP_XSD)
     val sourceFile = openXmlFileFromDialog() ?: return
@@ -98,18 +99,18 @@ abstract class DefaultState<in T> : State<T> {
     val planSerializer = PlanSerializer(xmlDocument, intersectionSerializer, junctionSerializer)
 
     try {
-        val plan = planSerializer.unserialize(xmlDocument.documentElement)
-        controller.changeStateAndInit(controller.LOADED_PLAN_STATE, plan)
+      val plan = planSerializer.unserialize(xmlDocument.documentElement)
+      controller.changeStateAndInit(controller.LOADED_PLAN_STATE, plan)
 
     } catch (e: Exception) {
-      System.err.println(e.localizedMessage)
+      Logger.error(e.localizedMessage)
       controller.manageException(RuntimeException("Something went wrong during plan parsing"))
     } finally {
       //dialog.close()
     }
   }
 
-  protected fun defaultLoadRoundRequestImpl(controller: Controller){
+  protected fun defaultLoadRoundRequestImpl(controller: Controller) {
     val validator: XmlValidatorImpl = XmlValidatorImpl()
     val xsdFile = getResource(Config.DELIVERY_PLANNING_XSD)
     val file = openXmlFileFromDialog() ?: return
@@ -121,20 +122,19 @@ abstract class DefaultState<in T> : State<T> {
     controller.window.loadingRound()
 
     val xmlDocument = XmlDocument.open(file)
-    val deliverySerializer = DeliverySerializer(xmlDocument,controller.plan!!)
+    val deliverySerializer = DeliverySerializer(xmlDocument, controller.plan!!)
     val warehouseSerializer = WarehouseSerializer(xmlDocument, controller.plan!!)
     val roundRequestSerializer = RoundRequestSerializer(xmlDocument, deliverySerializer, warehouseSerializer)
 
     try {
       val roundRequest = roundRequestSerializer.unserialize(xmlDocument.documentElement)
       controller.changeStateAndInit(controller.LOADED_DELIVERIES_STATE, roundRequest)
-    }
-    catch (e: Exception) {
+    } catch (e: Exception) {
       controller.manageException(RuntimeException("Something went wrong during round request parsing"))
     }
   }
 
-  protected fun fileLoadRoundRequestImpl(controller: Controller, file: File){
+  protected fun fileLoadRoundRequestImpl(controller: Controller, file: File) {
     val validator: XmlValidatorImpl = XmlValidatorImpl()
     val xsdFile = getResource(Config.DELIVERY_PLANNING_XSD)
 
@@ -143,7 +143,7 @@ abstract class DefaultState<in T> : State<T> {
 
     controller.window.loadingRound()
     val xmlDocument = XmlDocument.open(file)
-    val deliverySerializer = DeliverySerializer(xmlDocument,controller.plan!!)
+    val deliverySerializer = DeliverySerializer(xmlDocument, controller.plan!!)
     val warehouseSerializer = WarehouseSerializer(xmlDocument, controller.plan!!)
     val roundRequestSerializer = RoundRequestSerializer(xmlDocument, deliverySerializer, warehouseSerializer)
 
@@ -158,8 +158,9 @@ abstract class DefaultState<in T> : State<T> {
   }
 
   protected fun defaultCalculateRoundImpl(controller: Controller) {
-      val round = RoundComputerImpl(plan = controller.plan!!, roundRequest = controller.roundRequest!!, tsp = TSP1WithTimeSlot(controller.roundRequest!!), speed = defaultSpeed).round
-      controller.changeStateAndInit(controller.CALCULATED_ROUND_STATE, round)
+    val round = RoundComputerImpl(plan = controller.plan!!, roundRequest = controller.roundRequest!!, tsp = TSPSumMin(controller.roundRequest!!), speed = defaultSpeed).round
+    Logger.debug(round.toTrace())
+    controller.changeStateAndInit(controller.CALCULATED_ROUND_STATE, round)
   }
 
 }
