@@ -6,9 +6,7 @@ import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.Cursor
-import javafx.scene.Node
 import javafx.scene.control.ScrollPane
-import javafx.scene.input.MouseEvent
 
 import javafx.scene.layout.BorderPane
 import javafx.scene.paint.Color
@@ -67,7 +65,7 @@ class PlanFragment : Fragment(){
     if(round!=null){
       val notNullRound = round!!
 
-      notNullRound.path().forEach{
+      notNullRound.durationPathInSeconds().forEach{
         var fromX: Double
         var fromY: Double
         var toX = 0.0

@@ -4,6 +4,7 @@ import com.sun.javaws.exceptions.InvalidArgumentException
 import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
 import java.util.*
+import kotlin.collections.LinkedHashSet
 
 /**
  * A round is a computed round request
@@ -11,14 +12,18 @@ import java.util.*
 class Round(
     val warehouse: Warehouse,
     deliveries: LinkedHashSet<Delivery>,
-    path: LinkedHashSet<Path<Intersection, Junction>>
+    durationPath: LinkedHashSet<Path<Intersection, Junction>>,
+    distancePath: LinkedHashSet<Path<Intersection, Junction>>
 ) : Observable(), Measurable{
 
   private val _deliveries: MutableList<Delivery> = deliveries.toMutableList()
   fun deliveries(): LinkedHashSet<Delivery> = _deliveries.toLinkedHashSet()
 
-  private val _path: MutableList<Path<Intersection, Junction>> = path.toMutableList()
-  fun path(): LinkedHashSet<Path<Intersection, Junction>> = _path.toLinkedHashSet()
+  private val _durationPath: MutableList<Path<Intersection, Junction>> = durationPath.toMutableList()
+  fun durationPathInSeconds(): LinkedHashSet<Path<Intersection, Junction>> = _durationPath.toLinkedHashSet()
+
+  private val _distancePath: MutableList<Path<Intersection, Junction>> = distancePath.toMutableList()
+  fun distancePathInMeters(): LinkedHashSet<Path<Intersection, Junction>> = _distancePath.toLinkedHashSet()
 
   fun addDelivery(subPath: SubPath) {
 
@@ -30,8 +35,8 @@ class Round(
       val deliveryBefore = _deliveries.first { it.address == subPath.pathFromPreviousDelivery.nodes.first() }
       index = _deliveries.addAfter(deliveryBefore, subPath.delivery)
     }
-    _path.add(index, subPath.pathToNextDelivery)
-    _path.add(index, subPath.pathFromPreviousDelivery)
+    _durationPath.add(index, subPath.pathToNextDelivery)
+    _durationPath.add(index, subPath.pathFromPreviousDelivery)
 
     setChanged()
     notifyObservers()
@@ -50,10 +55,10 @@ class Round(
     if(index == -1) throw InvalidArgumentException(arrayOf("$delivery was not found in the round"))
     _deliveries.removeAt(index)
 
-    _path.removeAt(index)
-    _path.removeAt(index)
+    _durationPath.removeAt(index)
+    _durationPath.removeAt(index)
 
-    _path.add(index, pathToReplaceWith)
+    _durationPath.add(index, pathToReplaceWith)
 
     setChanged()
     notifyObservers()
@@ -64,7 +69,7 @@ class Round(
       var duration = Duration()
 
       val deliveryIterator = _deliveries.iterator()
-      val pathIterator = _path.iterator()
+      val pathIterator = _durationPath.iterator()
 
       var previousDelivery: Delivery? = null
       var currentHour = warehouse.departureHour

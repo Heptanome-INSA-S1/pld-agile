@@ -2,6 +2,7 @@ package fr.insalyon.pld.agile.view.fragment
 
 import fr.insalyon.pld.agile.model.Delivery
 import fr.insalyon.pld.agile.model.Round
+import fr.insalyon.pld.agile.util.txt.RoadSheetSerializer
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
 import javafx.scene.control.Button
@@ -14,6 +15,7 @@ import tornadofx.*
 class RoundFragment : Fragment() {
   val parentView: BorderPane by param()
   val round: Round? by param()
+  val roadSheetSerializer : RoadSheetSerializer = RoadSheetSerializer()
 
   val list = vbox {
     vboxConstraints {
@@ -86,6 +88,26 @@ class RoundFragment : Fragment() {
         id=""+round!!.warehouse.address.id
         action{
           fire(HighlightLocationEvent(""+round!!.warehouse.address.id,true))
+        }
+        style{
+          baseColor=Color.WHITE
+        }
+      }
+    }
+    label("RoadSheet") {
+      paddingLeft=30.0
+      paddingTop=5.0
+      style{
+        fontWeight = FontWeight.BOLD
+      }
+    }
+    hbox {
+      paddingTop=2
+      paddingLeft=30.0
+      button("Browse"){
+        id=""+round!!.warehouse.address.id
+        action{
+          roadSheetSerializer.serializeHTML(round!!)
         }
         style{
           baseColor=Color.WHITE
