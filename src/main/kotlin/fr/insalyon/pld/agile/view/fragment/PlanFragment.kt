@@ -6,7 +6,9 @@ import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.Cursor
+import javafx.scene.Node
 import javafx.scene.control.ScrollPane
+import javafx.scene.input.MouseEvent
 
 import javafx.scene.layout.BorderPane
 import javafx.scene.paint.Color
@@ -27,13 +29,6 @@ const val LEFT : Int = 3
 const val CENTER : Int = 4
 
 class PlanFragment : Fragment(){
-
-    private val colorLine :Color = Color.ORANGE
-    private val colorDelivery:Color = Color.GREEN
-    private val colorWarehouse:Color = Color.BROWN
-    private val colorLabelCircle :Color = Color.LIGHTGREEN
-    private val colorLineHighlight :Color = Color.RED
-    private val colorCircleHighlight :Color = Color.DARKBLUE
 
   val parentView: BorderPane by param()
   val plan: Plan by param()
@@ -111,7 +106,7 @@ class PlanFragment : Fragment(){
         centerX = warehouseXPos
         centerY = warehouseYPos
         radius = SIZE * 7
-        fill = colorWarehouse
+        fill = Color.BROWN
         id = notNullRound.warehouse.address.id.toString()
         onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTCORAL)) }
         setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
@@ -122,7 +117,7 @@ class PlanFragment : Fragment(){
           centerX = nodeX
           centerY = nodeY
           radius = SIZE * 7
-          fill = colorDelivery
+          fill = Color.GREEN
           id = it.address.id.toString()
           onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
           setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
@@ -139,7 +134,7 @@ class PlanFragment : Fragment(){
               alignment= Pos.CENTER
               style{
                   fontSize=7. px
-                  textFill=colorLabelCircle
+                  textFill=Color.LIGHTGREEN
               }
               val id = it.address.id.toString()
               //à optimiser ? deux events : un pour le cercle, un pour le label
@@ -283,9 +278,9 @@ class PlanFragment : Fragment(){
     var idHighlight: String? =null
     var colorHighlight:Color =Color.GREEN
 
-    private fun highlightLocation(idToHighlight:String, isWarehouse:Boolean){
-        if(idHighlight!=null) {
-            //println("lowlight : "+idHighlight)
+    private fun highlightLocation(id:String, isWarehouse:Boolean){
+        println("highlight : "+id)
+        if(idHighlight!=id)
             shapeGroup.children
                     .filter { it.id != null && it is Group && it.id ==idHighlight }
                     .forEach {
@@ -293,10 +288,12 @@ class PlanFragment : Fragment(){
                             (it as Line).stroke = colorLine
                         }
                     }
+        if(idHighlight!=null) {
+            //println("lowlight : "+idHighlight)
             shapeGroup.children
-                    .filter { it.id!=null && it.id==idHighlight }
+                    .filter { it.id!=null && it.id.equals(idHighlight) }
                     .forEach {
-                        //colorHighlight= if(isWarehouse) Color.BROWN else Color.GREEN
+                      //colorHighlight= if(isWarehouse) Color.BROWN else Color.GREEN
                         it.scaleX = 1.0
                         it.scaleY = 1.0
                         it.style {
