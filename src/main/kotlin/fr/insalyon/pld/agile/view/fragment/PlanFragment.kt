@@ -6,9 +6,7 @@ import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.Cursor
-import javafx.scene.Node
 import javafx.scene.control.ScrollPane
-import javafx.scene.input.MouseEvent
 
 import javafx.scene.layout.BorderPane
 import javafx.scene.paint.Color
@@ -272,24 +270,18 @@ class PlanFragment : Fragment(){
     var idHighlight: String? =null
     var colorHighlight:Color =Color.GREEN
 
-    private fun highlightLocation(id:String, isWarehouse:Boolean){
-        println("highlight : "+id)
-        if(idHighlight!=id)
-            shapeGroup.children
-                    .filter { it.id!=null && it.id.equals(id) }
-                    .forEach {
-                        it.scaleX = 3.0
-                        it.scaleY = 3.0
-                        it.style {
-                            fill = Color.DARKBLUE
-                        }
-                    }
+    private fun highlightLocation(idToHighlight:String, isWarehouse:Boolean){
         if(idHighlight!=null) {
             //println("lowlight : "+idHighlight)
             shapeGroup.children
-                    .filter { it.id!=null && it.id.equals(idHighlight) }
+                    .filter { it.id!=null && it.id == "pathHighlighted" }
                     .forEach {
-                      //colorHighlight= if(isWarehouse) Color.BROWN else Color.GREEN
+                        it.removeFromParent()
+                    }
+            shapeGroup.children
+                    .filter { it.id!=null && it.id==idHighlight }
+                    .forEach {
+                        //colorHighlight= if(isWarehouse) Color.BROWN else Color.GREEN
                         it.scaleX = 1.0
                         it.scaleY = 1.0
                         it.style {
@@ -297,8 +289,54 @@ class PlanFragment : Fragment(){
                         }
                     }
         }
-        if(idHighlight!=id) {
-            idHighlight = id
+        println("highlight : "+ idToHighlight)
+        if(idHighlight!= idToHighlight) {
+            shapeGroup.children
+                    .filter { it.id != null && it.id.equals(idToHighlight) }
+                    .forEach {
+                        it.scaleX = 2.0
+                        it.scaleY = 2.0
+                        it.style {
+                            fill = Color.DARKBLUE
+                        }
+                    }
+            var pathHighlight = group {
+                id ="pathHighlighted"
+                for(item in round!!.path()){
+                    var fromX: Double
+                    var fromY: Double
+                    var toX = 0.0
+                    var toY = 0.0
+                    var index = 0
+                    if(item.nodes.first().id.toString()!=idToHighlight)
+                        continue
+                    item.nodes.forEach{
+                        val (nodeX, nodeY) = transform(it.x, it.y)
+                        if(index>0){
+                            fromX = toX
+                            fromY = toY
+                            toX = nodeX
+                            toY = nodeY
+                            line {
+                                startY = fromY
+                                startX = fromX
+                                endY = toY
+                                endX = toX
+                                stroke = Color.RED
+                            }
+                        } else {
+                            toX = nodeX
+                            toY = nodeY
+                        }
+                        index++
+                    }
+                    break
+                }
+            }
+            shapeGroup.add(pathHighlight)
+        }
+        if(idHighlight!= idToHighlight) {
+            idHighlight = idToHighlight
             colorHighlight = if (isWarehouse) Color.BROWN else Color.GREEN
         }else{
             idHighlight=null

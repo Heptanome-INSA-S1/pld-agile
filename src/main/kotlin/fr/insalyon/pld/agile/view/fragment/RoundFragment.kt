@@ -15,7 +15,39 @@ class RoundFragment : Fragment() {
   val parentView: BorderPane by param()
   val round: Round? by param()
 
-  val list = vbox {
+  val list = vbox{
+    label("Deliveries") {
+      paddingTop=5.0
+      prefHeight=30.0
+      paddingBottom=15.0
+      paddingLeft=30.0
+      style{
+        fontWeight = FontWeight.BOLD
+      }
+    }
+    for (i in round!!.deliveries().indices) {
+      hbox {
+        paddingTop=2
+        label ("${i+2}.${if(i+2<10) "  " else ""}"){
+          paddingTop=4
+        }
+        button(""+round!!.deliveries().elementAt(i).address.id){
+          id = ""+round!!.deliveries().elementAt(i).address.id
+          action{
+            fire(HighlightLocationEvent(""+round!!.deliveries().elementAt(i).address.id,false))
+          }
+          style{
+            baseColor=Color.WHITE
+          }
+        }
+        label (deliveryToText(round!!.deliveries().elementAt(i))){
+          paddingTop=4
+        }
+      }
+    }
+  }
+
+  val container = vbox {
     vboxConstraints {
       paddingLeft=30.0
     }
@@ -47,37 +79,7 @@ class RoundFragment : Fragment() {
       paddingTop=20.0
       minWidth=350.0
       center{
-        vbox{
-          label("Deliveries") {
-            paddingTop=5.0
-            prefHeight=30.0
-            paddingBottom=15.0
-            paddingLeft=30.0
-            style{
-              fontWeight = FontWeight.BOLD
-            }
-          }
-          for (i in round!!.deliveries().indices) {
-            hbox {
-              paddingTop=2
-              label ("${i+2}.${if(i+2<10) "  " else ""}"){
-                paddingTop=4
-              }
-              button(""+round!!.deliveries().elementAt(i).address.id){
-                id = ""+round!!.deliveries().elementAt(i).address.id
-                action{
-                  fire(HighlightLocationEvent(""+round!!.deliveries().elementAt(i).address.id,false))
-                }
-                style{
-                  baseColor=Color.WHITE
-                }
-              }
-              label (deliveryToText(round!!.deliveries().elementAt(i))){
-                paddingTop=4
-              }
-            }
-          }
-        }
+        add(list)
       }
       right{
         vbox{
@@ -156,7 +158,7 @@ class RoundFragment : Fragment() {
   }
 
   override val root = scrollpane {
-    add(list)
+    add(container)
   }
 
   private fun deliveryToText(d: Delivery): String{
