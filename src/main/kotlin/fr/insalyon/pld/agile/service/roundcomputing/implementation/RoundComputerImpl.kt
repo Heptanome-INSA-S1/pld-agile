@@ -44,9 +44,7 @@ class RoundComputerImpl(
 
   private fun compute(): Round {
     val subPlanInMeters = getSubPlan()
-    val subPlanInSeconds = subPlanInMeters.rescale(speed.to(Speed.DistanceUnit.M, Speed.DurationUnit.S).value)
-
-    println(Arrays.deepToString(subPlanInSeconds.adjacencyMatrix))
+    val subPlanInSeconds = subPlanInMeters.rescale(1.0 / speed.to(Speed.DistanceUnit.M, Speed.DurationUnit.S).value)
 
     tsp.findSolution(
         10.minutes.toMillis().toInt(),

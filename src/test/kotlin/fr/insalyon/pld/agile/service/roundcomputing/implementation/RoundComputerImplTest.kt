@@ -18,9 +18,9 @@ class RoundComputerImplTest {
 
   val plan by lazy {
 
-    val roadOfLength1 = Junction(1, "")
-    val roadOfLength2 = Junction(2, "")
-    val roadOfLength4 = Junction(4, "")
+    val roadOfLength1 = Junction(1000, "")
+    val roadOfLength2 = Junction(2000, "")
+    val roadOfLength4 = Junction(4000, "")
 
     Plan(
         setOf<Intersection>(node1, source, node3, node4, node5, node6),
