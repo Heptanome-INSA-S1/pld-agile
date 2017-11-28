@@ -27,7 +27,11 @@ class RoundTest {
         pathFromWareHouseToDeliveryA,
         pathFromDeliveryAToDeliveryB,
         pathFromDeliveryBToWarehouse
-    ))
+    ), linkedSetOf(
+        pathFromWareHouseToDeliveryA,
+        pathFromDeliveryAToDeliveryB,
+        pathFromDeliveryBToWarehouse)
+    )
 
     assertEquals(9 h 45, warehouse.departureHour + round.length.seconds)
 
@@ -52,6 +56,10 @@ class RoundTest {
     val pathFromDeliveryBToWarehouse = Path(listOf(int3, int1), listOf(Junction(15.minutes.toSeconds(), "Road from B to Warehouse")))
 
     val round = Round(warehouse, linkedSetOf(deliveryA, deliveryB), linkedSetOf(
+        pathFromWareHouseToDeliveryA,
+        pathFromDeliveryAToDeliveryB,
+        pathFromDeliveryBToWarehouse
+    ), linkedSetOf(
         pathFromWareHouseToDeliveryA,
         pathFromDeliveryAToDeliveryB,
         pathFromDeliveryBToWarehouse
@@ -86,6 +94,10 @@ class RoundTest {
     val pathFromDeliveryBToWarehouse = Path(listOf(int3, int1), listOf(Junction(15.minutes.toSeconds(), "Road from B to Warehouse")))
 
     val round = Round(warehouse, linkedSetOf(deliveryA, deliveryB), linkedSetOf(
+        pathFromWareHouseToDeliveryA,
+        pathFromDeliveryAToDeliveryB,
+        pathFromDeliveryBToWarehouse
+    ), linkedSetOf(
         pathFromWareHouseToDeliveryA,
         pathFromDeliveryAToDeliveryB,
         pathFromDeliveryBToWarehouse

@@ -1,0 +1,26 @@
+Beginning of the round ! 
+You have to leave the warehouse (x:4, y:20) at 8 h 
+________________________________________________________________________
+You have to : 
+
+	|Take J1 during 5400000000 m
+
+	It's now time to do the delivery 0 (x:10, y:15) - Details:
+		Start at : n/a
+		Finish at : n/a
+		Duration : 15m
+________________________________________________________________________
+You have to : 
+
+	|Take J2 during 5400000000 m
+	|Take J3 during 5400000000 m
+
+	It's now time to do the delivery 1 (x:10, y:20) - Details:
+		Start at : n/a
+		Finish at : n/a
+		Duration : 10m
+________________________________________________________________________
+It's nearly finished, to come back at the warehouse : 
+
+	|Take J4 during e.length.dam.to(Distance.DistanceUnit.M).value} m
+	|Take J5 during e.length.dam.to(Distance.DistanceUnit.M).value} m

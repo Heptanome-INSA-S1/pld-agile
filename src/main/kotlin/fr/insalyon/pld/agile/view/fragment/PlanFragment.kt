@@ -75,7 +75,7 @@ class PlanFragment : Fragment(){
     if(round!=null){
       val notNullRound = round!!
 
-      notNullRound.path().forEach{
+      notNullRound.durationPathInSeconds().forEach{
         var fromX: Double
         var fromY: Double
         var toX = 0.0

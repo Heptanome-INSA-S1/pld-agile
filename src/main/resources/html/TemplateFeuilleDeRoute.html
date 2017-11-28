@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Feuille de route</title>
+    <style>
+        body{
+            width: 100%;
+            height: 100%;
+        }
+
+
+        .header{
+            background-color: aliceblue;
+            border: 1px solid black;
+            border-radius: 4px;
+            width: 80%;
+            height: 10%;
+            padding: 35px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+        }
+
+        .content{
+            width: 80%;
+            height: 10%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .row{
+            margin-top: 15px;
+            margin-bottom: 15px;
+            width: 100%;
+            height: auto;
+            display: inline-block;
+        }
+
+        .left{
+            float: left;
+        }
+
+        .right{
+            text-align: right;
+            width: auto;
+            height: auto;
+        }
+
+        .infos{
+            float: right;
+            margin-left: 8px;
+        }
+
+        .timer{
+            margin-left: 7px;
+            font-weight: bold;
+            font-size: medium;
+        }
+
+        .time, .localisation{
+            margin-top: 10px;
+            margin-right: 8px;
+        }
+
+        .img{
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header content">
+        Feuille de route
+    </div>
+    <div class="content">
+        <div class="row">
+            <div class="left">
+                Début
+                <br>
+                Fin
+            </div>
+            <div class="timer left">
+                <span>$startTime</span>
+                <br>
+                <span>$endTime</span>
+            </div>
+            <div class="infos">
+                passage à l'entrepot
+                <br>
+                livraisons
+            </div>
+            <div class="infos right">
+                <span>1<br>
+                    $nbDeliveries</span>
+            </div>
+        </div>
+        $rows
+        <!--<div class="row">
+            <div class="time left">
+                08 : 30 -
+            </div>
+            <div class="img left">
+                <img src="../img/index.png" width="36" height="30">
+            </div>
+            <div class="localisation">
+                Entrepôt 109
+            </div>
+        </div>-->
+        <div class="row">
+            Merci de respecter les règles du code de la route au cours de cette livraison. <br><br>
+            Cordialement, <br><br>
+            La Direction.
+        </div>
+    </div>
+</body>
+</html>
