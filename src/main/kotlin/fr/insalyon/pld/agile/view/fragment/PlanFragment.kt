@@ -14,6 +14,9 @@ import tornadofx.*
 import javafx.scene.input.ScrollEvent
 import java.lang.Math.abs
 import javafx.animation.TranslateTransition
+import javafx.scene.Group
+import javafx.scene.shape.Circle
+import javafx.scene.shape.Line
 import javafx.util.Duration
 
 
@@ -24,6 +27,13 @@ const val LEFT : Int = 3
 const val CENTER : Int = 4
 
 class PlanFragment : Fragment(){
+
+    private val colorLine :Color = Color.ORANGE
+    private val colorDelivery:Color = Color.GREEN
+    private val colorWarehouse:Color = Color.BROWN
+    private val colorLabelCircle :Color = Color.LIGHTGREEN
+    private val colorLineHighlight :Color = Color.RED
+    private val colorCircleHighlight :Color = Color.DARKBLUE
 
   val parentView: BorderPane by param()
   val plan: Plan by param()
@@ -71,26 +81,29 @@ class PlanFragment : Fragment(){
         var toX = 0.0
         var toY = 0.0
         var index = 0
-        it.nodes.forEach{
-          val (nodeX, nodeY) = transform(it.x, it.y)
-          if(index>0){
-            fromX = toX
-            fromY = toY
-            toX = nodeX
-            toY = nodeY
-            line {
-              startY = fromY
-              startX = fromX
-              endY = toY
-              endX = toX
-              stroke = Color.ORANGE
-            }
-          } else {
-            toX = nodeX
-            toY = nodeY
+          group{
+              id=it.nodes.first().id.toString()
+              it.nodes.forEach{
+                  val (nodeX, nodeY) = transform(it.x, it.y)
+                  if(index>0){
+                      fromX = toX
+                      fromY = toY
+                      toX = nodeX
+                      toY = nodeY
+                      line {
+                          startY = fromY
+                          startX = fromX
+                          endY = toY
+                          endX = toX
+                          stroke = colorLine
+                      }
+                  } else {
+                      toX = nodeX
+                      toY = nodeY
+                  }
+                  index++
+              }
           }
-          index++
-        }
       }
 
       val (warehouseXPos, warehouseYPos) = transform(notNullRound.warehouse.address.x, notNullRound.warehouse.address.y)
@@ -98,7 +111,7 @@ class PlanFragment : Fragment(){
         centerX = warehouseXPos
         centerY = warehouseYPos
         radius = SIZE * 7
-        fill = Color.BROWN
+        fill = colorWarehouse
         id = notNullRound.warehouse.address.id.toString()
         onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTCORAL)) }
         setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
@@ -109,7 +122,7 @@ class PlanFragment : Fragment(){
           centerX = nodeX
           centerY = nodeY
           radius = SIZE * 7
-          fill = Color.GREEN
+          fill = colorDelivery
           id = it.address.id.toString()
           onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
           setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
@@ -126,7 +139,7 @@ class PlanFragment : Fragment(){
               alignment= Pos.CENTER
               style{
                   fontSize=7. px
-                  textFill=Color.LIGHTGREEN
+                  textFill=colorLabelCircle
               }
               val id = it.address.id.toString()
               //à optimiser ? deux events : un pour le cercle, un pour le label
@@ -270,24 +283,20 @@ class PlanFragment : Fragment(){
     var idHighlight: String? =null
     var colorHighlight:Color =Color.GREEN
 
-    private fun highlightLocation(id:String, isWarehouse:Boolean){
-        println("highlight : "+id)
-        if(idHighlight!=id)
-            shapeGroup.children
-                    .filter { it.id!=null && it.id.equals(id) }
-                    .forEach {
-                        it.scaleX = 3.0
-                        it.scaleY = 3.0
-                        it.style {
-                            fill = Color.DARKBLUE
-                        }
-                    }
+    private fun highlightLocation(idToHighlight:String, isWarehouse:Boolean){
         if(idHighlight!=null) {
             //println("lowlight : "+idHighlight)
             shapeGroup.children
-                    .filter { it.id!=null && it.id.equals(idHighlight) }
+                    .filter { it.id != null && it is Group && it.id ==idHighlight }
                     .forEach {
-                      //colorHighlight= if(isWarehouse) Color.BROWN else Color.GREEN
+                        it.getChildList()!!.forEach {
+                            (it as Line).stroke = colorLine
+                        }
+                    }
+            shapeGroup.children
+                    .filter { it.id!=null && it.id==idHighlight }
+                    .forEach {
+                        //colorHighlight= if(isWarehouse) Color.BROWN else Color.GREEN
                         it.scaleX = 1.0
                         it.scaleY = 1.0
                         it.style {
@@ -295,9 +304,28 @@ class PlanFragment : Fragment(){
                         }
                     }
         }
-        if(idHighlight!=id) {
-            idHighlight = id
-            colorHighlight = if (isWarehouse) Color.BROWN else Color.GREEN
+        println("highlight : "+ idToHighlight)
+        if(idHighlight!= idToHighlight) {
+            shapeGroup.children
+                    .filter { it.id != null && it is Circle && it.id ==idToHighlight }
+                    .forEach {
+                        it.scaleX = 1.5
+                        it.scaleY = 1.5
+                        it.style {
+                            fill = colorCircleHighlight
+                        }
+                    }
+            shapeGroup.children
+                    .filter { it.id != null && it is Group && it.id ==idToHighlight }
+                    .forEach {
+                        it.getChildList()!!.forEach {
+                            (it as Line).stroke = colorLineHighlight
+                        }
+                    }
+        }
+        if(idHighlight!= idToHighlight) {
+            idHighlight = idToHighlight
+            colorHighlight = if (isWarehouse) colorWarehouse else colorDelivery
         }else{
             idHighlight=null
         }

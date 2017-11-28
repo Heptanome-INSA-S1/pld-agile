@@ -30,7 +30,7 @@
         </VBox>
     </center>
     <right>
-        <VBox alignment="CENTER" minWidth="250" maxWidth="300" spacing="10" fx:id="rightBox">
+        <VBox alignment="CENTER" minWidth="400" fx:id="rightBox">
             <Button text="Charger round request" fx:id="loadRoundRequestButton"/>
         </VBox>
     </right>
