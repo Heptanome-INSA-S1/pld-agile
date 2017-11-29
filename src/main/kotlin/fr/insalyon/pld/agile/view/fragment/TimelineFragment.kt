@@ -13,6 +13,10 @@ class TimelineFragment() : Fragment() {
   val round : Round by param()
   val planSize: Pair<Double, Double> by param()
 
+  private val colorLine = Color.DARKGREEN
+  private val colorWarehouse = Color.INDIANRED
+  private val colorDelivery = Color.BLUE
+
   val TOTAL_LENGTH : Long by lazy{
     var total = 0L
     round.distancePathInMeters().forEach {
@@ -38,38 +42,45 @@ class TimelineFragment() : Fragment() {
     minHeight = parentView.bottom.boundsInLocal.height
     println(minHeight)
 
-    scrollpane {
-      hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
-      group {
-        path {
-          val middle = 25.0
-          var actualX = 0.0
-          moveTo(y = 25.0)
-          circle {
-            centerX = actualX
-            centerY = middle
-            radius = 5.0
-            fill = Color.INDIANRED
-            tooltip { "Test " + actualX }
-          }
-          round.distancePathInMeters().forEach {
-            val deplacement = transform(it.edges)
-            timeDeplacement(it.edges)
-            actualX += deplacement
+    group {
+      paddingLeft=15.0
+      val middle = 15.0
+      var actualX = 0.0
+      round.distancePathInMeters().forEachIndexed { index,it ->
+        val deplacement = transform(it.edges)
+        timeDeplacement(it.edges)
+        actualX += deplacement
 
-
-            hlineTo(actualX).stroke = Color.DARKGREEN
-            /*actualX += 100.0
-            hlineTo(actualX)*/
-            circle {
-              centerX = actualX
-              centerY = middle
-              radius = 5.0
-              fill = Color.BLUE
-            }
-
-          }
+        line{
+          startX=actualX-deplacement
+          startY=middle
+          endX=actualX
+          endY=middle
+          stroke=colorLine
         }
+        /*actualX += 100.0
+        hlineTo(actualX)*/
+        circle {
+          centerX = actualX
+          centerY = middle
+          radius = 5.0
+          fill = if(index==round.deliveries().size) colorWarehouse  else colorDelivery
+        }
+        label("${index+2}."){
+          layoutX=actualX
+          layoutY=middle
+        }
+      }
+      circle {
+        centerX = 0.0
+        centerY = middle
+        radius = 5.0
+        fill = colorWarehouse
+        tooltip { "Test " + actualX }
+      }
+      label("1."){
+        layoutX=0.0
+        layoutY=middle
       }
     }
   }
@@ -92,7 +103,7 @@ class TimelineFragment() : Fragment() {
   }
 
   private fun transform(edges: List<Junction>): Double {
-    return length(edges).toDouble()/ TOTAL_LENGTH.toDouble() * (parentView.bottom.boundsInLocal.width - 15.0)
+    return length(edges).toDouble()/ TOTAL_LENGTH.toDouble() * (parentView.bottom.boundsInLocal.width - 70.0)
   }
 
 }
