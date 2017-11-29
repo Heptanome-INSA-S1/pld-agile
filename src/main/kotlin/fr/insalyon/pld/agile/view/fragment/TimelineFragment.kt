@@ -15,7 +15,17 @@ class TimelineFragment() : Fragment() {
 
   val TOTAL_LENGTH : Long by lazy{
     var total = 0L
-    round.path().forEach {
+    round.distancePathInMeters().forEach {
+      it.edges.forEach {
+        total += it.length
+      }
+    }
+    total
+  }
+
+  val TOTAL_DURATION : Long by lazy{
+    var total = 0L
+    round.durationPathInSeconds().forEach {
       it.edges.forEach {
         total += it.length
       }
@@ -42,7 +52,7 @@ class TimelineFragment() : Fragment() {
             fill = Color.INDIANRED
             tooltip { "Test " + actualX }
           }
-          round.path().forEach {
+          round.distancePathInMeters().forEach {
             val deplacement = transform(it.edges)
             timeDeplacement(it.edges)
             actualX += deplacement
