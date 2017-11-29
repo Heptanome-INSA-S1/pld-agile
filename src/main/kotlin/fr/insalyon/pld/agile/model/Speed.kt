@@ -29,3 +29,5 @@ class Speed constructor(
 }
 
 public val Int.km_h: Speed get() = Speed(this, Speed.DistanceUnit.KM, Speed.DurationUnit.H)
+public val Int.m_s: Speed get() = Speed(this,Speed.DistanceUnit.M, Speed.DurationUnit.S)
+public val Speed.m_s: Speed get() = Speed(this.value,Speed.DistanceUnit.M, Speed.DurationUnit.S)
