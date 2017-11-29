@@ -3,6 +3,7 @@ package fr.insalyon.pld.agile.service.roundmodifier.implementation
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.service.algorithm.implementation.DijsktraImpl
 import fr.insalyon.pld.agile.service.roundmodifier.api.RoundModifier
+import org.omg.CORBA.DynAnyPackage.InvalidValue
 
 class RoundModifierImp(
     private val delivery: Delivery,
@@ -30,71 +31,90 @@ class RoundModifierImp(
     }
 
     override fun modifyDelivery(delivery: Delivery, round: Round, i: Int) {
-        //TODO("not implemented yet")
-            var previousStartTime : Instant?
-            var previousEndTime : Instant?
-            var nextStartTime : Instant?
-            var previousDuration : Long?
+        val listEarliestEnd = getEarliestEndTime(round)
+        val listLatestEnd = getLastestEndTime(round)
 
-            var previousTravellingTime : Long
-            var nextTravellingTime : Long
+        var isFirstPartValid = true
+        var isSecondPartValid= true
 
-            // set specific values if the previous or the next element is the warehouse
-            if(i==0){
-                previousStartTime = round.warehouse.departureHour
-                previousEndTime = null
-                previousDuration = 0L
-                previousTravellingTime = computeTravellingTime(round.warehouse,delivery,round)
-                nextTravellingTime = computeTravellingTime(delivery, round.deliveries().elementAt(i+1), round)
-                nextStartTime = round.deliveries().elementAt(i+1).startTime
-            } else if (i == round.deliveries().size-1) {
-                nextStartTime = null
-                nextTravellingTime = computeTravellingTime(delivery, round.warehouse, round)
-                previousStartTime = round.deliveries().elementAt(i-1).startTime
-                previousEndTime = round.deliveries().elementAt(i-1).endTime
-                previousDuration = round.deliveries().elementAt(i-1).duration.length
-                previousTravellingTime = computeTravellingTime(round.deliveries().elementAt(i-1),delivery, round)
-                nextTravellingTime = computeTravellingTime(delivery, round.warehouse, round)
-                nextStartTime = null
-            } else {
-                previousStartTime = round.deliveries().elementAt(i-1).startTime
-                previousEndTime = round.deliveries().elementAt(i-1).endTime
-                previousStartTime = round.deliveries().elementAt(i-1).startTime
-                nextStartTime = round.deliveries().elementAt(i+1).startTime
-                previousDuration = round.deliveries().elementAt(i-1).duration.length
-                previousTravellingTime = computeTravellingTime(round.deliveries().elementAt(i-1),delivery, round)
-                nextTravellingTime = computeTravellingTime(delivery, round.deliveries().elementAt(i+1), round)
-                nextStartTime = round.deliveries().elementAt(i+1).startTime
+        if(isDeliveryValid(delivery)) {
+            if(delivery.startTime != null && delivery.startTime < listEarliestEnd[i]+ round.path().elementAt(i).length.seconds){
+                throw  IllegalArgumentException("The start time is not valid and must be greater than " + (listEarliestEnd[i]+ round.path().elementAt(i).length.seconds).toFormattedString())
             }
 
-            var isFirstPartValid =true
-            var isSecondPartValid = true
+            var nextNonNullLatestEndTime: Instant? = getNextNonNull(listLatestEnd,i)
+            if(delivery.startTime != null && nextNonNullLatestEndTime != null && delivery.startTime!! + delivery.duration > nextNonNullLatestEndTime!! - round.deliveries().elementAt(i+1).duration.length.seconds - round.path().elementAt(i+1).length.seconds){
+                throw IllegalArgumentException("The sum of the start time and the duration cannot exceed " + (nextNonNullLatestEndTime!! - round.deliveries().elementAt(i+1).duration.length.seconds
+                        - round.path().elementAt(i+1).length.seconds))
+            }
 
-            if(isDeliveryValid(delivery)){
-                // check previous contraints
-                if(delivery.startTime != null && previousEndTime != null && delivery.startTime < previousEndTime + previousTravellingTime.seconds ){
-                    isFirstPartValid = false
-                }
-                if(delivery.startTime!= null && previousStartTime != null && isFirstPartValid &&  delivery.startTime!! < previousStartTime + previousDuration.seconds + previousTravellingTime.seconds){
-                    isFirstPartValid = false
-                }
-                println("first part : " +  isFirstPartValid)
+            if(delivery.endTime != null && listLatestEnd[i+1] != null && i<round.deliveries().size-1 && delivery.endTime > listLatestEnd[i+1]!! - round.deliveries().elementAt(i+1).duration.length.seconds
+                    - round.path().elementAt(i+1).length.seconds) {
 
-                //Check next constraints
-                if(nextStartTime!= null && delivery.startTime!= null && nextStartTime < delivery.startTime + previousDuration.seconds + nextTravellingTime.seconds){
-                    isSecondPartValid = false
-                }
-                if(isSecondPartValid && delivery.endTime != null && nextStartTime != null && nextStartTime < delivery.endTime + nextTravellingTime.seconds){
-                    isSecondPartValid = false
-                }
-                println("second part : " + isSecondPartValid)
+                throw IllegalArgumentException("The end time cannot exceed " + (listLatestEnd[i+1]!! - round.deliveries().elementAt(i+1).duration.length.seconds
+                        - round.path().elementAt(i+1).length.seconds))
+            }
 
-                if(isFirstPartValid && isSecondPartValid) {
-                    round.modify(i,delivery.startTime, delivery.endTime, delivery.duration)
+            if(delivery.startTime == null && delivery.endTime == null) {
+                nextNonNullLatestEndTime =  getNextNonNull(listEarliestEnd,i)
+
+                if(nextNonNullLatestEndTime != null && delivery.duration.toSeconds() > nextNonNullLatestEndTime!!.toSeconds()-listEarliestEnd[i].toSeconds()){
+                    throw IllegalArgumentException("The duration cannot exceed " + (nextNonNullLatestEndTime.toSeconds() - listEarliestEnd[i].toSeconds()))
                 }
             }
+
+            round.modify(i,delivery.startTime,delivery.endTime, delivery.duration)
+        } else {
+            throw IllegalArgumentException("Check the values for the given delivery.")
+        }
     }
 
+    fun getLastestEndTime(round: Round): List<Instant?> {
+
+        val result = mutableListOf<Instant?>()
+        result.add(null)
+
+        round.deliveries().reversed().forEachIndexed { i, delivery ->
+
+            var index = round.deliveries().size - 1 - i
+            if(result.first() == null) {
+                result.add(0, delivery.endTime)
+            } else {
+                var lastestDeparture = result.first()!! - (round.deliveries().elementAt( index + 1).duration + round.path().elementAt(index + 1).length.seconds)
+                if(delivery.endTime != null && delivery.endTime < lastestDeparture) result.add(0,delivery.endTime) else result.add(0,lastestDeparture)
+            }
+        }
+        return result
+    }
+
+    fun getEarliestEndTime(round: Round): List<Instant> {
+
+        val result = mutableListOf<Instant>()
+        result += round.warehouse.departureHour
+
+        round.deliveries().forEachIndexed { index, delivery ->
+            val arrivalTime = result[index] + round.path().elementAt(index).length.seconds
+            val startDelivery = if(delivery.startTime != null && delivery.startTime > arrivalTime) delivery.startTime else arrivalTime
+            result += startDelivery + delivery.duration
+        }
+
+        val arrivalTime = result.last() + round.path().last().length.seconds
+        result += arrivalTime
+
+        return result
+
+    }
+
+    private fun getNextNonNull(list:List<Instant?>, i: Int) : Instant?{
+        var nextNonNullLatestEndTime: Instant? = null
+        for( j:Int in i+1 .. list.size) {
+            if(list[j] != null){
+                nextNonNullLatestEndTime = list[j]
+                break
+            }
+        }
+        return nextNonNullLatestEndTime
+    }
     /**
      * @param from : the delivery from the one you want to compute the time
      * @param to : the next delivery after from
@@ -147,12 +167,8 @@ class RoundModifierImp(
     }
 
     private fun isDeliveryValid(delivery: Delivery) : Boolean {
-        if(delivery.startTime != null && delivery.endTime !=null){
-            if(delivery.startTime.plus(Duration(0,0,delivery.duration.toSeconds().toInt())).compareTo(delivery.endTime) <0){
-                return true
-            }
-            return false
-        }
+        if(delivery.startTime != null && delivery.endTime !=null)
+            if(delivery.startTime!! + delivery.duration > delivery.endTime) return false
         return true
     }
 
