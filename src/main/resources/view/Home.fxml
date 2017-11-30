@@ -37,7 +37,6 @@
     </right>
     <bottom>
         <HBox alignment="BASELINE_LEFT" minHeight="50" maxHeight="70" fx:id="bottomBox">
-            <Button text="TEST"/>
         </HBox>
     </bottom>
 </BorderPane>

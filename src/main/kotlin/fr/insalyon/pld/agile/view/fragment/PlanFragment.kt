@@ -196,7 +196,7 @@ class PlanFragment : Fragment(){
           dragDelta.x = layoutX +shapeGroup.translateX - mouseEvent.sceneX
           dragDelta.y = layoutY + shapeGroup.translateY- mouseEvent.sceneY
       }
-      onMouseReleased = EventHandler { mouseEvent ->
+      onMouseReleased = EventHandler {
           cursor = Cursor.HAND
       }
       onMouseDragOver=EventHandler { mouseEvent ->

@@ -42,7 +42,7 @@ class TimelineFragment() : Fragment() {
     val middle = 15.0
     var actualX = 15.0
     var time = round.warehouse.departureHour.toSeconds()
-    round.distancePathInMeters().forEachIndexed { index, it ->
+    round.distancePathInMeters().forEach{
       val deplacement = transform(it.edges)
       actualX += deplacement
 
@@ -123,7 +123,6 @@ class TimelineFragment() : Fragment() {
   override val root: StackPane = stackpane {
     minWidth = parentView.bottom.boundsInLocal.width
     minHeight = parentView.bottom.boundsInLocal.height
-    println(minHeight)
     add(shapeGroup)
   }
 
