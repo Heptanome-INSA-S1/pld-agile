@@ -1,8 +1,11 @@
 package fr.insalyon.pld.agile
 
 import fr.insalyon.pld.agile.model.km_h
+import fr.insalyon.pld.agile.util.Logger
 
 object Config {
+
+  val LOGGER_LEVEL = Logger.DEBUG
 
   val DEFAULT_MAP = null
   val DEFAULT_DELIVERY = null

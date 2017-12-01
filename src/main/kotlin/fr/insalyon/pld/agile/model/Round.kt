@@ -3,6 +3,7 @@ package fr.insalyon.pld.agile.model
 import com.sun.javaws.exceptions.InvalidArgumentException
 import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
+import fr.insalyon.pld.agile.sumLongBy
 import java.util.*
 
 /**
@@ -11,14 +12,22 @@ import java.util.*
 class Round(
     val warehouse: Warehouse,
     deliveries: LinkedHashSet<Delivery>,
-    path: LinkedHashSet<Path<Intersection, Junction>>
+    durationPath: List<Measurable>,
+    distancePath: LinkedHashSet<Path<Intersection, Junction>>
 ) : Observable(), Measurable{
 
   private val _deliveries: MutableList<Delivery> = deliveries.toMutableList()
   fun deliveries(): LinkedHashSet<Delivery> = _deliveries.toLinkedHashSet()
 
-  private val _path: MutableList<Path<Intersection, Junction>> = path.toMutableList()
-  fun path(): LinkedHashSet<Path<Intersection, Junction>> = _path.toLinkedHashSet()
+  private val _durationPath: MutableList<Measurable> = durationPath.toMutableList()
+  fun durationPathInSeconds(): List<Duration> {
+    return _durationPath.map { it.length.seconds }
+  }
+
+  private val _distancePath: MutableList<Path<Intersection, Junction>> = distancePath.toMutableList()
+  fun distancePathInMeters(): LinkedHashSet<Path<Intersection, Junction>> {
+    return _distancePath.toLinkedHashSet()
+  }
 
   fun addDelivery(subPath: SubPath) {
 
@@ -30,8 +39,11 @@ class Round(
       val deliveryBefore = _deliveries.first { it.address == subPath.pathFromPreviousDelivery.nodes.first() }
       index = _deliveries.addAfter(deliveryBefore, subPath.delivery)
     }
-    _path.add(index, subPath.pathToNextDelivery)
-    _path.add(index, subPath.pathFromPreviousDelivery)
+    _durationPath.add(index, subPath.durationToNextDelivery)
+    _durationPath.add(index, subPath.durationFromPreviousDelivery)
+
+    _distancePath.add(index, subPath.pathToNextDelivery)
+    _distancePath.add(index, subPath.pathFromPreviousDelivery)
 
     setChanged()
     notifyObservers()
@@ -42,27 +54,34 @@ class Round(
     _deliveries[index] = newDelivery
   }
 
-  fun removeDelivery(delivery: Delivery, pathToReplaceWith: Path<Intersection, Junction>) {
+  fun removeDelivery(delivery: Delivery, pathToReplaceWith: Path<Intersection, Junction>, duration: Duration) {
 
     val index = _deliveries.indexOf(delivery)
     if(index == -1) throw InvalidArgumentException(arrayOf("$delivery was not found in the round"))
+
     _deliveries.removeAt(index)
 
-    _path.removeAt(index)
-    _path.removeAt(index)
+    _durationPath.removeAt(index)
+    _distancePath.removeAt(index)
 
-    _path.add(index, pathToReplaceWith)
+    _durationPath.removeAt(index)
+    _distancePath.removeAt(index)
+
+    _durationPath.add(index, duration)
+    _distancePath.add(index, pathToReplaceWith)
 
     setChanged()
     notifyObservers()
   }
+
+  val distance: Long = _distancePath.sumLongBy { it.length }
 
   override val length: Long
     get() {
       var duration = Duration()
 
       val deliveryIterator = _deliveries.iterator()
-      val pathIterator = _path.iterator()
+      val pathIterator = _durationPath.iterator()
 
       var previousDelivery: Delivery? = null
       var currentHour = warehouse.departureHour
@@ -106,7 +125,38 @@ class Round(
     return stringBuilder.toString()
   }
 
-  private fun <E> MutableList<E>.toLinkedHashSet(): LinkedHashSet<E> {
+  fun toTrace(): String {
+
+    val stringBuilder = StringBuilder()
+
+    stringBuilder.appendln("Departure: ${warehouse.departureHour}")
+    stringBuilder.appendln("Warehouse at ${warehouse.address.id}")
+    var time = warehouse.departureHour
+    deliveries().forEachIndexed{index, delivery ->
+      time += _durationPath[index].length.seconds
+      var waitingTime = 0.seconds
+      if(delivery.startTime != null && time < delivery.startTime) {
+        waitingTime = delivery.startTime - time
+      }
+
+      stringBuilder.appendln("Travel time: ${_durationPath[index].length.seconds}")
+
+      stringBuilder.appendln("Delivery: ${delivery.address.id}")
+      stringBuilder.appendln("Arrival at $time - Waiting time: $waitingTime - StartTime: ${delivery.startTime} - Duration: ${delivery.duration} - EndTime: ${delivery.endTime} - DepartureTime: ${time + waitingTime + delivery.duration}")
+      time += waitingTime
+      time += delivery.duration
+    }
+
+    stringBuilder.appendln("Travel time: ${_durationPath.last().length.seconds}")
+    time += _durationPath.last().length.seconds
+    stringBuilder.appendln("Arrival at $time")
+    stringBuilder.appendln("Warehouse at ${warehouse.address.id}")
+
+    return stringBuilder.toString()
+
+  }
+
+  private fun <E> List<E>.toLinkedHashSet(): LinkedHashSet<E> {
     val linkedHashSet = linkedSetOf<E>()
     linkedHashSet.addAll(this)
     return linkedHashSet

@@ -1,7 +1,11 @@
 package fr.insalyon.pld.agile.lib.graph.model
 
 import fr.insalyon.pld.agile.POSITIVE_INFINITY
+import fr.insalyon.pld.agile.model.Duration
+import fr.insalyon.pld.agile.model.Speed
+import fr.insalyon.pld.agile.model.seconds
 import fr.insalyon.pld.agile.sumLongBy
+
 
 /**
  * A path from the nodes nodes.first() to the nodes.nodes.last() using all the intermediate nodes
@@ -44,6 +48,10 @@ data class Path<out N, out E : Measurable>(
         .append("]")
 
     return stringBuilder.toString()
+  }
+
+  fun toDuration(speed: Speed): Duration {
+    return (length * (1.0 / speed.to(Speed.DistanceUnit.M, Speed.DurationUnit.S).value)).toLong().seconds
   }
 
 

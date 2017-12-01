@@ -1,12 +1,14 @@
 package fr.insalyon.pld.agile.service.roundcomputing.implementation
 
 import fr.insalyon.pld.agile.lib.graph.model.Graph
+import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.service.algorithm.api.TSP
 import fr.insalyon.pld.agile.service.algorithm.implementation.DijsktraImpl
 import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1
 import fr.insalyon.pld.agile.service.roundcomputing.api.RoundComputer
+import java.util.*
 
 class RoundComputerImpl(
     /**
@@ -16,11 +18,12 @@ class RoundComputerImpl(
     /**
      * The round request to compute
      */
-    val roundRequest: RoundRequest,
+    private val roundRequest: RoundRequest,
+    private val tsp: TSP = TSP1(),
     /**
-     * The truck speed in dm/s
+     * The truck speed
      */
-    val speed: Speed
+    private val speed: Speed
 ) : RoundComputer {
 
   fun getSubPlan(): Graph<Intersection, Path<Intersection, Junction>> {
@@ -40,30 +43,29 @@ class RoundComputerImpl(
   }
 
   private fun compute(): Round {
+    val subPlanInMeters = getSubPlan()
+    val subPlanInSeconds = subPlanInMeters.rescale(1.0 / speed.to(Speed.DistanceUnit.M, Speed.DurationUnit.S).value)
 
-    val speedInDamSeconds = speed.to(Speed.DistanceUnit.DAM, Speed.DurationUnit.S)
-
-    val tsp: TSP = TSP1()
-    val subPlan = getSubPlan()
     tsp.findSolution(
-        10_000,
+        10.minutes.toMillis().toInt(),
         roundRequest.intersections.size,
-        subPlan.adjacencyMatrix.map { row -> row.map { it -> it * speedInDamSeconds.value }.toLongArray() }.toTypedArray(),
+        subPlanInSeconds.adjacencyMatrix,
         roundRequest.durations.map { it.toSeconds() }.toLongArray()
     )
 
     val intersections = buildIntersections(tsp)
     val linkedSetOfDeliveries = buildDeliveries(intersections)
-    val linkedSetOfPaths = buildPath(intersections, subPlan)
+    val linkedSetOfDurationPaths = buildDurationPath(intersections, subPlanInSeconds)
+    val linkedSetOfDistancePaths = buildDistancePath(intersections, subPlanInMeters)
 
-    return Round(roundRequest.warehouse, linkedSetOfDeliveries, linkedSetOfPaths)
+    return Round(roundRequest.warehouse, linkedSetOfDeliveries, linkedSetOfDurationPaths, linkedSetOfDistancePaths)
 
   }
 
   private fun buildIntersections(tsp: TSP): List<Intersection> {
     val result = mutableListOf<Intersection>()
     roundRequest.intersections.indices
-        .map { index -> tsp.getBestSolution(index) }
+        .map { index -> tsp.getBestSolution(index) ?: throw RuntimeException("Cannot compute this round.") }
         .forEach { nodeIndex -> result += roundRequest.intersections[nodeIndex] }
     return result
   }
@@ -72,9 +74,25 @@ class RoundComputerImpl(
     return intersections.filterIndexed{ i, _ -> i != 0 }.map { intersection -> roundRequest.deliveries.first { it.address == intersection } }.toLinkedHashSet()
   }
 
-  private fun buildPath(intersections: List<Intersection>, subPlan: Graph<Intersection, Path<Intersection, Junction>>): LinkedHashSet<Path<Intersection, Junction>> {
+  private fun buildDistancePath(intersections: List<Intersection>, subPlan: Graph<Intersection, Path<Intersection, Junction>>): LinkedHashSet<Path<Intersection, Junction>> {
     val result = LinkedHashSet<Path<Intersection, Junction>>()
     result.add(subPlan.edgeBetween(roundRequest.warehouse.address, intersections[1])!!.element)
+
+
+    for(i in 1 until intersections.size - 1) {
+      result.add(
+          subPlan.edgeBetween(intersections[i], intersections[i+1])!!.element
+      )
+    }
+
+    result.add(subPlan.outEdgesOf(intersections.last()).find { it.to.element == roundRequest.warehouse.address }!!.element)
+    return result
+  }
+
+  private fun buildDurationPath(intersections: List<Intersection>, subPlan: Graph<Intersection, Measurable>): List<Measurable> {
+    val result = mutableListOf<Measurable>()
+
+    result += subPlan.edgeBetween(roundRequest.warehouse.address, intersections[1])!!.element
 
     for(i in 1 until intersections.size - 1) {
       result.add(
