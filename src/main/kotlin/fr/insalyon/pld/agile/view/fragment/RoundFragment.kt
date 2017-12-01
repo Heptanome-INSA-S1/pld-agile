@@ -73,9 +73,6 @@ class RoundFragment : Fragment() {
           baseColor=Color.WHITE
         }
       }
-      label (" : "+ round!!.warehouse.departureHour.toFormattedString()){
-        paddingTop=4
-      }
     }
     borderpane {
       paddingTop=20.0
@@ -181,12 +178,12 @@ class RoundFragment : Fragment() {
 
   override val root = scrollpane {
     if(round != null) {
-      add(list)
+      add(container)
     }
   }
 
   private fun deliveryToText(d: Delivery): String{
-    var res = " ( "+d.duration+" )"
+    var res = ""
     if(d.startTime !=null && d.endTime !=null) {
       res += " : " + d.startTime.toFormattedString() + "-"+ d.endTime.toFormattedString()
     }

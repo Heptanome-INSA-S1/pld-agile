@@ -6,6 +6,8 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <BorderPane xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" >
     <top>
         <GridPane>
@@ -25,13 +27,17 @@
         </GridPane>
     </top>
     <center>
-        <VBox alignment="CENTER" spacing="10" fx:id="centerBox" minWidth="800" minHeight="800" >
+        <StackPane alignment="CENTER"  fx:id="centerBox" minWidth="800" minHeight="800" >
             <Button text="Charger map" fx:id="loadPlanButton"/>
-        </VBox>
+        </StackPane>
     </center>
     <right>
         <VBox alignment="CENTER" minWidth="400" fx:id="rightBox">
             <Button text="Charger round request" fx:id="loadRoundRequestButton"/>
         </VBox>
     </right>
+    <bottom>
+        <HBox alignment="BASELINE_LEFT" minHeight="50" maxHeight="70" fx:id="bottomBox">
+        </HBox>
+    </bottom>
 </BorderPane>

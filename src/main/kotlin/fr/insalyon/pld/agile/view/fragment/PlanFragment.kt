@@ -17,6 +17,7 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.scene.shape.Line
 import javafx.util.Duration
+import java.lang.Math.min
 import tornadofx.*
 import java.lang.Math.abs
 
@@ -40,9 +41,9 @@ class PlanFragment : Fragment(){
   val plan: Plan by param()
   val round: Round? by param()
 
-  val MAP_SIZE: Double by param(800.0)
+  var MAP_SIZE=min(parentView.center.boundsInLocal.width,parentView.center.boundsInLocal.height)
 
-  var SIZE = 1.0
+    var SIZE = 1.0
 
   private fun transform(x: Number, y: Number): Pair<Double, Double> {
     val transformedX = (y.toDouble() / (plan.height.toDouble()) * MAP_SIZE)
@@ -152,6 +153,8 @@ class PlanFragment : Fragment(){
   }
 
   val scroll = scrollpane {
+      shapeGroup.translateX=(parentView.center.boundsInLocal.width-MAP_SIZE)/2
+      shapeGroup.translateY=(parentView.center.boundsInLocal.height-MAP_SIZE)/2
       hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
       vbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
       style = "-fx-background: #3B3833;"
@@ -194,29 +197,31 @@ class PlanFragment : Fragment(){
       onMousePressed = EventHandler { mouseEvent ->
           // record a delta distance for the drag and drop operation.
           cursor = Cursor.MOVE
-          dragDelta.x = layoutX +shapeGroup.translateX - mouseEvent.sceneX
-          dragDelta.y = layoutY + shapeGroup.translateY- mouseEvent.sceneY
+          println(""+parentView.center.boundsInLocal.width+" "+layoutX+" "+mouseEvent.sceneX)
+          dragDelta.x = (shapeGroup.translateX - mouseEvent.sceneX)
+          dragDelta.y = (shapeGroup.translateY - mouseEvent.sceneY)
       }
-      onMouseReleased = EventHandler { mouseEvent ->
+      onMouseReleased = EventHandler {
           cursor = Cursor.HAND
       }
       onMouseDragOver=EventHandler { mouseEvent ->
-          if(abs(mouseEvent.sceneX + dragDelta.x)<400*abs(1-shapeGroup.scaleX)+50||abs(mouseEvent.sceneX + dragDelta.x)<abs(shapeGroup.translateX))
+          println(""+ mouseEvent.sceneX +" "+ dragDelta.x+" "+shapeGroup.scaleX+" "+(parentView.center.boundsInLocal.width/2)*(1-shapeGroup.scaleX)+" "+parentView.center.boundsInLocal.width)
+          if(abs(mouseEvent.sceneX + dragDelta.x)*MAP_SIZE/parentView.center.boundsInLocal.width<(parentView.center.boundsInLocal.width/2)*abs(1-shapeGroup.scaleX)+50||abs(mouseEvent.sceneX + dragDelta.x)<abs(shapeGroup.translateX))
             shapeGroup.translateX = mouseEvent.sceneX + dragDelta.x
-          if(abs(mouseEvent.sceneY + dragDelta.y)<400*abs(1-shapeGroup.scaleY)+50||abs(mouseEvent.sceneY + dragDelta.y)<abs(shapeGroup.translateY))
+          if(abs(mouseEvent.sceneY + dragDelta.y)*MAP_SIZE/parentView.center.boundsInLocal.height<(parentView.center.boundsInLocal.height/2)*abs(1-shapeGroup.scaleY)+50||abs(mouseEvent.sceneY + dragDelta.y)<abs(shapeGroup.translateY))
             shapeGroup.translateY = mouseEvent.sceneY + dragDelta.y
       }
       onMouseClicked = EventHandler { mouseEvent ->
           if (mouseEvent.clickCount == 2) {
               val tt = TranslateTransition(Duration.millis(500.0), shapeGroup)
-              if(abs(shapeGroup.translateX +400 - mouseEvent.sceneX)<400*abs(1-shapeGroup.scaleX)+50 )
-                  tt.toX =  shapeGroup.translateX + 400 - mouseEvent.sceneX
+              if(abs(shapeGroup.translateX +(MAP_SIZE/2) - mouseEvent.sceneX)<(MAP_SIZE/2)*abs(1-shapeGroup.scaleX)+50 )
+                  tt.toX =  shapeGroup.translateX + (MAP_SIZE/2) - mouseEvent.sceneX
               else
-                  tt.toX = (400*abs(1-shapeGroup.scaleX)+50)*(400-mouseEvent.sceneX)/abs(400-mouseEvent.sceneX) //TODO chercher comment avoir le signe
-              if(abs(shapeGroup.translateY +400 - mouseEvent.sceneY)<400*abs(1-shapeGroup.scaleY)+50)
-                  tt.toY = shapeGroup.translateY + 400 - mouseEvent.sceneY
+                  tt.toX = ((MAP_SIZE/2)*abs(1-shapeGroup.scaleX)+50)*((MAP_SIZE/2)-mouseEvent.sceneX)/abs((MAP_SIZE/2)-mouseEvent.sceneX) //TODO chercher comment avoir le signe
+              if(abs(shapeGroup.translateY +(MAP_SIZE/2) - mouseEvent.sceneY)<(MAP_SIZE/2)*abs(1-shapeGroup.scaleY)+50)
+                  tt.toY = shapeGroup.translateY + (MAP_SIZE/2) - mouseEvent.sceneY
               else
-                  tt.toY = (400*abs(1-shapeGroup.scaleY)+50)*(400-mouseEvent.sceneY)/abs(400-mouseEvent.sceneY)
+                  tt.toY = ((MAP_SIZE/2)*abs(1-shapeGroup.scaleY)+50)*((MAP_SIZE/2)-mouseEvent.sceneY)/abs((MAP_SIZE/2)-mouseEvent.sceneY)
               tt.play()
           }
       }
@@ -234,9 +239,7 @@ class PlanFragment : Fragment(){
         }
     }
 
-  override val root = stackpane {
-    add(scroll)
-  }
+  override val root = scroll
 
 
   fun zoomIn() {
