@@ -1,23 +1,24 @@
 package fr.insalyon.pld.agile.view.fragment
+
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
+import fr.insalyon.pld.agile.util.Logger
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
+import javafx.animation.TranslateTransition
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.Cursor
+import javafx.scene.Group
 import javafx.scene.control.ScrollPane
-
+import javafx.scene.input.ScrollEvent
 import javafx.scene.layout.BorderPane
 import javafx.scene.paint.Color
-import tornadofx.*
-import javafx.scene.input.ScrollEvent
-import java.lang.Math.abs
-import javafx.animation.TranslateTransition
-import javafx.scene.Group
 import javafx.scene.shape.Circle
 import javafx.scene.shape.Line
 import javafx.util.Duration
+import tornadofx.*
+import java.lang.Math.abs
 
 
 const val UP : Int = 0
@@ -75,7 +76,7 @@ class PlanFragment : Fragment(){
     if(round!=null){
       val notNullRound = round!!
 
-      notNullRound.durationPathInSeconds().forEach{
+      notNullRound.distancePathInMeters().forEach{
         var fromX: Double
         var fromY: Double
         var toX = 0.0
@@ -187,7 +188,7 @@ class PlanFragment : Fragment(){
       }
       val dragDelta = Delta()
       onDragDetected=EventHandler {
-          println("onDragDetected")
+          Logger.debug("onDragDetected")
           startFullDrag()
       }
       onMousePressed = EventHandler { mouseEvent ->
@@ -200,7 +201,6 @@ class PlanFragment : Fragment(){
           cursor = Cursor.HAND
       }
       onMouseDragOver=EventHandler { mouseEvent ->
-          //println(""+ (mouseEvent.sceneX + dragDelta.x)+" "+shapeGroup.scaleX+" "+400*(1-shapeGroup.scaleX))
           if(abs(mouseEvent.sceneX + dragDelta.x)<400*abs(1-shapeGroup.scaleX)+50||abs(mouseEvent.sceneX + dragDelta.x)<abs(shapeGroup.translateX))
             shapeGroup.translateX = mouseEvent.sceneX + dragDelta.x
           if(abs(mouseEvent.sceneY + dragDelta.y)<400*abs(1-shapeGroup.scaleY)+50||abs(mouseEvent.sceneY + dragDelta.y)<abs(shapeGroup.translateY))
@@ -221,7 +221,7 @@ class PlanFragment : Fragment(){
           }
       }
       setOnKeyPressed { event ->
-          println(event.character)
+          Logger.debug(event.character)
       }
    }
 
@@ -285,7 +285,6 @@ class PlanFragment : Fragment(){
 
     private fun highlightLocation(idToHighlight:String, isWarehouse:Boolean){
         if(idHighlight!=null) {
-            //println("lowlight : "+idHighlight)
             shapeGroup.children
                     .filter { it.id != null && it is Group && it.id ==idHighlight }
                     .forEach {
@@ -304,7 +303,7 @@ class PlanFragment : Fragment(){
                         }
                     }
         }
-        println("highlight : "+ idToHighlight)
+        Logger.debug("highlight : "+ idToHighlight)
         if(idHighlight!= idToHighlight) {
             shapeGroup.children
                     .filter { it.id != null && it is Circle && it.id ==idToHighlight }

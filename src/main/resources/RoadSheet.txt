@@ -3,7 +3,7 @@ You have to leave the warehouse (x:4, y:20) at 8 h
 ________________________________________________________________________
 You have to : 
 
-	|Take J1 during 5400000000 m
+	|Take J1 during 1000 m
 
 	It's now time to do the delivery 0 (x:10, y:15) - Details:
 		Start at : n/a
@@ -12,8 +12,8 @@ You have to :
 ________________________________________________________________________
 You have to : 
 
-	|Take J2 during 5400000000 m
-	|Take J3 during 5400000000 m
+	|Take J2 during 1000 m
+	|Take J3 during 1000 m
 
 	It's now time to do the delivery 1 (x:10, y:20) - Details:
 		Start at : n/a

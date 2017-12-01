@@ -7,9 +7,9 @@ import fr.insalyon.pld.agile.POSITIVE_INFINITY
  * The edges are like Triple(fromNode, edge, toNode)
  */
 open class Graph<N, out E : Measurable>(
-    elements: Set<N> = emptySet(),
-    edges: Set<Triple<N, E, N>> = emptySet(),
-    worstLength: Long = Long.POSITIVE_INFINITY
+    private val elements: Set<N> = emptySet(),
+    private val edges: Set<Triple<N, E, N>> = emptySet(),
+    private val worstLength: Long = Long.POSITIVE_INFINITY
 ) {
   private val internalOutEdges = mutableListOf<MutableList<Edge<N, E>>>()
   private val internalInEdges = mutableListOf<MutableList<Edge<N, E>>>()
@@ -78,5 +78,18 @@ open class Graph<N, out E : Measurable>(
   fun edgeBetween(from: N, to: N): Edge<N, E>? = outEdges[nodes.first { it.element == from }.index].find { it.to.element == to }
 
   override fun toString(): String = "Graph(nodes=$nodes, internalOutEdges=$internalOutEdges)"
+
+  fun rescale(coef: Number): Graph<N, Measurable> {
+    return Graph(
+        elements,
+        edges.map {
+          val path = object : Measurable {
+            override val length: Long
+              get() = (it.second.length * coef.toDouble()).toLong()
+          }
+          Triple(it.first, path, it.third) }.toSet(),
+        worstLength
+    )
+  }
 
 }
