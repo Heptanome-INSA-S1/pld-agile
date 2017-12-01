@@ -15,11 +15,6 @@ import javafx.scene.layout.VBox
 import javafx.scene.layout.HBox
 import javafx.stage.Modality
 import tornadofx.*
-import javafx.scene.input.TransferMode
-import javafx.stage.Modality
-import javafx.scene.control.Alert.AlertType
-import javafx.scene.image.Image
-import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 
 /**
