@@ -46,11 +46,9 @@ class Round(
     notifyObservers()
   }
 
-  fun modify(delivery: Delivery, startTime: Instant?, endTime: Instant?, duration: Duration) {
-    val newDelivery = delivery.copy(startTime = startTime, endTime = endTime, duration = duration)
-    val index = _deliveries.indexOf(delivery)
-    _deliveries.removeAt(index)
-    _deliveries.add(index, newDelivery)
+  fun modify(index: Int, startTime: Instant?, endTime: Instant?, duration: Duration) {
+    val newDelivery = _deliveries[index].copy(startTime = startTime, endTime = endTime, duration = duration)
+    _deliveries[index] = newDelivery
   }
 
   fun removeDelivery(delivery: Delivery, pathToReplaceWith: Path<Intersection, Junction>) {
