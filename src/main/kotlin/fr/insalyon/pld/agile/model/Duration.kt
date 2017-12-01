@@ -24,6 +24,9 @@ class Duration private constructor(
   }
 
   fun toSeconds() = _seconds
+
+  fun toMillis() = _seconds * 1000L
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (javaClass != other?.javaClass) return false

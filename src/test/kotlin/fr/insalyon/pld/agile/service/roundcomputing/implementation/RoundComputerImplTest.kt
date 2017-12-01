@@ -1,25 +1,26 @@
 package fr.insalyon.pld.agile.service.roundcomputing.implementation
 
 import fr.insalyon.pld.agile.model.*
+import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1
 import fr.insalyon.pld.agile.service.roundcomputing.api.RoundComputer
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class RoundComputerImplTest {
 
-  val source = Intersection(2,0,0)
+  val source = Intersection(2, 0, 0)
 
-  val node1 = Intersection(1,0,0)
-  val node3 = Intersection(3,0,0)
-  val node4 = Intersection(4,0,0)
-  val node5 = Intersection(5,0,0)
-  val node6 = Intersection(6,0,0)
+  val node1 = Intersection(1, 0, 0)
+  val node3 = Intersection(3, 0, 0)
+  val node4 = Intersection(4, 0, 0)
+  val node5 = Intersection(5, 0, 0)
+  val node6 = Intersection(6, 0, 0)
 
   val plan by lazy {
 
-    val roadOfLength1 = Junction(1, "")
-    val roadOfLength2 = Junction(2, "")
-    val roadOfLength4 = Junction(4, "")
+    val roadOfLength1 = Junction(1000, "")
+    val roadOfLength2 = Junction(2000, "")
+    val roadOfLength4 = Junction(4000, "")
 
     Plan(
         setOf<Intersection>(node1, source, node3, node4, node5, node6),
@@ -47,7 +48,7 @@ class RoundComputerImplTest {
   @Test
   fun compute() {
 
-    val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, 15.km_h)
+    val roundComputer: RoundComputer = RoundComputerImpl(plan = plan,roundRequest =  roundRequest, tsp = TSP1(),speed = 15.km_h)
     val round = roundComputer.round
 
     assertEquals(source, round.warehouse.address)

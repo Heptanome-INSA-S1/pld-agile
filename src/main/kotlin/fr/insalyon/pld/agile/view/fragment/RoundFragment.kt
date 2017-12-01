@@ -177,7 +177,9 @@ class RoundFragment : Fragment() {
   }
 
   override val root = scrollpane {
-    add(container)
+    if(round != null) {
+      add(container)
+    }
   }
 
   private fun deliveryToText(d: Delivery): String{

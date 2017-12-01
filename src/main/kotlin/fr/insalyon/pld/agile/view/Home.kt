@@ -2,12 +2,18 @@ package fr.insalyon.pld.agile.view
 
 
 import fr.insalyon.pld.agile.controller.implementation.Controller
+import fr.insalyon.pld.agile.util.Logger
 import fr.insalyon.pld.agile.view.fragment.PlanFragment
 import fr.insalyon.pld.agile.view.fragment.RoundFragment
 import fr.insalyon.pld.agile.view.fragment.TimelineFragment
 import javafx.scene.control.*
+import javafx.scene.control.Alert.AlertType
+import javafx.scene.image.Image
+import javafx.scene.input.TransferMode
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.VBox
+import javafx.scene.layout.HBox
+import javafx.stage.Modality
 import tornadofx.*
 import javafx.scene.input.TransferMode
 import javafx.stage.Modality
@@ -84,7 +90,7 @@ class Home : View() {
 
   fun refreshPlan() {
     centerBox.clear()
-    println("Plan is printed")
+    Logger.info("Plan is printed")
     centerBox.add(PlanFragment::class, mapOf(
         PlanFragment::parentView to root,
         PlanFragment::plan to controller.plan))

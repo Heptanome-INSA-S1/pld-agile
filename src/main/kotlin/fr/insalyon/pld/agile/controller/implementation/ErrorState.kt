@@ -1,6 +1,7 @@
 package fr.insalyon.pld.agile.controller.implementation
 
 import fr.insalyon.pld.agile.controller.api.State
+import fr.insalyon.pld.agile.util.Logger
 import java.io.File
 
 class ErrorState : DefaultState<Pair<Exception, State<Nothing>>>(){
@@ -10,28 +11,28 @@ class ErrorState : DefaultState<Pair<Exception, State<Nothing>>>(){
   override fun init(controller: Controller, element: Pair<Exception, State<Nothing>>) {
     val exception = element.first
     previousState = element.second
-    controller.window.errorPopUp(exception.message)
+    exception.printStackTrace()
+    controller.window.errorPopUp(exception.localizedMessage)
   }
 
   override fun loadPlan(controller: Controller) {
-    println("loadPlan was call in ErrorState")
+    Logger.info("loadPlan was call in ErrorState")
   }
 
   override fun loadPlan(controller: Controller, file: File) {
-    println("loadPlan with file was call in ErrorState")
+    Logger.info("loadPlan with file was call in ErrorState")
   }
 
   override fun loadRoundRequest(controller: Controller) {
-    println("loadRoundRequest was call in ErrorState")
+    Logger.info("loadRoundRequest was call in ErrorState")
   }
 
   override fun loadRoundRequest(controller: Controller, file : File) {
-    println("loadRoundRequest with file was call in ErrorState")
+    Logger.info("loadRoundRequest with file was call in ErrorState")
   }
 
   override fun ok(controller: Controller) {
-   // controller.window.counter.value = ""
-    println("Ok was call from ERROR_STATE")
+    Logger.info("Ok was call from ERROR_STATE")
     controller.changeState(previousState)
   }
 
