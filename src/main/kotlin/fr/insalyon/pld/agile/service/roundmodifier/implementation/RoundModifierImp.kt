@@ -1,5 +1,6 @@
 package fr.insalyon.pld.agile.service.roundmodifier.implementation
 
+import fr.insalyon.pld.agile.lib.graph.model.Path
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.service.algorithm.implementation.DijsktraImpl
 import fr.insalyon.pld.agile.service.roundmodifier.api.RoundModifier
