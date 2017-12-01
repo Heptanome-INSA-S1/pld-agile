@@ -178,7 +178,7 @@ class RoundFragment : Fragment() {
 
   override val root = scrollpane {
     if(round != null) {
-      add(list)
+      add(container)
     }
   }
 
