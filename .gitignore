@@ -5,3 +5,5 @@ build/
 
 *.class
 /out/
+
+src/main/dist/FeuilleDeRoute\.html
