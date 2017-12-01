@@ -76,12 +76,11 @@ class RoadSheetSerializer(){
             }
             var infoLivraison : String = "Livraison au point("+round.deliveries().elementAt(i).address.x!!+","+round.deliveries().elementAt(i).address.y+")<br><br>"
             var j=i
-           while(j<round.durationPathInSeconds().size && round.deliveries().elementAt(i).address != round.durationPathInSeconds().elementAt(j).nodes[0]) {
+           while(j<round.durationPathInSeconds().size && round.deliveries().elementAt(i).address != round.distancePathInMeters().elementAt(j).nodes[0]) {
                 var distance = 0.0
-                var oldName =""
                 round.distancePathInMeters().elementAt(j).edges.forEachIndexed { index, it ->
                     distance += it.length.toDouble()
-                    if (!(index + 1 < round.durationPathInSeconds().elementAt(j).edges.size && it.name.equals(round.durationPathInSeconds().elementAt(j).edges.elementAt(index + 1).name))) {
+                    if (!(index + 1 < round.distancePathInMeters().elementAt(j).edges.size && it.name.equals(round.distancePathInMeters().elementAt(j).edges.elementAt(index + 1).name))) {
                         infoLivraison += "\t Prends  ${it.name} sur ${distance/1000.0} m<br>"
                         distance = 0.0
                     }
