@@ -17,16 +17,44 @@ class Round(
 ) : Observable(), Measurable {
 
   private val _deliveries: MutableList<Delivery> = deliveries.toMutableList()
+  /**
+   * Return the ordered list of deliveries
+   */
   fun deliveries(): List<Delivery> = _deliveries.toList()
 
+  /**
+   * Return the duration of the paths in the round
+   */
   private val _durationPath: MutableList<Measurable> = durationPath.toMutableList()
   fun durationPathInSeconds(): List<Duration> {
     return _durationPath.map { it.length.seconds }
   }
 
+  /**
+   * Return the distance paths (plan part) in the round
+   */
   private val _distancePath: MutableList<Path<Intersection, Junction>> = distancePath.toMutableList()
   fun distancePathInMeters(): List<Path<Intersection, Junction>> {
     return _distancePath
+  }
+
+  /**
+   * Return the waitingTimes for the deliveries in the round
+   */
+  fun getWaitingTimes(): List<Duration> {
+    var waitingTimes = mutableListOf<Duration>()
+    var currentTime = warehouse.departureHour
+    _deliveries.forEachIndexed { i, delivery ->
+      currentTime += _durationPath[i].length.seconds
+      if(delivery.startTime != null && delivery.startTime > currentTime) {
+        waitingTimes.add(delivery.startTime - currentTime)
+        currentTime  = delivery.startTime
+      } else {
+        waitingTimes.add(0.seconds)
+      }
+      currentTime += delivery.duration
+    }
+    return waitingTimes
   }
 
   fun addDelivery(subPath: SubPath) {

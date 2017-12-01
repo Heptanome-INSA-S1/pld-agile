@@ -2,6 +2,7 @@ package fr.insalyon.pld.agile.model
 
 import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
+import fr.insalyon.pld.agile.util.Logger
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -149,6 +150,35 @@ class RoundTest {
     assertEquals(500 + 900 + 250, round.length)
 
   }
+
+  @Test
+  fun testWaitingTimeDuration() {
+
+
+    val round = Round(
+        Warehouse(Intersection(1), 8 h 0),
+        linkedSetOf(
+            Delivery(Intersection(2), startTime = 8 h 20, duration = 5.minutes),
+            Delivery(Intersection(3), startTime = 8 h 40, duration = 15.minutes)
+        ), listOf(
+        object : Measurable {
+          override val length = 10.minutes.toSeconds()
+        },
+        object : Measurable {
+          override val length = 10.minutes.toSeconds()
+        },
+        object : Measurable {
+          override val length = 20.minutes.toSeconds()
+        }
+        ), listOf(
+            Path(listOf(), listOf()),
+            Path(listOf(), listOf()),
+            Path(listOf(), listOf())
+        )
+    )
+    assertEquals(listOf(10.minutes, 5.minutes), round.getWaitingTimes())
+  }
+
 
 
 }
