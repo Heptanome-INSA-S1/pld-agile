@@ -1,10 +1,14 @@
 package fr.insalyon.pld.agile.service.roundmodifier.implementaion
 
 import fr.insalyon.pld.agile.model.*
+import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1
+import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1WithTimeSlot
 import fr.insalyon.pld.agile.service.roundcomputing.api.RoundComputer
 import fr.insalyon.pld.agile.service.roundcomputing.implementation.RoundComputerImpl
 import fr.insalyon.pld.agile.service.roundmodifier.implementation.RoundModifierImp
+import fr.insalyon.pld.agile.util.Logger
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class RoundModifierImpTest {
@@ -20,26 +24,26 @@ class RoundModifierImpTest {
 
     val plan by lazy {
 
-        val roadOfLength1 = Junction(1, "")
-        val roadOfLength2 = Junction(2, "")
-        val roadOfLength4 = Junction(4, "")
+        val roadOfLength1 = Junction(1000, "")
+        val roadOfLength2 = Junction(2000, "")
+        val roadOfLength4 = Junction(4000, "")
 
         Plan(
                 setOf<Intersection>(node1, source, node3, node4, node5, node6, node7),
-                setOf(
-                        //Triple(srcNode, road, destNode)
-                        Triple(node1, roadOfLength1, source),
-                        Triple(node1, roadOfLength4, node3),
-                        Triple(source, roadOfLength1, node4),
-                        Triple(source, roadOfLength2, node5),
-                        Triple(node4, roadOfLength1, node3),
-                        Triple(node4, roadOfLength2, node5),
-                        Triple(node5, roadOfLength1, node6),
-                        Triple(node6, roadOfLength1, source),
-                        Triple(node4,roadOfLength1,node7),
-                        Triple(node7, roadOfLength1, node6)
+            setOf(
+                //Triple(srcNode, road, destNode)
+                Triple(node1, roadOfLength1, source),
+                Triple(node1, roadOfLength4, node3),
+                Triple(source, roadOfLength1, node4),
+                Triple(source, roadOfLength2, node5),
+                Triple(node4, roadOfLength1, node3),
+                Triple(node4, roadOfLength2, node5),
+                Triple(node5, roadOfLength1, node6),
+                Triple(node6, roadOfLength1, source),
+                Triple(node4,roadOfLength1,node7),
+                Triple(node7, roadOfLength1, node6)
 
-                )
+            )
         )
     }
 
@@ -55,73 +59,46 @@ class RoundModifierImpTest {
 
     @Test
     fun removeDeliveryAtFirstPosition(){
-        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, 15.km_h)
+        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(roundRequest.deliveries.elementAt(0),round,plan)
-        roundModifier.removeDelivery(Delivery(node4, duration = 200.seconds),round, 0)
+        val roundModifier = RoundModifierImp(round,plan)
+        Logger.debug(round.toTrace())
 
-        Assert.assertEquals(3, round.path().size)
+        roundModifier.removeDelivery(0, round)
 
-        Assert.assertEquals(2,round.path().elementAt(0).edges[0].length)
-        Assert.assertEquals(2,round.path().elementAt(0).nodes[0].id)
-        Assert.assertEquals(5,round.path().elementAt(0).nodes[1].id)
+        assertEquals(2, round.deliveries().size)
+        assertEquals(2000, round.distancePathInMeters().elementAt(0).length)
+        assertEquals(5, round.deliveries().elementAt(0).address.id)
 
-        Assert.assertEquals(1, round.path().elementAt(1).edges[0].length)
-        Assert.assertEquals(5,  round.path().elementAt(1).nodes[0].id)
-        Assert.assertEquals(6,round.path().elementAt(1).nodes[1].id)
-
-        Assert.assertEquals(1, round.path().elementAt(2).edges[0].length)
-        Assert.assertEquals(6,round.path().elementAt(2).nodes[0].id)
-        Assert.assertEquals(2,round.path().elementAt(2).nodes[1].id)
     }
 
     @Test
     fun removeDeliveryTestNotAtFirstPosition(){
-        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, 15.km_h)
+        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(roundRequest.deliveries.elementAt(1),round,plan)
-        roundModifier.removeDelivery(Delivery(node5, duration = 400.seconds),round, 1)
+        val roundModifier = RoundModifierImp(round,plan)
+        roundModifier.removeDelivery(1, round)
 
-        Assert.assertEquals(2,round.deliveries().size)
-        Assert.assertEquals(4,round.deliveries().elementAt(0).address.id)
-        Assert.assertEquals(6,round.deliveries().elementAt(1).address.id)
-
-        Assert.assertEquals(1,round.path().elementAt(0).edges[0].length)
-        Assert.assertEquals(2,round.path().elementAt(0).nodes[0].id)
-        Assert.assertEquals(4,round.path().elementAt(0).nodes[1].id)
-
-        Assert.assertEquals(1, round.path().elementAt(1).edges[0].length)
-        Assert.assertEquals(1, round.path().elementAt(1).edges[1].length)
-        Assert.assertEquals(4, round.path().elementAt(1).nodes[0].id)
-        Assert.assertEquals(7, round.path().elementAt(1).nodes[1].id)
-        Assert.assertEquals(6, round.path().elementAt(1).nodes[2].id)
-
-        Assert.assertEquals(1,round.path().elementAt(2).edges[0].length)
-        Assert.assertEquals(6,round.path().elementAt(2).nodes[0].id)
-        Assert.assertEquals(2,round.path().elementAt(2).nodes[1].id)
+        assertEquals(2000, round.distancePathInMeters().elementAt(1).length)
+      assertEquals(4, round.deliveries().elementAt(0).address.id)
+      assertEquals(6, round.deliveries().elementAt(1).address.id)
     }
 
     @Test
     fun removeDeliveryTestLastPosition() {
-        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, 15.km_h)
+        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(roundRequest.deliveries.elementAt(2),round,plan)
-        roundModifier.removeDelivery(Delivery(node6, duration = 100.seconds),round, 2)
+        val roundModifier = RoundModifierImp(round,plan)
+        roundModifier.removeDelivery(2, round)
+
+        Assert.assertEquals("2 -> 4 -> 5 -> 2", round.toString())
 
         Assert.assertEquals(2,round.deliveries().size)
         Assert.assertEquals(4,round.deliveries().elementAt(0).address.id)
         Assert.assertEquals(5,round.deliveries().elementAt(1).address.id)
-
-        Assert.assertEquals(4, round.path().elementAt(0).nodes[1].id)
-
-        Assert.assertEquals(5, round.path().elementAt(1).nodes[1].id)
-
-
-        Assert.assertEquals(6, round.path().elementAt(2).nodes[1].id)
-        Assert.assertEquals(2,round.path().elementAt(2).nodes[2].id)
     }
 
     @Test
@@ -160,13 +137,13 @@ class RoundModifierImpTest {
                 )
         )
 
-        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, 15.km_h)
+        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(roundRequest.deliveries.elementAt(1),round,plan)
+        val roundModifier = RoundModifierImp(round,plan)
         var listEarliestEndTime = roundModifier.getEarliestEndTime(round)
 
-        println(listEarliestEndTime)
+        Logger.debug(listEarliestEndTime)
 
     }
 
@@ -206,13 +183,13 @@ class RoundModifierImpTest {
                 )
         )
 
-        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, 15.km_h)
+        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(roundRequest.deliveries.elementAt(1),round,plan)
+        val roundModifier = RoundModifierImp(round,plan)
         var listLatestEndTime = roundModifier.getLastestEndTime(round)
 
-        println(listLatestEndTime)
+        Logger.debug(listLatestEndTime)
     }
 
     //Values for testing the modification of a delivery
@@ -248,20 +225,21 @@ class RoundModifierImpTest {
     @Test(expected = IllegalArgumentException::class)
     fun roundModifyCheckCannotStartBefore8h40(){
 
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, 15.km_h)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(roundRequestBis.deliveries.elementAt(0),round,planBis)
+        val roundModifier = RoundModifierImp(round,planBis)
         roundModifier.modifyDelivery(Delivery(address = node3, startTime = 8 h 39, duration = 600.seconds),round, 1)
     }
 
     @Test
     fun roundModifyCheckCanStartAt8h40(){
 
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, 15.km_h)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(roundRequestBis.deliveries.elementAt(2),round,planBis)
+        Logger.debug(round.toTrace())
+        val roundModifier = RoundModifierImp(round,planBis)
         roundModifier.modifyDelivery(Delivery(address = node3, startTime = 8 h 40, duration = 600.seconds),round, 1)
 
         Assert.assertEquals(8 h 40, round.deliveries().elementAt(1).startTime)
@@ -269,20 +247,20 @@ class RoundModifierImpTest {
 
     @Test (expected= IllegalArgumentException::class)
     fun roundModifyCheckCannotFinishAfter10h30() {
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, 15.km_h)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(roundRequestBis.deliveries.elementAt(2),round,planBis)
+        val roundModifier = RoundModifierImp(round,planBis)
         roundModifier.modifyDelivery(Delivery(address = node1, startTime = 8 h 40, duration = 600.seconds, endTime = 10 h 31),round, 1)
     }
 
     @Test
     fun roundModifyCheckMustFinishMaxAt10h30() {
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, 15.km_h)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 15.km_h)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(roundRequestBis.deliveries.elementAt(2),round,planBis)
-
+        val roundModifier = RoundModifierImp(round,planBis)
+        Logger.debug(round.toTrace())
         Assert.assertEquals(10 h 0, round.deliveries().elementAt(1).endTime)
         roundModifier.modifyDelivery(Delivery(address = node1, startTime = 8 h 40, duration = 600.seconds, endTime = 10 h 30),round, 1)
 
@@ -292,10 +270,10 @@ class RoundModifierImpTest {
     @Test(expected = IllegalArgumentException::class)
     fun roundModifyCheckDurationGreatherThanPreviousAndNextConstraints() {
 
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, 15.km_h)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(roundRequestBis.deliveries.elementAt(2),round,planBis)
+        val roundModifier = RoundModifierImp(round,planBis)
 
         Assert.assertEquals(600.seconds, round.deliveries().elementAt(1).duration)
         roundModifier.modifyDelivery(Delivery(address = node3, duration = 10800.seconds ),round, 1)
@@ -306,10 +284,10 @@ class RoundModifierImpTest {
     @Test
     fun roundModifyCheckDurationWithRespectToConstraints() {
 
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, 15.km_h)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(roundRequestBis.deliveries.elementAt(2),round,planBis)
+        val roundModifier = RoundModifierImp(round,planBis)
 
         Assert.assertEquals(600.seconds, round.deliveries().elementAt(1).duration)
         roundModifier.modifyDelivery(Delivery(address = node3, duration = 1800.seconds ),round, 1)
@@ -319,10 +297,10 @@ class RoundModifierImpTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun roundModifyFirstElementCannotStartBefore8h15() {
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, 15.km_h)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(roundRequestBis.deliveries.elementAt(2),round,planBis)
+        val roundModifier = RoundModifierImp(round,planBis)
 
         Assert.assertEquals(600.seconds, round.deliveries().elementAt(0).duration)
         roundModifier.modifyDelivery(Delivery(address = node3, startTime = 8 h 14, duration = 600.seconds),round, 0)
@@ -330,10 +308,10 @@ class RoundModifierImpTest {
 
     @Test
     fun roundModifyFirstElementCanStartAt8h15(){
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, 15.km_h)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(roundRequestBis.deliveries.elementAt(2),round,planBis)
+        val roundModifier = RoundModifierImp(round,planBis)
 
         Assert.assertEquals(600.seconds, round.deliveries().elementAt(1).duration)
         roundModifier.modifyDelivery(Delivery(address = node3, startTime = 8 h 15, duration = 600.seconds),round, 0)
@@ -342,10 +320,10 @@ class RoundModifierImpTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun roundModifyFirstElementCannotEndAfter9h35() {
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, 15.km_h)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(roundRequestBis.deliveries.elementAt(2),round,planBis)
+        val roundModifier = RoundModifierImp(round,planBis)
 
         Assert.assertEquals(600.seconds, round.deliveries().elementAt(0).duration)
         roundModifier.modifyDelivery(Delivery(address = node3, startTime = 8 h 15, duration = 600.seconds, endTime = 9 h 36),round, 0)

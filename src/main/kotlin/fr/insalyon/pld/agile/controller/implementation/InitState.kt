@@ -1,8 +1,10 @@
 package fr.insalyon.pld.agile.controller.implementation
 
+import fr.insalyon.pld.agile.util.Logger
+
 class InitState : DefaultState<Any>() {
   override fun init(controller: Controller, element: Any) {
-    println("Etat actuel = INIT_STATE")
+    Logger.info("Etat actuel = INIT_STATE")
     super.init(controller, element)
   }
 }

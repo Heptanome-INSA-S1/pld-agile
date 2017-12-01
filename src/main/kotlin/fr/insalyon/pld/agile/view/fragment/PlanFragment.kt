@@ -1,20 +1,25 @@
 package fr.insalyon.pld.agile.view.fragment
+
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
+import fr.insalyon.pld.agile.util.Logger
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
+import javafx.animation.TranslateTransition
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.Cursor
-import javafx.scene.Node
+import javafx.scene.Group
 import javafx.scene.control.ScrollPane
-import javafx.scene.input.MouseEvent
-
+import javafx.scene.input.ScrollEvent
 import javafx.scene.layout.BorderPane
 import javafx.scene.paint.Color
+import javafx.scene.shape.Circle
+import javafx.scene.shape.Line
+import javafx.util.Duration
+import java.lang.Math.min
 import tornadofx.*
-import javafx.scene.input.ScrollEvent
-
+import java.lang.Math.abs
 
 
 const val UP : Int = 0
@@ -25,13 +30,20 @@ const val CENTER : Int = 4
 
 class PlanFragment : Fragment(){
 
+    private val colorLine :Color = Color.ORANGE
+    private val colorDelivery:Color = Color.GREEN
+    private val colorWarehouse:Color = Color.BROWN
+    private val colorLabelCircle :Color = Color.LIGHTGREEN
+    private val colorLineHighlight :Color = Color.RED
+    private val colorCircleHighlight :Color = Color.DARKBLUE
+
   val parentView: BorderPane by param()
   val plan: Plan by param()
   val round: Round? by param()
 
-  val MAP_SIZE: Double by param(800.0)
+  var MAP_SIZE=min(parentView.center.boundsInLocal.width,parentView.center.boundsInLocal.height)
 
-  var SIZE = 1.0
+    var SIZE = 1.0
 
   private fun transform(x: Number, y: Number): Pair<Double, Double> {
     val transformedX = (y.toDouble() / (plan.height.toDouble()) * MAP_SIZE)
@@ -65,32 +77,35 @@ class PlanFragment : Fragment(){
     if(round!=null){
       val notNullRound = round!!
 
-      notNullRound.path().forEach{
+      notNullRound.distancePathInMeters().forEach{
         var fromX: Double
         var fromY: Double
         var toX = 0.0
         var toY = 0.0
         var index = 0
-        it.nodes.forEach{
-          val (nodeX, nodeY) = transform(it.x, it.y)
-          if(index>0){
-            fromX = toX
-            fromY = toY
-            toX = nodeX
-            toY = nodeY
-            line {
-              startY = fromY
-              startX = fromX
-              endY = toY
-              endX = toX
-              stroke = Color.ORANGE
-            }
-          } else {
-            toX = nodeX
-            toY = nodeY
+          group{
+              id=it.nodes.first().id.toString()
+              it.nodes.forEach{
+                  val (nodeX, nodeY) = transform(it.x, it.y)
+                  if(index>0){
+                      fromX = toX
+                      fromY = toY
+                      toX = nodeX
+                      toY = nodeY
+                      line {
+                          startY = fromY
+                          startX = fromX
+                          endY = toY
+                          endX = toX
+                          stroke = colorLine
+                      }
+                  } else {
+                      toX = nodeX
+                      toY = nodeY
+                  }
+                  index++
+              }
           }
-          index++
-        }
       }
 
       val (warehouseXPos, warehouseYPos) = transform(notNullRound.warehouse.address.x, notNullRound.warehouse.address.y)
@@ -98,7 +113,7 @@ class PlanFragment : Fragment(){
         centerX = warehouseXPos
         centerY = warehouseYPos
         radius = SIZE * 7
-        fill = Color.BROWN
+        fill = colorWarehouse
         id = notNullRound.warehouse.address.id.toString()
         onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTCORAL)) }
         setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
@@ -109,7 +124,7 @@ class PlanFragment : Fragment(){
           centerX = nodeX
           centerY = nodeY
           radius = SIZE * 7
-          fill = Color.GREEN
+          fill = colorDelivery
           id = it.address.id.toString()
           onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
           setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
@@ -126,7 +141,7 @@ class PlanFragment : Fragment(){
               alignment= Pos.CENTER
               style{
                   fontSize=7. px
-                  textFill=Color.LIGHTGREEN
+                  textFill=colorLabelCircle
               }
               val id = it.address.id.toString()
               //à optimiser ? deux events : un pour le cercle, un pour le label
@@ -138,6 +153,8 @@ class PlanFragment : Fragment(){
   }
 
   val scroll = scrollpane {
+      shapeGroup.translateX=(parentView.center.boundsInLocal.width-MAP_SIZE)/2
+      shapeGroup.translateY=(parentView.center.boundsInLocal.height-MAP_SIZE)/2
       hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
       vbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
       style = "-fx-background: #3B3833;"
@@ -173,35 +190,43 @@ class PlanFragment : Fragment(){
           var y: Double = 0.toDouble()
       }
       val dragDelta = Delta()
+      onDragDetected=EventHandler {
+          Logger.debug("onDragDetected")
+          startFullDrag()
+      }
       onMousePressed = EventHandler { mouseEvent ->
           // record a delta distance for the drag and drop operation.
           cursor = Cursor.MOVE
-          dragDelta.x = getLayoutX() - mouseEvent.getSceneX();
-          dragDelta.y = getLayoutY() - mouseEvent.getSceneY();
+          println(""+parentView.center.boundsInLocal.width+" "+layoutX+" "+mouseEvent.sceneX)
+          dragDelta.x = (shapeGroup.translateX - mouseEvent.sceneX)
+          dragDelta.y = (shapeGroup.translateY - mouseEvent.sceneY)
       }
-      onMouseReleased = EventHandler { mouseEvent ->
-          shapeGroup.translateX += mouseEvent.sceneX + dragDelta.x;
-          shapeGroup.translateY += mouseEvent.sceneY + dragDelta.y;
+      onMouseReleased = EventHandler {
           cursor = Cursor.HAND
       }
-      onMouseDragged = EventHandler { mouseEvent ->
-          //event pas appelé = pas d'animation
-          //TODO
-          shapeGroup.translateX += mouseEvent.sceneX + dragDelta.x;
-          shapeGroup.translateY += mouseEvent.sceneY + dragDelta.y;
+      onMouseDragOver=EventHandler { mouseEvent ->
+          println(""+ mouseEvent.sceneX +" "+ dragDelta.x+" "+shapeGroup.scaleX+" "+(parentView.center.boundsInLocal.width/2)*(1-shapeGroup.scaleX)+" "+parentView.center.boundsInLocal.width)
+          if(abs(mouseEvent.sceneX + dragDelta.x)*MAP_SIZE/parentView.center.boundsInLocal.width<(parentView.center.boundsInLocal.width/2)*abs(1-shapeGroup.scaleX)+50||abs(mouseEvent.sceneX + dragDelta.x)<abs(shapeGroup.translateX))
+            shapeGroup.translateX = mouseEvent.sceneX + dragDelta.x
+          if(abs(mouseEvent.sceneY + dragDelta.y)*MAP_SIZE/parentView.center.boundsInLocal.height<(parentView.center.boundsInLocal.height/2)*abs(1-shapeGroup.scaleY)+50||abs(mouseEvent.sceneY + dragDelta.y)<abs(shapeGroup.translateY))
+            shapeGroup.translateY = mouseEvent.sceneY + dragDelta.y
       }
-      onMouseEntered = EventHandler {  mouseEvent ->
-          cursor = Cursor.HAND
-      }
-      onMouseClicked = EventHandler {  mouseEvent ->
-          if(mouseEvent.clickCount==2){
-              println(""+shapeGroup.translateX+" "+mouseEvent.sceneX)
-              shapeGroup.translateX += 400-mouseEvent.sceneX
-              shapeGroup.translateY += 400- mouseEvent.sceneY
+      onMouseClicked = EventHandler { mouseEvent ->
+          if (mouseEvent.clickCount == 2) {
+              val tt = TranslateTransition(Duration.millis(500.0), shapeGroup)
+              if(abs(shapeGroup.translateX +(MAP_SIZE/2) - mouseEvent.sceneX)<(MAP_SIZE/2)*abs(1-shapeGroup.scaleX)+50 )
+                  tt.toX =  shapeGroup.translateX + (MAP_SIZE/2) - mouseEvent.sceneX
+              else
+                  tt.toX = ((MAP_SIZE/2)*abs(1-shapeGroup.scaleX)+50)*((MAP_SIZE/2)-mouseEvent.sceneX)/abs((MAP_SIZE/2)-mouseEvent.sceneX) //TODO chercher comment avoir le signe
+              if(abs(shapeGroup.translateY +(MAP_SIZE/2) - mouseEvent.sceneY)<(MAP_SIZE/2)*abs(1-shapeGroup.scaleY)+50)
+                  tt.toY = shapeGroup.translateY + (MAP_SIZE/2) - mouseEvent.sceneY
+              else
+                  tt.toY = ((MAP_SIZE/2)*abs(1-shapeGroup.scaleY)+50)*((MAP_SIZE/2)-mouseEvent.sceneY)/abs((MAP_SIZE/2)-mouseEvent.sceneY)
+              tt.play()
           }
       }
       setOnKeyPressed { event ->
-          println(event.character)
+          Logger.debug(event.character)
       }
    }
 
@@ -214,9 +239,7 @@ class PlanFragment : Fragment(){
         }
     }
 
-  override val root = stackpane {
-    add(scroll)
-  }
+  override val root = scroll
 
 
   fun zoomIn() {
@@ -225,26 +248,14 @@ class PlanFragment : Fragment(){
   }
 
   fun zoomOut() {
-    shapeGroup.scaleX -= 0.25
-    shapeGroup.scaleY -= 0.25
+      if(shapeGroup.scaleX>0.75&&shapeGroup.scaleY>0.75) {
+          shapeGroup.scaleX -= 0.25
+          shapeGroup.scaleY -= 0.25
+      }
   }
 
   fun move(direction: Int){
-    println("Before -> ")
-    println(" T_Y : "+ shapeGroup.translateY)
-    println(" T_X : " + shapeGroup.translateX)
-    println(" S_X : " + shapeGroup.scaleX)
-    println(" S_Y : " + shapeGroup.scaleY)
-    println(" Layout X " + shapeGroup.layoutX)
-    println(" Layout Y " + shapeGroup.layoutY)
-    println(scroll.viewportBounds)
-    println(scroll.layoutBounds)
-    println(scroll.boundsInLocal)
-    println(scroll.boundsInParent)
-    println("--------")
-    println(shapeGroup.boundsInParent)
-    println(shapeGroup.boundsInLocal)
-    println(shapeGroup.layoutBounds)
+
     when(direction){
       UP -> {
         shapeGroup.translateY += OFFSET_SIZE
@@ -263,12 +274,6 @@ class PlanFragment : Fragment(){
         shapeGroup.translateY = 0.0
       }
     }
-
-    println("After -> ")
-    println(" T_Y : "+ shapeGroup.translateY)
-    println(" T_X : " + shapeGroup.translateX)
-    println(" S_X : " + shapeGroup.scaleX)
-    println(" S_Y : " + shapeGroup.scaleY)
   }
 
     init {
@@ -281,24 +286,19 @@ class PlanFragment : Fragment(){
     var idHighlight: String? =null
     var colorHighlight:Color =Color.GREEN
 
-    private fun highlightLocation(id:String, isWarehouse:Boolean){
-        println("highlight : "+id)
-        if(idHighlight!=id)
+    private fun highlightLocation(idToHighlight:String, isWarehouse:Boolean){
+        if(idHighlight!=null) {
             shapeGroup.children
-                    .filter { it.id!=null && it.id.equals(id) }
+                    .filter { it.id != null && it is Group && it.id ==idHighlight }
                     .forEach {
-                        it.scaleX = 3.0
-                        it.scaleY = 3.0
-                        it.style {
-                            fill = Color.DARKBLUE
+                        it.getChildList()!!.forEach {
+                            (it as Line).stroke = colorLine
                         }
                     }
-        if(idHighlight!=null) {
-            //println("lowlight : "+idHighlight)
             shapeGroup.children
-                    .filter { it.id!=null && it.id.equals(idHighlight) }
+                    .filter { it.id!=null && it.id==idHighlight }
                     .forEach {
-                      //colorHighlight= if(isWarehouse) Color.BROWN else Color.GREEN
+                        //colorHighlight= if(isWarehouse) Color.BROWN else Color.GREEN
                         it.scaleX = 1.0
                         it.scaleY = 1.0
                         it.style {
@@ -306,9 +306,28 @@ class PlanFragment : Fragment(){
                         }
                     }
         }
-        if(idHighlight!=id) {
-            idHighlight = id
-            colorHighlight = if (isWarehouse) Color.BROWN else Color.GREEN
+        Logger.debug("highlight : "+ idToHighlight)
+        if(idHighlight!= idToHighlight) {
+            shapeGroup.children
+                    .filter { it.id != null && it is Circle && it.id ==idToHighlight }
+                    .forEach {
+                        it.scaleX = 1.5
+                        it.scaleY = 1.5
+                        it.style {
+                            fill = colorCircleHighlight
+                        }
+                    }
+            shapeGroup.children
+                    .filter { it.id != null && it is Group && it.id ==idToHighlight }
+                    .forEach {
+                        it.getChildList()!!.forEach {
+                            (it as Line).stroke = colorLineHighlight
+                        }
+                    }
+        }
+        if(idHighlight!= idToHighlight) {
+            idHighlight = idToHighlight
+            colorHighlight = if (isWarehouse) colorWarehouse else colorDelivery
         }else{
             idHighlight=null
         }
