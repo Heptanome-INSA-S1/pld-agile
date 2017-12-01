@@ -89,8 +89,8 @@ class RoundComputerImpl(
     return result
   }
 
-  private fun buildDurationPath(intersections: List<Intersection>, subPlan: Graph<Intersection, Measurable>): LinkedHashSet<Measurable> {
-    val result = LinkedHashSet<Measurable>()
+  private fun buildDurationPath(intersections: List<Intersection>, subPlan: Graph<Intersection, Measurable>): List<Measurable> {
+    val result = mutableListOf<Measurable>()
 
     result += subPlan.edgeBetween(roundRequest.warehouse.address, intersections[1])!!.element
 

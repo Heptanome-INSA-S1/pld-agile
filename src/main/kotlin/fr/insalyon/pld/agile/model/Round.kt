@@ -12,7 +12,7 @@ import java.util.*
 class Round(
     val warehouse: Warehouse,
     deliveries: LinkedHashSet<Delivery>,
-    durationPath: LinkedHashSet<Measurable>,
+    durationPath: List<Measurable>,
     distancePath: LinkedHashSet<Path<Intersection, Junction>>
 ) : Observable(), Measurable{
 
@@ -20,8 +20,8 @@ class Round(
   fun deliveries(): LinkedHashSet<Delivery> = _deliveries.toLinkedHashSet()
 
   private val _durationPath: MutableList<Measurable> = durationPath.toMutableList()
-  fun durationPathInSeconds(): LinkedHashSet<Duration> {
-    return _durationPath.map { it.length.seconds }.toLinkedHashSet()
+  fun durationPathInSeconds(): List<Duration> {
+    return _durationPath.map { it.length.seconds }
   }
 
   private val _distancePath: MutableList<Path<Intersection, Junction>> = distancePath.toMutableList()
@@ -39,30 +39,36 @@ class Round(
       val deliveryBefore = _deliveries.first { it.address == subPath.pathFromPreviousDelivery.nodes.first() }
       index = _deliveries.addAfter(deliveryBefore, subPath.delivery)
     }
-    _durationPath.add(index, subPath.pathToNextDelivery)
-    _durationPath.add(index, subPath.pathFromPreviousDelivery)
+    _durationPath.add(index, subPath.durationToNextDelivery)
+    _durationPath.add(index, subPath.durationFromPreviousDelivery)
+
+    _distancePath.add(index, subPath.pathToNextDelivery)
+    _distancePath.add(index, subPath.pathFromPreviousDelivery)
 
     setChanged()
     notifyObservers()
   }
 
-  fun modify(delivery: Delivery, startTime: Instant?, endTime: Instant?, duration: Duration) {
-    val newDelivery = delivery.copy(startTime = startTime, endTime = endTime, duration = duration)
-    val index = _deliveries.indexOf(delivery)
-    _deliveries.removeAt(index)
-    _deliveries.add(index, newDelivery)
+  fun modify(index: Int, startTime: Instant?, endTime: Instant?, duration: Duration) {
+    val newDelivery = _deliveries[index].copy(startTime = startTime, endTime = endTime, duration = duration)
+    _deliveries[index] = newDelivery
   }
 
-  fun removeDelivery(delivery: Delivery, pathToReplaceWith: Path<Intersection, Junction>) {
+  fun removeDelivery(delivery: Delivery, pathToReplaceWith: Path<Intersection, Junction>, duration: Duration) {
 
     val index = _deliveries.indexOf(delivery)
     if(index == -1) throw InvalidArgumentException(arrayOf("$delivery was not found in the round"))
+
     _deliveries.removeAt(index)
 
     _durationPath.removeAt(index)
-    _durationPath.removeAt(index)
+    _distancePath.removeAt(index)
 
-    _durationPath.add(index, pathToReplaceWith)
+    _durationPath.removeAt(index)
+    _distancePath.removeAt(index)
+
+    _durationPath.add(index, duration)
+    _distancePath.add(index, pathToReplaceWith)
 
     setChanged()
     notifyObservers()
