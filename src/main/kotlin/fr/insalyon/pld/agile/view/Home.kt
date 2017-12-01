@@ -22,10 +22,16 @@ import javafx.scene.layout.StackPane
  */
 class Home : View() {
   override val root: BorderPane by fxml("/view/Home.fxml")
+
+  // Buttons
   private val loadPlanButton: Button by fxid()
   private val loadRoundRequestButton: Button by fxid()
   private val loadPlanMenuItem: MenuItem by fxid()
   private val loadRoundRequestMenuItem: MenuItem by fxid()
+  private val undo: MenuItem by fxid()
+  private val redo: MenuItem by fxid()
+
+  // Canvas
   private val centerBox: StackPane by fxid()
   private val rightBox: VBox by fxid()
   private val bottomBox: HBox by fxid()
@@ -81,6 +87,15 @@ class Home : View() {
     loadRoundRequestMenuItem.setOnAction {
       controller.loadRoundRequest()
     }
+
+    redo.setOnAction {
+      controller.redo()
+    }
+
+    undo.setOnAction {
+      controller.undo()
+    }
+
   }
 
   fun refreshPlan() {
@@ -104,7 +119,7 @@ class Home : View() {
     rightBox.clear()
     rightBox.add(RoundFragment::class, mapOf(
         RoundFragment::parentView to root,
-        RoundFragment::round to controller.round))
+        RoundFragment::controller to controller))
     bottomBox.clear()
     bottomBox.add(TimelineFragment::class, mapOf(
     TimelineFragment::parentView to root,
@@ -118,7 +133,7 @@ class Home : View() {
     alert.title = "Erreur"
     alert.headerText = "Une erreur est survenu :"
     alert.contentText = message
-    alert.initOwner(this.currentWindow)
+    alert.initOwner(currentWindow)
     alert.initModality(Modality.APPLICATION_MODAL)
 
     alert.showAndWait()

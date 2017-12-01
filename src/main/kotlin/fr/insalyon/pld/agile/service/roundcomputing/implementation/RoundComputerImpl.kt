@@ -5,7 +5,7 @@ import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.service.algorithm.api.TSP
-import fr.insalyon.pld.agile.service.algorithm.implementation.DijsktraImpl
+import fr.insalyon.pld.agile.service.algorithm.implementation.Dijkstra
 import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1
 import fr.insalyon.pld.agile.service.roundcomputing.api.RoundComputer
 import java.util.*
@@ -31,7 +31,7 @@ class RoundComputerImpl(
     val roads = mutableSetOf<Triple<Intersection, Path<Intersection, Junction>, Intersection>>()
 
     for(source: Intersection in roundRequest.intersections) {
-      val dijsktra = DijsktraImpl<Intersection, Junction>(plan, source)
+      val dijsktra = Dijkstra<Intersection, Junction>(plan, source)
       val destinations = roundRequest.intersections.filter { it != source }
       for(destination: Intersection in destinations) {
         nodes.add(source)
@@ -74,8 +74,8 @@ class RoundComputerImpl(
     return intersections.filterIndexed{ i, _ -> i != 0 }.map { intersection -> roundRequest.deliveries.first { it.address == intersection } }.toLinkedHashSet()
   }
 
-  private fun buildDistancePath(intersections: List<Intersection>, subPlan: Graph<Intersection, Path<Intersection, Junction>>): LinkedHashSet<Path<Intersection, Junction>> {
-    val result = LinkedHashSet<Path<Intersection, Junction>>()
+  private fun buildDistancePath(intersections: List<Intersection>, subPlan: Graph<Intersection, Path<Intersection, Junction>>): List<Path<Intersection, Junction>> {
+    val result = mutableListOf<Path<Intersection, Junction>>()
     result.add(subPlan.edgeBetween(roundRequest.warehouse.address, intersections[1])!!.element)
 
 

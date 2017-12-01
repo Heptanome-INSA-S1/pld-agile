@@ -1,6 +1,7 @@
 package fr.insalyon.pld.agile.controller.api
 
 import fr.insalyon.pld.agile.controller.implementation.Controller
+import fr.insalyon.pld.agile.model.Delivery
 import java.io.File
 
 interface State<in T> {
@@ -36,6 +37,11 @@ interface State<in T> {
    * @param controller
    */
   fun calculateRound(controller: Controller)
+
+  /**
+   * Remove the delivery from the controller's round
+   */
+  fun deleteDelivery(controller: Controller, delivery: Delivery)
 
   /**
    *

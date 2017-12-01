@@ -13,11 +13,11 @@ class Round(
     val warehouse: Warehouse,
     deliveries: LinkedHashSet<Delivery>,
     durationPath: List<Measurable>,
-    distancePath: LinkedHashSet<Path<Intersection, Junction>>
-) : Observable(), Measurable{
+    distancePath: List<Path<Intersection, Junction>>
+) : Observable(), Measurable {
 
   private val _deliveries: MutableList<Delivery> = deliveries.toMutableList()
-  fun deliveries(): LinkedHashSet<Delivery> = _deliveries.toLinkedHashSet()
+  fun deliveries(): List<Delivery> = _deliveries.toList()
 
   private val _durationPath: MutableList<Measurable> = durationPath.toMutableList()
   fun durationPathInSeconds(): List<Duration> {
@@ -25,8 +25,8 @@ class Round(
   }
 
   private val _distancePath: MutableList<Path<Intersection, Junction>> = distancePath.toMutableList()
-  fun distancePathInMeters(): LinkedHashSet<Path<Intersection, Junction>> {
-    return _distancePath.toLinkedHashSet()
+  fun distancePathInMeters(): List<Path<Intersection, Junction>> {
+    return _distancePath
   }
 
   fun addDelivery(subPath: SubPath) {
@@ -49,9 +49,17 @@ class Round(
     notifyObservers()
   }
 
+  fun removePath(i: Int) {
+    _durationPath.removeAt(i)
+    _distancePath.removeAt(i)
+  }
+
   fun modify(index: Int, startTime: Instant?, endTime: Instant?, duration: Duration) {
     val newDelivery = _deliveries[index].copy(startTime = startTime, endTime = endTime, duration = duration)
     _deliveries[index] = newDelivery
+
+    setChanged()
+    notifyObservers()
   }
 
   fun removeDelivery(delivery: Delivery, pathToReplaceWith: Path<Intersection, Junction>, duration: Duration) {
@@ -154,12 +162,6 @@ class Round(
 
     return stringBuilder.toString()
 
-  }
-
-  private fun <E> List<E>.toLinkedHashSet(): LinkedHashSet<E> {
-    val linkedHashSet = linkedSetOf<E>()
-    linkedHashSet.addAll(this)
-    return linkedHashSet
   }
 
   private fun <E> MutableList<E>.addAfter(elementBefore: E, elementToAdd: E): Int {

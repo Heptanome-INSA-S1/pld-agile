@@ -120,6 +120,6 @@ class RoadSheetSerializer(){
         htmlString = htmlString.replace("\$nbDeliveries", nbDeliveries)
         val newHtmlFile = File("src/main/dist/FeuilleDeRoute.html")
         FileUtils.writeStringToFile(newHtmlFile, htmlString)
-        Desktop.getDesktop().browse(newHtmlFile.toURI())
+       // Desktop.getDesktop().browse(newHtmlFile.toURI())
     }
 }

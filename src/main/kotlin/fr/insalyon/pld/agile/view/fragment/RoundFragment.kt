@@ -1,5 +1,6 @@
 package fr.insalyon.pld.agile.view.fragment
 
+import fr.insalyon.pld.agile.controller.implementation.Controller
 import fr.insalyon.pld.agile.model.Delivery
 import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.util.txt.RoadSheetSerializer
@@ -11,10 +12,13 @@ import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import tornadofx.*
 import java.net.URI
+import java.util.*
 
-class RoundFragment : Fragment() {
+class RoundFragment : Fragment(), Observer {
+
+  val controller: Controller by param()
   val parentView: BorderPane by param()
-  val round: Round? by param()
+  val round = controller.round
   val roadSheetSerializer : RoadSheetSerializer = RoadSheetSerializer()
 
   val list = vbox{
@@ -118,6 +122,7 @@ class RoundFragment : Fragment() {
                 }
               }
               button{
+                action { deleteDelivery(round!!.deliveries().elementAt(i)) }
                 prefWidth=30.0
                 prefHeight=30.0
                 style{
@@ -194,6 +199,16 @@ class RoundFragment : Fragment() {
     subscribe<HighlightLocationInListEvent> {
       event -> highlightLocation(event.id,event.color)
     }
+    controller.round!!.addObserver(this)
+  }
+
+  private fun deleteDelivery(delivery: Delivery) {
+    controller.deleteDelivery(delivery)
+  }
+
+  override fun update(o: Observable?, arg: Any?) {
+    controller.round!!.deleteObserver(this)
+    controller.window.refreshRound()
   }
 
   private fun highlightLocation(id:String,color:Color){

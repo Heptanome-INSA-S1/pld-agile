@@ -1,5 +1,6 @@
 package fr.insalyon.pld.agile.model
 
+import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -27,7 +28,7 @@ class RoundTest {
         pathFromWareHouseToDeliveryA,
         pathFromDeliveryAToDeliveryB,
         pathFromDeliveryBToWarehouse
-    ), linkedSetOf(
+    ), listOf(
         pathFromWareHouseToDeliveryA,
         pathFromDeliveryAToDeliveryB,
         pathFromDeliveryBToWarehouse)
@@ -59,7 +60,7 @@ class RoundTest {
         pathFromWareHouseToDeliveryA,
         pathFromDeliveryAToDeliveryB,
         pathFromDeliveryBToWarehouse
-    ), linkedSetOf(
+    ), listOf(
         pathFromWareHouseToDeliveryA,
         pathFromDeliveryAToDeliveryB,
         pathFromDeliveryBToWarehouse
@@ -99,7 +100,7 @@ class RoundTest {
         pathFromWareHouseToDeliveryA,
         pathFromDeliveryAToDeliveryB,
         pathFromDeliveryBToWarehouse
-    ), linkedSetOf(
+    ), listOf(
         pathFromWareHouseToDeliveryA,
         pathFromDeliveryAToDeliveryB,
         pathFromDeliveryBToWarehouse
@@ -111,5 +112,43 @@ class RoundTest {
     assertEquals("1 -> 3 -> 1", round.toString())
 
   }
+
+  @Test
+  fun lengthUpdate() {
+
+    val round = Round(
+        Warehouse(Intersection(1), 8 h 5),
+        linkedSetOf(
+            Delivery(Intersection(2), duration = 900.seconds),
+            Delivery(Intersection(3), duration = 900.seconds)
+        ), listOf(
+        object : Measurable {
+          override val length = 500L
+        },
+        object : Measurable {
+          override val length = 300L
+        },
+        object : Measurable {
+          override val length = 400L
+        }
+    ), listOf(
+        Path(listOf(), listOf()),
+        Path(listOf(), listOf()),
+        Path(listOf(), listOf())
+    )
+    )
+
+    assertEquals(500 + 900 + 300 + 900 + 400, round.length)
+
+    val replacePath = Path(
+        listOf(Intersection(2), Intersection(1)),
+        listOf(Junction(250, "A"))
+    )
+    round.removeDelivery(round.deliveries().elementAt(1), replacePath, 250.seconds)
+
+    assertEquals(500 + 900 + 250, round.length)
+
+  }
+
 
 }

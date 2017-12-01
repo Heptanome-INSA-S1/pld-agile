@@ -6,9 +6,12 @@ import fr.insalyon.pld.agile.Config.MAP_XSD
 import fr.insalyon.pld.agile.Config.defaultSpeed
 import fr.insalyon.pld.agile.controller.api.Command
 import fr.insalyon.pld.agile.controller.api.State
+import fr.insalyon.pld.agile.controller.commands.RemoveDelivery
 import fr.insalyon.pld.agile.getResource
+import fr.insalyon.pld.agile.model.Delivery
 import fr.insalyon.pld.agile.service.algorithm.implementation.TSPSumMin
 import fr.insalyon.pld.agile.service.roundcomputing.implementation.RoundComputerImpl
+import fr.insalyon.pld.agile.service.roundmodifier.implementation.RoundModifierImp
 import fr.insalyon.pld.agile.util.Logger
 import fr.insalyon.pld.agile.util.xml.XmlDocument
 import fr.insalyon.pld.agile.util.xml.serialization.implementation.*
@@ -56,9 +59,17 @@ abstract class DefaultState<in T> : State<T> {
     Logger.warn("Ok was called")
   }
 
-  override fun undo(controller: Controller, commands: List<Command>) {}
+  override fun deleteDelivery(controller: Controller, delivery: Delivery) {
+    Logger.warn("Delete delivery was calculated")
+  }
 
-  override fun redo(controller: Controller, commands: List<Command>) {}
+  override fun undo(controller: Controller, commands: List<Command>) {
+    controller.undo()
+  }
+
+  override fun redo(controller: Controller, commands: List<Command>) {
+    controller.redo()
+  }
 
   protected fun defaultLoadPlanImpl(controller: Controller) {
     val validator: XmlValidatorImpl = XmlValidatorImpl()
@@ -76,7 +87,6 @@ abstract class DefaultState<in T> : State<T> {
     val planSerializer = PlanSerializer(xmlDocument, intersectionSerializer, junctionSerializer)
 
     try {
-
       val plan = planSerializer.unserialize(xmlDocument.documentElement)
       controller.changeStateAndInit(controller.LOADED_PLAN_STATE, plan)
     } catch (e: Exception) {
@@ -160,7 +170,15 @@ abstract class DefaultState<in T> : State<T> {
   protected fun defaultCalculateRoundImpl(controller: Controller) {
     val round = RoundComputerImpl(plan = controller.plan!!, roundRequest = controller.roundRequest!!, tsp = TSPSumMin(controller.roundRequest!!), speed = defaultSpeed).round
     Logger.debug(round.toTrace())
+    controller.commands.reset()
     controller.changeStateAndInit(controller.CALCULATED_ROUND_STATE, round)
+  }
+
+  protected fun defaultDeleteDelivery(controller: Controller, delivery: Delivery) {
+    val roundModifier = RoundModifierImp(controller.plan!!)
+    val removeDeliveryCommand = RemoveDelivery(roundModifier, controller, delivery)
+    controller.commands.add(removeDeliveryCommand)
+    controller.changeStateAndInit(controller.CALCULATED_ROUND_STATE, controller.round!!)
   }
 
 }

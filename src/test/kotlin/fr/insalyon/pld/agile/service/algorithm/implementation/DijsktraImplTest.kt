@@ -41,7 +41,7 @@ class DijsktraImplTest {
   @Test
   fun getPath() {
 
-    val dijkstra: Dijkstra<Intersection, Junction> = DijsktraImpl<Intersection, Junction>(graph, source)
+    val dijkstra: Dijkstra<Intersection, Junction> = Dijkstra<Intersection, Junction>(graph, source)
     assertEquals(1, dijkstra.getShortestPath(Intersection(id = 2)).length)
     assertEquals(3, dijkstra.getShortestPath(Intersection(id = 3)).length)
     assertEquals(4, dijkstra.getShortestPath(Intersection(id = 6)).length)

@@ -1,10 +1,8 @@
 package fr.insalyon.pld.agile.service.roundmodifier.api
 
 import fr.insalyon.pld.agile.Config
-import fr.insalyon.pld.agile.model.Delivery
-import fr.insalyon.pld.agile.model.Round
-import fr.insalyon.pld.agile.model.Speed
-import fr.insalyon.pld.agile.model.SubPath
+import fr.insalyon.pld.agile.lib.graph.model.Path
+import fr.insalyon.pld.agile.model.*
 
 interface RoundModifier {
 

@@ -17,7 +17,7 @@ class TspBenchmarkTest {
     val roads = mutableSetOf<Triple<Intersection, Path<Intersection, Junction>, Intersection>>()
 
     for(source: Intersection in roundRequest.intersections) {
-      val dijsktra = DijsktraImpl<Intersection, Junction>(plan, source)
+      val dijsktra = Dijkstra<Intersection, Junction>(plan, source)
       val destinations = roundRequest.intersections.filter { it != source }
       for(destination: Intersection in destinations) {
         nodes.add(source)

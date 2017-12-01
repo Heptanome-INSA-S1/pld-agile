@@ -62,7 +62,7 @@ class RoundModifierImpTest {
         val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(round,plan)
+        val roundModifier = RoundModifierImp(plan)
         Logger.debug(round.toTrace())
 
         roundModifier.removeDelivery(0, round)
@@ -78,7 +78,7 @@ class RoundModifierImpTest {
         val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(round,plan)
+        val roundModifier = RoundModifierImp(plan)
         roundModifier.removeDelivery(1, round)
 
         assertEquals(2000, round.distancePathInMeters().elementAt(1).length)
@@ -91,7 +91,7 @@ class RoundModifierImpTest {
         val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(round,plan)
+        val roundModifier = RoundModifierImp(plan)
         roundModifier.removeDelivery(2, round)
 
         Assert.assertEquals("2 -> 4 -> 5 -> 2", round.toString())
@@ -140,7 +140,7 @@ class RoundModifierImpTest {
         val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(round,plan)
+        val roundModifier = RoundModifierImp(plan)
         var listEarliestEndTime = roundModifier.getEarliestEndTime(round)
 
         Logger.debug(listEarliestEndTime)
@@ -186,7 +186,7 @@ class RoundModifierImpTest {
         val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(round,plan)
+        val roundModifier = RoundModifierImp(plan)
         var listLatestEndTime = roundModifier.getLastestEndTime(round)
 
         Logger.debug(listLatestEndTime)
@@ -228,7 +228,7 @@ class RoundModifierImpTest {
         val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(round,planBis)
+        val roundModifier = RoundModifierImp(planBis)
         roundModifier.modifyDelivery(Delivery(address = node3, startTime = 8 h 39, duration = 600.seconds),round, 1)
     }
 
@@ -239,7 +239,7 @@ class RoundModifierImpTest {
         val round = roundComputer.round
 
         Logger.debug(round.toTrace())
-        val roundModifier = RoundModifierImp(round,planBis)
+        val roundModifier = RoundModifierImp(planBis)
         roundModifier.modifyDelivery(Delivery(address = node3, startTime = 8 h 40, duration = 600.seconds),round, 1)
 
         Assert.assertEquals(8 h 40, round.deliveries().elementAt(1).startTime)
@@ -250,7 +250,7 @@ class RoundModifierImpTest {
         val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(round,planBis)
+        val roundModifier = RoundModifierImp(planBis)
         roundModifier.modifyDelivery(Delivery(address = node1, startTime = 8 h 40, duration = 600.seconds, endTime = 10 h 31),round, 1)
     }
 
@@ -259,7 +259,7 @@ class RoundModifierImpTest {
         val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 15.km_h)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(round,planBis)
+        val roundModifier = RoundModifierImp(planBis)
         Logger.debug(round.toTrace())
         Assert.assertEquals(10 h 0, round.deliveries().elementAt(1).endTime)
         roundModifier.modifyDelivery(Delivery(address = node1, startTime = 8 h 40, duration = 600.seconds, endTime = 10 h 30),round, 1)
@@ -273,7 +273,7 @@ class RoundModifierImpTest {
         val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(round,planBis)
+        val roundModifier = RoundModifierImp(planBis)
 
         Assert.assertEquals(600.seconds, round.deliveries().elementAt(1).duration)
         roundModifier.modifyDelivery(Delivery(address = node3, duration = 10800.seconds ),round, 1)
@@ -287,7 +287,7 @@ class RoundModifierImpTest {
         val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(round,planBis)
+        val roundModifier = RoundModifierImp(planBis)
 
         Assert.assertEquals(600.seconds, round.deliveries().elementAt(1).duration)
         roundModifier.modifyDelivery(Delivery(address = node3, duration = 1800.seconds ),round, 1)
@@ -300,7 +300,7 @@ class RoundModifierImpTest {
         val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(round,planBis)
+        val roundModifier = RoundModifierImp(planBis)
 
         Assert.assertEquals(600.seconds, round.deliveries().elementAt(0).duration)
         roundModifier.modifyDelivery(Delivery(address = node3, startTime = 8 h 14, duration = 600.seconds),round, 0)
@@ -311,7 +311,7 @@ class RoundModifierImpTest {
         val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(round,planBis)
+        val roundModifier = RoundModifierImp(planBis)
 
         Assert.assertEquals(600.seconds, round.deliveries().elementAt(1).duration)
         roundModifier.modifyDelivery(Delivery(address = node3, startTime = 8 h 15, duration = 600.seconds),round, 0)
@@ -323,7 +323,7 @@ class RoundModifierImpTest {
         val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
         val round = roundComputer.round
 
-        val roundModifier = RoundModifierImp(round,planBis)
+        val roundModifier = RoundModifierImp(planBis)
 
         Assert.assertEquals(600.seconds, round.deliveries().elementAt(0).duration)
         roundModifier.modifyDelivery(Delivery(address = node3, startTime = 8 h 15, duration = 600.seconds, endTime = 9 h 36),round, 0)
