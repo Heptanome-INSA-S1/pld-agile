@@ -1,11 +1,8 @@
 package fr.insalyon.pld.agile.view.fragment
 
-import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
-import javafx.scene.Group
 import javafx.scene.control.Label
-import javafx.scene.control.ScrollPane
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
@@ -147,11 +144,9 @@ class TimelineFragment() : Fragment() {
     var res = ""
     if(hours != 0L)
       res += ""+ hours + "h"
-    if(minutes != 0L) {
-      if (minutes < 10)
-        res += "0"
-      res += "" + minutes
-    }
+    if (minutes < 10)
+      res += "0"
+    res += "" + minutes
     return res
   }
 
