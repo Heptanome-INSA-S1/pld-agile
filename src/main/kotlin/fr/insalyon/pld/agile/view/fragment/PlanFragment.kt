@@ -187,7 +187,7 @@ class PlanFragment : Fragment(){
       onMousePressed = EventHandler { mouseEvent ->
           // record a delta distance for the drag and drop operation.
           cursor = Cursor.MOVE
-          println(""+parentView.center.boundsInLocal.width+" "+layoutX+" "+mouseEvent.sceneX)
+          //println(""+parentView.center.boundsInLocal.width+" "+layoutX+" "+mouseEvent.sceneX)
           dragDelta.x = (shapeGroup.translateX - mouseEvent.sceneX)
           dragDelta.y = (shapeGroup.translateY - mouseEvent.sceneY)
       }
@@ -195,7 +195,7 @@ class PlanFragment : Fragment(){
           cursor = Cursor.HAND
       }
       onMouseDragOver=EventHandler { mouseEvent ->
-          println(""+ mouseEvent.sceneX +" "+ dragDelta.x+" "+shapeGroup.scaleX+" "+(parentView.center.boundsInLocal.width/2)*(1-shapeGroup.scaleX)+" "+parentView.center.boundsInLocal.width)
+          //println(""+ mouseEvent.sceneX +" "+ dragDelta.x+" "+shapeGroup.scaleX+" "+(parentView.center.boundsInLocal.width/2)*(1-shapeGroup.scaleX)+" "+parentView.center.boundsInLocal.width)
           if(abs(mouseEvent.sceneX + dragDelta.x)*MAP_SIZE/parentView.center.boundsInLocal.width<(parentView.center.boundsInLocal.width/2)*abs(1-shapeGroup.scaleX)+50||abs(mouseEvent.sceneX + dragDelta.x)<abs(shapeGroup.translateX))
             shapeGroup.translateX = mouseEvent.sceneX + dragDelta.x
           if(abs(mouseEvent.sceneY + dragDelta.y)*MAP_SIZE/parentView.center.boundsInLocal.height<(parentView.center.boundsInLocal.height/2)*abs(1-shapeGroup.scaleY)+50||abs(mouseEvent.sceneY + dragDelta.y)<abs(shapeGroup.translateY))
