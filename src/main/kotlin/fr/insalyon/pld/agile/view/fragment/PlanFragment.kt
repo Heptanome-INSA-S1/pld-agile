@@ -7,12 +7,12 @@ import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
 import javafx.animation.TranslateTransition
 import javafx.event.EventHandler
-import javafx.geometry.Pos
 import javafx.scene.Cursor
 import javafx.scene.Group
 import javafx.scene.control.ScrollPane
 import javafx.scene.input.ScrollEvent
 import javafx.scene.layout.BorderPane
+import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.scene.shape.Line
@@ -120,33 +120,23 @@ class PlanFragment : Fragment(){
       }
       notNullRound.deliveries().forEachIndexed { index, it ->
         val (nodeX, nodeY) = transform(it.address.x, it.address.y)
-        circle {
-          centerX = nodeX
-          centerY = nodeY
-          radius = SIZE * 7
-          fill = colorDelivery
-          id = it.address.id.toString()
-          onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
-          setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
-        }
-
-          label(""+(index+2)){
-              if(index+2>9) {
-                  layoutX = nodeX - 4
-                  layoutY = nodeY - 5.5
-              }else{
-                  layoutX = nodeX - 2
-                  layoutY = nodeY - 5.5
-              }
-              alignment= Pos.CENTER
-              style{
-                  fontSize=7. px
-                  textFill=colorLabelCircle
-              }
-              val id = it.address.id.toString()
-              //à optimiser ? deux events : un pour le cercle, un pour le label
+          stackpane {
+              id = it.address.id.toString()
+              layoutX=nodeX-SIZE*7
+              layoutY=nodeY-SIZE*7
               onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
               setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
+              circle {
+                  radius = SIZE * 7
+                  fill = colorDelivery
+              }
+
+              label(""+(index+2)){
+                  style{
+                      fontSize=7. px
+                      textFill=colorLabelCircle
+                  }
+              }
           }
       }
     }
@@ -289,31 +279,32 @@ class PlanFragment : Fragment(){
     private fun highlightLocation(idToHighlight:String, isWarehouse:Boolean){
         if(idHighlight!=null) {
             shapeGroup.children
+                    .filter { it.id!=null && it is StackPane && it.id==idHighlight }
+                    .forEach {
+                        var circle:Circle = it.getChildList()!!.first() as Circle
+                        circle.scaleX = 1.0
+                        circle.scaleY = 1.0
+                        circle.style {
+                            fill = colorHighlight
+                        }
+                    }
+            shapeGroup.children
                     .filter { it.id != null && it is Group && it.id ==idHighlight }
                     .forEach {
                         it.getChildList()!!.forEach {
                             (it as Line).stroke = colorLine
                         }
                     }
-            shapeGroup.children
-                    .filter { it.id!=null && it.id==idHighlight }
-                    .forEach {
-                        //colorHighlight= if(isWarehouse) Color.BROWN else Color.GREEN
-                        it.scaleX = 1.0
-                        it.scaleY = 1.0
-                        it.style {
-                            fill = colorHighlight
-                        }
-                    }
         }
         Logger.debug("highlight : "+ idToHighlight)
         if(idHighlight!= idToHighlight) {
             shapeGroup.children
-                    .filter { it.id != null && it is Circle && it.id ==idToHighlight }
+                    .filter { it.id != null && it is StackPane && it.id ==idToHighlight }
                     .forEach {
-                        it.scaleX = 1.5
-                        it.scaleY = 1.5
-                        it.style {
+                        var circle:Circle = it.getChildList()!!.first() as Circle
+                        circle.scaleX = 1.5
+                        circle.scaleY = 1.5
+                        circle.style {
                             fill = colorCircleHighlight
                         }
                     }
