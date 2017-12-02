@@ -11,7 +11,7 @@ class LoadedPlanState : DefaultState<Plan>(){
     Logger.info("Etat actuel = LOADED_PLAN_STATE")
     Logger.info("The plan has been well loaded")
     controller.plan = element
-    controller.window.refreshPlan()
+    controller.window.refreshAll()
   }
 
   override fun loadRoundRequest(controller: Controller) {

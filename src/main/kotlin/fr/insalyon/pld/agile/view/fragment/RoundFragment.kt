@@ -211,7 +211,7 @@ class RoundFragment : Fragment(), Observer {
 
   override fun update(o: Observable?, arg: Any?) {
     controller.round!!.deleteObserver(this)
-    controller.window.refreshRound()
+    controller.window.refreshAll()
   }
 
   private fun highlightLocation(id: String, color: Color) {

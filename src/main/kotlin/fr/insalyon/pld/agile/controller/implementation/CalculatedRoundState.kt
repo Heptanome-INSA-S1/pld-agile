@@ -12,7 +12,7 @@ class CalculatedRoundState : DefaultState<Round>(), State<Round> {
   override fun init(controller: Controller, element: Round) {
     controller.round = element
     Logger.info(controller.round!!.warehouse.departureHour + controller.round!!.length.seconds)
-    controller.window.refreshRound()
+    controller.window.refreshAll()
   }
 
   override fun loadRoundRequest(controller: Controller) {

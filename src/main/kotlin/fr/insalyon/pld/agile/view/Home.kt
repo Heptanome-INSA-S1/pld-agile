@@ -50,6 +50,8 @@ class Home : View() {
       }
     }
 
+    root.widthProperty().addListener{ _,_,_ -> refreshTimeLine() }
+
     centerBox.setOnDragDropped { event ->
       val db = event.dragboard
       var success = false
@@ -98,34 +100,45 @@ class Home : View() {
 
   }
 
+  fun refreshAll() {
+    refreshPlan()
+    refreshRound()
+    refreshTimeLine()
+  }
+
   fun refreshPlan() {
     centerBox.clear()
-    Logger.info("Plan is printed")
+    Logger.info("Plan is refreshed")
     centerBox.add(PlanFragment::class, mapOf(
         PlanFragment::parentView to root,
+        PlanFragment::round to controller.round,
         PlanFragment::plan to controller.plan))
-    rightBox.clear()
-    rightBox.add(loadRoundRequestButton)
+  }
 
-    bottomBox.clear()
+  fun refreshTimeLine() {
+    Logger.info("Timeline is refreshed")
+    if(controller.round == null) {
+      bottomBox.clear()
+    } else {
+      bottomBox.clear()
+      bottomBox.add(TimelineFragment::class, mapOf(
+          TimelineFragment::parentView to root,
+          TimelineFragment::round to controller.round
+      ))
+    }
   }
 
   fun refreshRound() {
-    centerBox.clear()
-    centerBox.add(PlanFragment::class, mapOf(
-          PlanFragment::parentView to root,
-          PlanFragment::round to controller.round,
-          PlanFragment::plan to controller.plan))
-    rightBox.clear()
-    rightBox.add(RoundFragment::class, mapOf(
-        RoundFragment::parentView to root,
-        RoundFragment::controller to controller))
-    bottomBox.clear()
-    bottomBox.add(TimelineFragment::class, mapOf(
-    TimelineFragment::parentView to root,
-    TimelineFragment::round to controller.round,
-    TimelineFragment::planSize to Pair<Double, Double>(controller.plan!!.width.toDouble(), controller.plan!!.height.toDouble())
-    ))
+    Logger.info("Round is refreshed")
+    if(controller.round == null) {
+      rightBox.clear()
+      rightBox.add(loadRoundRequestButton)
+    } else {
+      rightBox.clear()
+      rightBox.add(RoundFragment::class, mapOf(
+          RoundFragment::parentView to root,
+          RoundFragment::controller to controller))
+    }
   }
 
   fun errorPopUp(message: String?) {
