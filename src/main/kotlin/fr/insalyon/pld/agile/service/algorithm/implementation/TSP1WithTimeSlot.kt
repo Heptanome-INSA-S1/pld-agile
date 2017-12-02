@@ -7,11 +7,11 @@ import java.util.*
 class TSP1WithTimeSlot(
     roundRequest: RoundRequest
 ) : TemplateTSPWithTimeSlot(roundRequest) {
-  override fun bound(sommetCourant: Int, nonVus: ArrayList<Int>, cout: Array<LongArray>, duree: LongArray, currentTime: Instant, startTimes: Array<Instant?>, endTimes: Array<Instant?>): Long {
-    return 0L
+  override fun iterator(sommetCrt: Int, nonVus: ArrayList<Int>, cout: Array<LongArray>, duree: LongArray, currentTime: Instant, startTimes: Array<Instant?>): Iterator<Int> {
+    return IteratorSeq(nonVus, sommetCrt)
   }
 
-  override fun iterator(sommetCrt: Int, nonVus: ArrayList<Int>, cout: Array<LongArray>, duree: LongArray): Iterator<Int> {
-    return IteratorSeq(nonVus, sommetCrt)
+  override fun bound(sommetCourant: Int, nonVus: ArrayList<Int>, cout: Array<LongArray>, duree: LongArray, currentTime: Instant, startTimes: Array<Instant?>, endTimes: Array<Instant?>): Long {
+    return 0L
   }
 }

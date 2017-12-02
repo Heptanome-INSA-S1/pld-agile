@@ -51,7 +51,7 @@ data class Path<out N, out E : Measurable>(
   }
 
   fun toDuration(speed: Speed): Duration {
-    return (length * (1.0 / speed.to(Speed.DistanceUnit.M, Speed.DurationUnit.S).value)).toLong().seconds
+    return (length.toDouble() / speed.to(Speed.DistanceUnit.M, Speed.DurationUnit.S).value).toLong().seconds
   }
 
 
