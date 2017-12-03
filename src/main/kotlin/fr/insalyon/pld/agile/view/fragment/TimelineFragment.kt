@@ -1,12 +1,9 @@
 package fr.insalyon.pld.agile.view.fragment
 
-import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.sumLongBy
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
-import javafx.scene.Group
 import javafx.scene.control.Label
-import javafx.scene.control.ScrollPane
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
@@ -14,10 +11,9 @@ import javafx.scene.shape.Circle
 import javafx.scene.shape.Line
 import tornadofx.*
 
-class TimelineFragment() : Fragment() {
-
-  val parentView: BorderPane by param()
-  val round: Round by param()
+class TimelineFragment: Fragment() {
+  val parentView:BorderPane by param()
+  val round : Round by param()
   val planSize: Pair<Double, Double> by param()
 
   var idHighlight: String? = null
@@ -66,7 +62,14 @@ class TimelineFragment() : Fragment() {
           }
         }
       }
-      label(time.toFormattedString()) {
+      if(deplacement>30)
+        label("${secondsToString(time)}"){
+          id=idDelivery
+          layoutX=actualX-10.0
+          layoutY=middle-23
+          style{
+            fontSize=10.px
+      /*label(time.toFormattedString()) {
         id = idDelivery
         layoutX = actualX - 10.0
         layoutY = middle - 23
@@ -81,9 +84,21 @@ class TimelineFragment() : Fragment() {
           layoutX = actualX - 10.0
           layoutY = middle + 10
           style {
-            fontSize = 10.px
+            fontSize = 10.px*/
           }
         }
+      if(index<round.deliveries().size){
+        val attente = round.deliveries().first { it.address.id.toString() == idDelivery }.duration.toSeconds().toDouble()
+        time+=attente.toLong()
+        if(transform(round.distancePathInMeters().elementAt(index+1).edges)>30)
+          label("${secondsToString(time)}"){
+            id=it1.nodes.last().id.toString()
+            layoutX=actualX-10.0
+            layoutY=middle+10
+            style{
+              fontSize=10.px
+            }
+          }
       }
     }
     stackpane {
@@ -122,7 +137,21 @@ class TimelineFragment() : Fragment() {
       highlightLocation(event.id, event.isWarehouse)
     }
   }
-
+  private fun secondsToString(seconds:Long):String{
+    var secondes = seconds
+    if(secondes==0L)
+      return "0s"
+    val hours : Long = secondes / 3600L
+    secondes -= hours * 3600L
+    val minutes : Long = secondes / 60L
+    var res = ""
+    if(hours != 0L)
+      res += ""+ hours + "h"
+    if (minutes < 10)
+      res += "0"
+    res += "" + minutes
+    return res
+  }
   private fun length(edges: List<Junction>): Long = edges.sumLongBy { it.length }
 
   private fun transform(edges: List<Junction>): Double =
