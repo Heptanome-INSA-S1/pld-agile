@@ -137,8 +137,8 @@ class RoundFragment : Fragment() {
       }
     }
 
-    label("")
     label("Warehouse") {
+      paddingTop=20.0
       paddingLeft=30.0
       style{
         fontWeight = FontWeight.BOLD
@@ -161,13 +161,13 @@ class RoundFragment : Fragment() {
     }
     label("RoadSheet") {
       paddingLeft=30.0
-      paddingTop=5.0
+      paddingTop=20.0
       style{
         fontWeight = FontWeight.BOLD
       }
     }
     hbox {
-      paddingTop=2
+      paddingTop=10.0
       paddingLeft=30.0
       button("Browse"){
         id=""+round!!.warehouse.address.id

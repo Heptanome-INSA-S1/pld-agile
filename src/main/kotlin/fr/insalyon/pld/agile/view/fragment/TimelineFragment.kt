@@ -54,7 +54,7 @@ class TimelineFragment: Fragment() {
     }
     actualX=15.0
     round.distancePathInMeters().forEachIndexed { index,it1 ->
-      val deplacement = transform(it1.edges)
+      var deplacement = transform(it1.edges)
       actualX += deplacement
       time += length(it1.edges).seconds.toSeconds()
       val idDelivery = it1.nodes.last().id.toString()
@@ -72,24 +72,27 @@ class TimelineFragment: Fragment() {
           }
         }
       }
-      label("${secondsToString(time)}"){
-        id=idDelivery
-        layoutX=actualX-10.0
-        layoutY=middle-23
-        style{
-          fontSize=10.px
-        }
-      }
-      if(index<round.deliveries().size){
-        time+= round.deliveries().first { it.address.id.toString() == idDelivery }.duration.toSeconds()
+      if(deplacement>30)
         label("${secondsToString(time)}"){
-          id=it1.nodes.last().id.toString()
+          id=idDelivery
           layoutX=actualX-10.0
-          layoutY=middle+10
+          layoutY=middle-23
           style{
             fontSize=10.px
           }
         }
+      if(index<round.deliveries().size){
+        val attente = round.deliveries().first { it.address.id.toString() == idDelivery }.duration.toSeconds().toDouble()
+        time+=attente.toLong()
+        if(transform(round.distancePathInMeters().elementAt(index+1).edges)>30)
+          label("${secondsToString(time)}"){
+            id=it1.nodes.last().id.toString()
+            layoutX=actualX-10.0
+            layoutY=middle+10
+            style{
+              fontSize=10.px
+            }
+          }
       }
     }
     stackpane {
@@ -141,11 +144,9 @@ class TimelineFragment: Fragment() {
     var res = ""
     if(hours != 0L)
       res += ""+ hours + "h"
-    if(minutes != 0L) {
-      if (minutes < 10)
-        res += "0"
-      res += "" + minutes
-    }
+    if (minutes < 10)
+      res += "0"
+    res += "" + minutes
     return res
   }
 

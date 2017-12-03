@@ -7,16 +7,17 @@ import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
 import javafx.animation.TranslateTransition
 import javafx.event.EventHandler
-import javafx.geometry.Pos
 import javafx.scene.Cursor
 import javafx.scene.Group
 import javafx.scene.control.ScrollPane
 import javafx.scene.input.ScrollEvent
 import javafx.scene.layout.BorderPane
+import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.scene.shape.Line
 import javafx.util.Duration
+import java.lang.Math.min
 import tornadofx.*
 import java.lang.Math.abs
 
@@ -40,9 +41,9 @@ class PlanFragment : Fragment(){
   val plan: Plan by param()
   val round: Round? by param()
 
-  val MAP_SIZE: Double by param(800.0)
+  var MAP_SIZE=min(parentView.center.boundsInLocal.width,parentView.center.boundsInLocal.height)
 
-  var SIZE = 1.0
+    var SIZE = 1.0
 
   private fun transform(x: Number, y: Number): Pair<Double, Double> {
     val transformedX = (y.toDouble() / (plan.height.toDouble()) * MAP_SIZE)
@@ -119,39 +120,31 @@ class PlanFragment : Fragment(){
       }
       notNullRound.deliveries().forEachIndexed { index, it ->
         val (nodeX, nodeY) = transform(it.address.x, it.address.y)
-        circle {
-          centerX = nodeX
-          centerY = nodeY
-          radius = SIZE * 7
-          fill = colorDelivery
-          id = it.address.id.toString()
-          onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
-          setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
-        }
-
-          label(""+(index+2)){
-              if(index+2>9) {
-                  layoutX = nodeX - 4
-                  layoutY = nodeY - 5.5
-              }else{
-                  layoutX = nodeX - 2
-                  layoutY = nodeY - 5.5
-              }
-              alignment= Pos.CENTER
-              style{
-                  fontSize=7. px
-                  textFill=colorLabelCircle
-              }
-              val id = it.address.id.toString()
-              //à optimiser ? deux events : un pour le cercle, un pour le label
+          stackpane {
+              id = it.address.id.toString()
+              layoutX=nodeX-SIZE*7
+              layoutY=nodeY-SIZE*7
               onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
               setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
+              circle {
+                  radius = SIZE * 7
+                  fill = colorDelivery
+              }
+
+              label(""+(index+2)){
+                  style{
+                      fontSize=7. px
+                      textFill=colorLabelCircle
+                  }
+              }
           }
       }
     }
   }
 
   val scroll = scrollpane {
+      shapeGroup.translateX=(parentView.center.boundsInLocal.width-MAP_SIZE)/2
+      shapeGroup.translateY=(parentView.center.boundsInLocal.height-MAP_SIZE)/2
       hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
       vbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
       style = "-fx-background: #3B3833;"
@@ -194,29 +187,31 @@ class PlanFragment : Fragment(){
       onMousePressed = EventHandler { mouseEvent ->
           // record a delta distance for the drag and drop operation.
           cursor = Cursor.MOVE
-          dragDelta.x = layoutX +shapeGroup.translateX - mouseEvent.sceneX
-          dragDelta.y = layoutY + shapeGroup.translateY- mouseEvent.sceneY
+          //println(""+parentView.center.boundsInLocal.width+" "+layoutX+" "+mouseEvent.sceneX)
+          dragDelta.x = (shapeGroup.translateX - mouseEvent.sceneX)
+          dragDelta.y = (shapeGroup.translateY - mouseEvent.sceneY)
       }
       onMouseReleased = EventHandler {
           cursor = Cursor.HAND
       }
       onMouseDragOver=EventHandler { mouseEvent ->
-          if(abs(mouseEvent.sceneX + dragDelta.x)<400*abs(1-shapeGroup.scaleX)+50||abs(mouseEvent.sceneX + dragDelta.x)<abs(shapeGroup.translateX))
+          //println(""+ mouseEvent.sceneX +" "+ dragDelta.x+" "+shapeGroup.scaleX+" "+(parentView.center.boundsInLocal.width/2)*(1-shapeGroup.scaleX)+" "+parentView.center.boundsInLocal.width)
+          if(abs(mouseEvent.sceneX + dragDelta.x)*MAP_SIZE/parentView.center.boundsInLocal.width<(parentView.center.boundsInLocal.width/2)*abs(1-shapeGroup.scaleX)+50||abs(mouseEvent.sceneX + dragDelta.x)<abs(shapeGroup.translateX))
             shapeGroup.translateX = mouseEvent.sceneX + dragDelta.x
-          if(abs(mouseEvent.sceneY + dragDelta.y)<400*abs(1-shapeGroup.scaleY)+50||abs(mouseEvent.sceneY + dragDelta.y)<abs(shapeGroup.translateY))
+          if(abs(mouseEvent.sceneY + dragDelta.y)*MAP_SIZE/parentView.center.boundsInLocal.height<(parentView.center.boundsInLocal.height/2)*abs(1-shapeGroup.scaleY)+50||abs(mouseEvent.sceneY + dragDelta.y)<abs(shapeGroup.translateY))
             shapeGroup.translateY = mouseEvent.sceneY + dragDelta.y
       }
       onMouseClicked = EventHandler { mouseEvent ->
           if (mouseEvent.clickCount == 2) {
               val tt = TranslateTransition(Duration.millis(500.0), shapeGroup)
-              if(abs(shapeGroup.translateX +400 - mouseEvent.sceneX)<400*abs(1-shapeGroup.scaleX)+50 )
-                  tt.toX =  shapeGroup.translateX + 400 - mouseEvent.sceneX
+              if(abs(shapeGroup.translateX +(MAP_SIZE/2) - mouseEvent.sceneX)<(MAP_SIZE/2)*abs(1-shapeGroup.scaleX)+50 )
+                  tt.toX =  shapeGroup.translateX + (MAP_SIZE/2) - mouseEvent.sceneX
               else
-                  tt.toX = (400*abs(1-shapeGroup.scaleX)+50)*(400-mouseEvent.sceneX)/abs(400-mouseEvent.sceneX) //TODO chercher comment avoir le signe
-              if(abs(shapeGroup.translateY +400 - mouseEvent.sceneY)<400*abs(1-shapeGroup.scaleY)+50)
-                  tt.toY = shapeGroup.translateY + 400 - mouseEvent.sceneY
+                  tt.toX = ((MAP_SIZE/2)*abs(1-shapeGroup.scaleX)+50)*((MAP_SIZE/2)-mouseEvent.sceneX)/abs((MAP_SIZE/2)-mouseEvent.sceneX) //TODO chercher comment avoir le signe
+              if(abs(shapeGroup.translateY +(MAP_SIZE/2) - mouseEvent.sceneY)<(MAP_SIZE/2)*abs(1-shapeGroup.scaleY)+50)
+                  tt.toY = shapeGroup.translateY + (MAP_SIZE/2) - mouseEvent.sceneY
               else
-                  tt.toY = (400*abs(1-shapeGroup.scaleY)+50)*(400-mouseEvent.sceneY)/abs(400-mouseEvent.sceneY)
+                  tt.toY = ((MAP_SIZE/2)*abs(1-shapeGroup.scaleY)+50)*((MAP_SIZE/2)-mouseEvent.sceneY)/abs((MAP_SIZE/2)-mouseEvent.sceneY)
               tt.play()
           }
       }
@@ -234,9 +229,7 @@ class PlanFragment : Fragment(){
         }
     }
 
-  override val root = stackpane {
-    add(scroll)
-  }
+  override val root = scroll
 
 
   fun zoomIn() {
@@ -286,31 +279,32 @@ class PlanFragment : Fragment(){
     private fun highlightLocation(idToHighlight:String, isWarehouse:Boolean){
         if(idHighlight!=null) {
             shapeGroup.children
+                    .filter { it.id!=null && it is StackPane && it.id==idHighlight }
+                    .forEach {
+                        var circle:Circle = it.getChildList()!!.first() as Circle
+                        circle.scaleX = 1.0
+                        circle.scaleY = 1.0
+                        circle.style {
+                            fill = colorHighlight
+                        }
+                    }
+            shapeGroup.children
                     .filter { it.id != null && it is Group && it.id ==idHighlight }
                     .forEach {
                         it.getChildList()!!.forEach {
                             (it as Line).stroke = colorLine
                         }
                     }
-            shapeGroup.children
-                    .filter { it.id!=null && it.id==idHighlight }
-                    .forEach {
-                        //colorHighlight= if(isWarehouse) Color.BROWN else Color.GREEN
-                        it.scaleX = 1.0
-                        it.scaleY = 1.0
-                        it.style {
-                            fill = colorHighlight
-                        }
-                    }
         }
         Logger.debug("highlight : "+ idToHighlight)
         if(idHighlight!= idToHighlight) {
             shapeGroup.children
-                    .filter { it.id != null && it is Circle && it.id ==idToHighlight }
+                    .filter { it.id != null && it is StackPane && it.id ==idToHighlight }
                     .forEach {
-                        it.scaleX = 1.5
-                        it.scaleY = 1.5
-                        it.style {
+                        var circle:Circle = it.getChildList()!!.first() as Circle
+                        circle.scaleX = 1.5
+                        circle.scaleY = 1.5
+                        circle.style {
                             fill = colorCircleHighlight
                         }
                     }

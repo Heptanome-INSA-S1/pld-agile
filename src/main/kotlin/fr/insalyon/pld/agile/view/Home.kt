@@ -15,6 +15,7 @@ import javafx.scene.layout.VBox
 import javafx.scene.layout.HBox
 import javafx.stage.Modality
 import tornadofx.*
+import javafx.scene.layout.StackPane
 
 /**
  * Default home screen
@@ -25,7 +26,7 @@ class Home : View() {
   private val loadRoundRequestButton: Button by fxid()
   private val loadPlanMenuItem: MenuItem by fxid()
   private val loadRoundRequestMenuItem: MenuItem by fxid()
-  private val centerBox: VBox by fxid()
+  private val centerBox: StackPane by fxid()
   private val rightBox: VBox by fxid()
   private val bottomBox: HBox by fxid()
   private val progressIndicator = ProgressIndicator()
@@ -86,7 +87,7 @@ class Home : View() {
     centerBox.clear()
     Logger.info("Plan is printed")
     centerBox.add(PlanFragment::class, mapOf(
-        PlanFragment::parentView to this,
+        PlanFragment::parentView to root,
         PlanFragment::plan to controller.plan))
     rightBox.clear()
     rightBox.add(loadRoundRequestButton)
@@ -97,12 +98,12 @@ class Home : View() {
   fun refreshRound() {
     centerBox.clear()
     centerBox.add(PlanFragment::class, mapOf(
-          PlanFragment::parentView to this,
+          PlanFragment::parentView to root,
           PlanFragment::round to controller.round,
           PlanFragment::plan to controller.plan))
     rightBox.clear()
     rightBox.add(RoundFragment::class, mapOf(
-        RoundFragment::parentView to this,
+        RoundFragment::parentView to root,
         RoundFragment::round to controller.round))
     bottomBox.clear()
     bottomBox.add(TimelineFragment::class, mapOf(
