@@ -5,6 +5,7 @@ import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.util.txt.RoadSheetSerializer
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
+import fr.insalyon.pld.agile.view.model.DeliveryModel
 import javafx.scene.control.Button
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
@@ -15,6 +16,7 @@ import java.net.URI
 class RoundFragment : Fragment() {
   val parentView: BorderPane by param()
   val round: Round? by param()
+  val model: DeliveryModel by inject()
   val roadSheetSerializer : RoadSheetSerializer = RoadSheetSerializer()
 
   val list = vbox{
@@ -104,7 +106,7 @@ class RoundFragment : Fragment() {
               }
             }
           }
-          for (i in round!!.deliveries().indices) {
+          round!!.deliveries().forEach {
             hbox {
               spacing=3.0
               paddingTop=2
@@ -115,6 +117,9 @@ class RoundFragment : Fragment() {
                   backgroundImage += URI.create( "image/edit.png")
                   backgroundRepeat += Pair(BackgroundRepeat.NO_REPEAT,BackgroundRepeat.NO_REPEAT)
                   backgroundPosition+= BackgroundPosition.CENTER
+                }
+                action {
+                  openEditor(it)
                 }
               }
               button{
@@ -208,6 +213,11 @@ class RoundFragment : Fragment() {
                         }
                       }
             }
+  }
+
+  private fun openEditor(delivery: Delivery?){
+    openInternalWindow(DeliveryEditor::class, params = mapOf(
+        DeliveryEditor::delivery to delivery))
   }
 
 }

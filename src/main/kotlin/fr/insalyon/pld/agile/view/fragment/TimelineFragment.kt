@@ -1,11 +1,8 @@
 package fr.insalyon.pld.agile.view.fragment
 
-import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
-import javafx.scene.Group
 import javafx.scene.control.Label
-import javafx.scene.control.ScrollPane
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
@@ -13,7 +10,7 @@ import javafx.scene.shape.Circle
 import javafx.scene.shape.Line
 import tornadofx.*
 
-class TimelineFragment() : Fragment() {
+class TimelineFragment: Fragment() {
   val parentView:BorderPane by param()
   val round : Round by param()
   val planSize: Pair<Double, Double> by param()
