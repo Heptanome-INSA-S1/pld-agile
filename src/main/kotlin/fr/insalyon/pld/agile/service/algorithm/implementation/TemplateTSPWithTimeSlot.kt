@@ -52,7 +52,9 @@ abstract class TemplateTSPWithTimeSlot(
       sommetCrt: Int,
       nonVus: ArrayList<Int>,
       cout: Array<LongArray>,
-      duree: LongArray
+      duree: LongArray,
+      currentTime: Instant,
+      startTimes: Array<Instant?>
   ): Iterator<Int>
 
   internal open fun branchAndBound(
@@ -80,7 +82,7 @@ abstract class TemplateTSPWithTimeSlot(
         coutMeilleureSolution = coutVus
       }
     } else if (coutVus + bound(sommetCrt, nonVus, cout, duree, currentTime, startTimes, endTimes) < coutMeilleureSolution) {
-      val it = iterator(sommetCrt, nonVus, cout, duree)
+      val it = iterator(sommetCrt, nonVus, cout, duree, currentTime, startTimes)
       for(prochainSommet in it) {
         vus.add(prochainSommet)
         nonVus.remove(prochainSommet)

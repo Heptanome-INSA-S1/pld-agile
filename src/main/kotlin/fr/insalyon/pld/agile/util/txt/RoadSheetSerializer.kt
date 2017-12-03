@@ -66,22 +66,48 @@ class RoadSheetSerializer(){
             "            </div>\n" +
             "        </div>"
         rows = rows.replace("timexxx", startTime)
-        rows = rows.replace("numb", ""+round.warehouse.address.id)
+        var y=0
+        var infoL = "${round.warehouse.address.id}<br><br>"
+        while(y<round.distancePathInMeters().size && round.deliveries().elementAt(0).address != round.distancePathInMeters().elementAt(y).nodes[0]) {
+            var distance = 0.0
+            round.distancePathInMeters().elementAt(y).edges.forEachIndexed { index, it ->
+                distance += it.length.toDouble()
+                if (!(index + 1 < round.distancePathInMeters().elementAt(y).edges.size && it.name.equals(round.distancePathInMeters().elementAt(y).edges.elementAt(index + 1).name))) {
+                    var distances = "${distance} m"
+                    if(distance > 999){
+                        distance /= 1000.0
+                        distances = "${distance} km"
+                    }
+                    infoL += "\t Prends  ${it.name} sur ${distances}<br>"
+                    distance = 0.0
+                }
+            }
+            y++
+        }
+        rows = rows.replace("numb", infoL)
         for (i in 0 until round.deliveries().size){
-            currentTime += round.deliveries().elementAt(i).duration
+            if(i>0){
+                currentTime += round.deliveries().elementAt(i-1).duration
+            }
+            currentTime += round.durationPathInSeconds().elementAt(i)
             var waitingTime: Duration? = null
             if(round.deliveries().elementAt(i).startTime != null && round.deliveries().elementAt(i).startTime!! > currentTime) {
                 waitingTime = round.deliveries().elementAt(i).startTime!! - currentTime
                 currentTime = round.deliveries().elementAt(i).startTime!!
             }
             var infoLivraison : String = "Livraison au point("+round.deliveries().elementAt(i).address.x!!+","+round.deliveries().elementAt(i).address.y+")<br><br>"
-            var j=i
-           while(j<round.durationPathInSeconds().size && round.deliveries().elementAt(i).address != round.distancePathInMeters().elementAt(j).nodes[0]) {
+            var j=i+1
+           while(j<round.distancePathInMeters().size && round.deliveries().elementAt(i).address != round.distancePathInMeters().elementAt(j-1).nodes[0]) {
                 var distance = 0.0
                 round.distancePathInMeters().elementAt(j).edges.forEachIndexed { index, it ->
                     distance += it.length.toDouble()
                     if (!(index + 1 < round.distancePathInMeters().elementAt(j).edges.size && it.name.equals(round.distancePathInMeters().elementAt(j).edges.elementAt(index + 1).name))) {
-                        infoLivraison += "\t Prends  ${it.name} sur ${distance/1000.0} m<br>"
+                        var distances = "${distance} m"
+                        if(distance > 999){
+                            distance /= 1000.0
+                            distances = "${distance} km"
+                        }
+                        infoLivraison += "\t Prends  ${it.name} sur ${distances}<br>"
                         distance = 0.0
                     }
                 }
@@ -101,6 +127,8 @@ class RoadSheetSerializer(){
             rows = rows.replace("timexxx", ""+currentTime.toFormattedString())
             rows = rows.replace("localisationxxx", infoLivraison)
         }
+        currentTime += round.deliveries().last().duration
+        currentTime += round.durationPathInSeconds().last()
         rows+= "<div class=\"row\">\n" +
             "            <div class=\"time left\">\n" +
             "                timexxx -\n" +
@@ -112,14 +140,15 @@ class RoadSheetSerializer(){
             "                Entrepôt numb\n" +
             "            </div>\n" +
             "        </div>"
-        rows = rows.replace("timexxx", " ")
+        rows = rows.replace("timexxx", currentTime.toFormattedString())
         rows = rows.replace("numb", ""+round.warehouse.address.id)
-        val endTime = ""
+        val endTime = currentTime
         htmlString = htmlString.replace("\$startTime", startTime)
+        htmlString = htmlString.replace("\$endTime", currentTime.toFormattedString())
         htmlString = htmlString.replace("\$rows", rows)
         htmlString = htmlString.replace("\$nbDeliveries", nbDeliveries)
         val newHtmlFile = File("src/main/dist/FeuilleDeRoute.html")
         FileUtils.writeStringToFile(newHtmlFile, htmlString)
-        Desktop.getDesktop().browse(newHtmlFile.toURI())
+       // Desktop.getDesktop().browse(newHtmlFile.toURI())
     }
 }

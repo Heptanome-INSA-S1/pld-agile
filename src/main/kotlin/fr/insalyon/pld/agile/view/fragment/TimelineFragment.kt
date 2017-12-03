@@ -1,6 +1,7 @@
 package fr.insalyon.pld.agile.view.fragment
 
 import fr.insalyon.pld.agile.model.*
+import fr.insalyon.pld.agile.sumLongBy
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import javafx.scene.control.Label
 import javafx.scene.layout.BorderPane
@@ -15,31 +16,20 @@ class TimelineFragment: Fragment() {
   val round : Round by param()
   val planSize: Pair<Double, Double> by param()
 
-  private val colorLine = Color.DARKGREEN
-  private val colorWarehouse = Color.INDIANRED
-  private val colorDelivery = Color.BLUE
-  private val colorCircleHighlight = Color.RED
-  private val colorLineHighlight = Color.DARKRED
-  private val colorLabel = Color.WHITE
-  private val colorLabelHoursHighlight = Color.DARKRED
+  var idHighlight: String? = null
+  var colorHighlight: Color = Color.WHITE
 
   private val circleRadius = 10.0
 
-  private val TOTAL_LENGTH : Long by lazy{
-    var total = 0L
-    round.distancePathInMeters().forEach {
-      it.edges.forEach {
-        total += it.length
-      }
-    }
-    total
+  private val TOTAL_LENGTH: Long by lazy {
+    round.distance
   }
 
-  private val shapeGroup =group {
+  private val shapeGroup = group {
     val middle = 15.0
     var actualX = 15.0
-    var time = round.warehouse.departureHour.toSeconds()
-    round.distancePathInMeters().forEach{
+    var time = round.warehouse.departureHour
+    round.distancePathInMeters().forEach {
       val deplacement = transform(it.edges)
       actualX += deplacement
 
@@ -49,26 +39,26 @@ class TimelineFragment: Fragment() {
         startY = middle
         endX = actualX
         endY = middle
-        stroke = colorLine
+        stroke = Config.Colors.colorLine
       }
     }
-    actualX=15.0
-    round.distancePathInMeters().forEachIndexed { index,it1 ->
-      var deplacement = transform(it1.edges)
+    actualX = 15.0
+    round.distancePathInMeters().forEachIndexed { index, it1 ->
+      val deplacement = transform(it1.edges)
       actualX += deplacement
-      time += length(it1.edges).seconds.toSeconds()
+      time += length(it1.edges).seconds
       val idDelivery = it1.nodes.last().id.toString()
       stackpane {
-        id=idDelivery
-        layoutX=actualX - circleRadius
-        layoutY=middle - circleRadius
+        id = idDelivery
+        layoutX = actualX - circleRadius
+        layoutY = middle - circleRadius
         circle {
           radius = circleRadius
-          fill = if(index==round.deliveries().size) colorWarehouse  else colorDelivery
+          fill = if (index == round.deliveries().size) Config.Colors.colorWarehouse else Config.Colors.colorDelivery
         }
-        label("${index+2}"){
-          style{
-            textFill=colorLabel
+        label("${index + 2}") {
+          style {
+            textFill = Config.Colors.colorLabel
           }
         }
       }
@@ -79,6 +69,22 @@ class TimelineFragment: Fragment() {
           layoutY=middle-23
           style{
             fontSize=10.px
+      /*label(time.toFormattedString()) {
+        id = idDelivery
+        layoutX = actualX - 10.0
+        layoutY = middle - 23
+        style {
+          fontSize = 10.px
+        }
+      }
+      if (index < round.deliveries().size) {
+        time += round.deliveries().first { it.address.id.toString() == idDelivery }.duration
+        label(time.toFormattedString()) {
+          id = it1.nodes.last().id.toString()
+          layoutX = actualX - 10.0
+          layoutY = middle + 10
+          style {
+            fontSize = 10.px*/
           }
         }
       if(index<round.deliveries().size){
@@ -96,26 +102,26 @@ class TimelineFragment: Fragment() {
       }
     }
     stackpane {
-      id=round.warehouse.address.id.toString()
-      layoutX=15.0 - circleRadius
-      layoutY=middle - circleRadius
+      id = round.warehouse.address.id.toString()
+      layoutX = 15.0 - circleRadius
+      layoutY = middle - circleRadius
       circle {
         radius = circleRadius
-        fill = colorWarehouse
+        fill = Config.Colors.colorWarehouse
         tooltip { "Test " + actualX }
       }
-      label("1"){
-        style{
-          textFill=colorLabel
+      label("1") {
+        style {
+          textFill = Config.Colors.colorLabel
         }
       }
     }
-    label("${secondsToString(round.warehouse.departureHour.toSeconds())}"){
-      id=round.warehouse.address.id.toString()
-      layoutX=15.0-10.0
-      layoutY=middle+10
-      style{
-        fontSize=10.px
+    label(round.warehouse.departureHour.toFormattedString()) {
+      id = round.warehouse.address.id.toString()
+      layoutX = 15.0 - 10.0
+      layoutY = middle + 10
+      style {
+        fontSize = 10.px
       }
     }
   }
@@ -126,14 +132,11 @@ class TimelineFragment: Fragment() {
     add(shapeGroup)
   }
 
-  private fun length(edges: List<Junction>) : Long {
-    var totalLength = 0L
-    edges.forEach {
-      totalLength += it.length
+  init {
+    subscribe<HighlightLocationEvent> { event ->
+      highlightLocation(event.id, event.isWarehouse)
     }
-    return totalLength
   }
-
   private fun secondsToString(seconds:Long):String{
     var secondes = seconds
     if(secondes==0L)
@@ -149,71 +152,63 @@ class TimelineFragment: Fragment() {
     res += "" + minutes
     return res
   }
+  private fun length(edges: List<Junction>): Long = edges.sumLongBy { it.length }
 
   private fun transform(edges: List<Junction>): Double =
-          length(edges).toDouble()/ TOTAL_LENGTH.toDouble() * (parentView.bottom.boundsInLocal.width - 70.0)
+      length(edges).toDouble() / TOTAL_LENGTH.toDouble() * (parentView.bottom.boundsInLocal.width - 70.0)
 
-  init {
-    subscribe<HighlightLocationEvent> {
-      event -> highlightLocation(event.id,event.isWarehouse)
+  private fun highlightLocation(idToHighlight: String, isWarehouse: Boolean) {
+    if (idHighlight != null) {
+      shapeGroup.children
+          .filter { it.id != null && it is Line && it.id == idHighlight }
+          .forEach {
+            (it as Line).stroke = Config.Colors.colorLine
+            it.strokeWidth = 1.0
+          }
+      shapeGroup.children
+          .filter { it.id != null && it.id == idHighlight }
+          .forEach {
+            if (it is StackPane) {
+              val circle = it.getChildList()!!.first() as Circle
+              circle.style {
+                fill = colorHighlight
+              }
+            } else if (it is Label) {
+              it.style {
+                fontSize = 10.px
+                textFill = Color.BLACK
+              }
+            }
+          }
     }
-  }
-
-  var idHighlight: String? =null
-  var colorHighlight:Color =Color.WHITE
-
-  private fun highlightLocation(idToHighlight:String, isWarehouse:Boolean){
-    if(idHighlight!=null) {
+    if (idHighlight != idToHighlight) {
       shapeGroup.children
-              .filter { it.id != null && it is Line && it.id ==idHighlight }
-              .forEach {
-                (it as Line).stroke = colorLine
-                it.strokeWidth = 1.0
+          .filter { it.id != null && it.id == idToHighlight }
+          .forEach {
+            if (it is StackPane) {
+              val circle = it.getChildList()!!.first() as Circle
+              circle.style {
+                fill = Config.Colors.colorCircleHighlight
               }
+            } else if (it is Label) {
+              it.style {
+                fontSize = 10.px
+                textFill = Config.Colors.colorLabelHoursHighlight
+              }
+            }
+          }
       shapeGroup.children
-              .filter { it.id!=null && it.id==idHighlight }
-              .forEach {
-                if(it is StackPane){
-                  val circle = it.getChildList()!!.first() as Circle
-                  circle.style {
-                    fill = colorHighlight
-                  }
-                }else if(it is Label){
-                  it.style {
-                    fontSize=10.px
-                    textFill = Color.BLACK
-                  }
-                }
-              }
+          .filter { it.id != null && it is Line && it.id == idToHighlight }
+          .forEach {
+            (it as Line).stroke = Config.Colors.colorLineHighlight
+            it.strokeWidth = 2.0
+          }
     }
-    if(idHighlight!= idToHighlight) {
-      shapeGroup.children
-              .filter { it.id != null && it.id ==idToHighlight }
-              .forEach {
-                if(it is StackPane) {
-                  val circle = it.getChildList()!!.first() as Circle
-                  circle.style {
-                    fill = colorCircleHighlight
-                  }
-                }else if(it is Label){
-                  it.style {
-                    fontSize=10.px
-                    textFill=colorLabelHoursHighlight
-                  }
-                }
-              }
-      shapeGroup.children
-              .filter { it.id != null && it is Line && it.id ==idToHighlight }
-              .forEach {
-                (it as Line).stroke = colorLineHighlight
-                it.strokeWidth = 2.0
-              }
-    }
-    if(idHighlight!= idToHighlight) {
+    if (idHighlight != idToHighlight) {
       idHighlight = idToHighlight
-      colorHighlight = if (isWarehouse) colorWarehouse else colorDelivery
-    }else{
-      idHighlight=null
+      colorHighlight = if (isWarehouse) Config.Colors.colorWarehouse else Config.Colors.colorDelivery
+    } else {
+      idHighlight = null
     }
   }
 }

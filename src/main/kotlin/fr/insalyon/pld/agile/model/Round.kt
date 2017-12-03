@@ -12,21 +12,49 @@ import java.util.*
 class Round(
     val warehouse: Warehouse,
     deliveries: LinkedHashSet<Delivery>,
-    durationPath: LinkedHashSet<Measurable>,
-    distancePath: LinkedHashSet<Path<Intersection, Junction>>
-) : Observable(), Measurable{
+    durationPath: List<Measurable>,
+    distancePath: List<Path<Intersection, Junction>>
+) : Observable(), Measurable {
 
   private val _deliveries: MutableList<Delivery> = deliveries.toMutableList()
-  fun deliveries(): LinkedHashSet<Delivery> = _deliveries.toLinkedHashSet()
+  /**
+   * Return the ordered list of deliveries
+   */
+  fun deliveries(): List<Delivery> = _deliveries.toList()
 
+  /**
+   * Return the duration of the paths in the round
+   */
   private val _durationPath: MutableList<Measurable> = durationPath.toMutableList()
-  fun durationPathInSeconds(): LinkedHashSet<Duration> {
-    return _durationPath.map { it.length.seconds }.toLinkedHashSet()
+  fun durationPathInSeconds(): List<Duration> {
+    return _durationPath.map { it.length.seconds }
   }
 
+  /**
+   * Return the distance paths (plan part) in the round
+   */
   private val _distancePath: MutableList<Path<Intersection, Junction>> = distancePath.toMutableList()
-  fun distancePathInMeters(): LinkedHashSet<Path<Intersection, Junction>> {
-    return _distancePath.toLinkedHashSet()
+  fun distancePathInMeters(): List<Path<Intersection, Junction>> {
+    return _distancePath
+  }
+
+  /**
+   * Return the waitingTimes for the deliveries in the round
+   */
+  fun getWaitingTimes(): List<Duration> {
+    var waitingTimes = mutableListOf<Duration>()
+    var currentTime = warehouse.departureHour
+    _deliveries.forEachIndexed { i, delivery ->
+      currentTime += _durationPath[i].length.seconds
+      if(delivery.startTime != null && delivery.startTime > currentTime) {
+        waitingTimes.add(delivery.startTime - currentTime)
+        currentTime  = delivery.startTime
+      } else {
+        waitingTimes.add(0.seconds)
+      }
+      currentTime += delivery.duration
+    }
+    return waitingTimes
   }
 
   fun addDelivery(subPath: SubPath) {
@@ -39,30 +67,44 @@ class Round(
       val deliveryBefore = _deliveries.first { it.address == subPath.pathFromPreviousDelivery.nodes.first() }
       index = _deliveries.addAfter(deliveryBefore, subPath.delivery)
     }
-    _durationPath.add(index, subPath.pathToNextDelivery)
-    _durationPath.add(index, subPath.pathFromPreviousDelivery)
+    _durationPath.add(index, subPath.durationToNextDelivery)
+    _durationPath.add(index, subPath.durationFromPreviousDelivery)
+
+    _distancePath.add(index, subPath.pathToNextDelivery)
+    _distancePath.add(index, subPath.pathFromPreviousDelivery)
 
     setChanged()
     notifyObservers()
   }
 
-  fun modify(delivery: Delivery, startTime: Instant?, endTime: Instant?, duration: Duration) {
-    val newDelivery = delivery.copy(startTime = startTime, endTime = endTime, duration = duration)
-    val index = _deliveries.indexOf(delivery)
-    _deliveries.removeAt(index)
-    _deliveries.add(index, newDelivery)
+  fun removePath(i: Int) {
+    _durationPath.removeAt(i)
+    _distancePath.removeAt(i)
   }
 
-  fun removeDelivery(delivery: Delivery, pathToReplaceWith: Path<Intersection, Junction>) {
+  fun modify(index: Int, startTime: Instant?, endTime: Instant?, duration: Duration) {
+    val newDelivery = _deliveries[index].copy(startTime = startTime, endTime = endTime, duration = duration)
+    _deliveries[index] = newDelivery
+
+    setChanged()
+    notifyObservers()
+  }
+
+  fun removeDelivery(delivery: Delivery, pathToReplaceWith: Path<Intersection, Junction>, duration: Duration) {
 
     val index = _deliveries.indexOf(delivery)
     if(index == -1) throw InvalidArgumentException(arrayOf("$delivery was not found in the round"))
+
     _deliveries.removeAt(index)
 
     _durationPath.removeAt(index)
-    _durationPath.removeAt(index)
+    _distancePath.removeAt(index)
 
-    _durationPath.add(index, pathToReplaceWith)
+    _durationPath.removeAt(index)
+    _distancePath.removeAt(index)
+
+    _durationPath.add(index, duration)
+    _distancePath.add(index, pathToReplaceWith)
 
     setChanged()
     notifyObservers()
@@ -148,12 +190,6 @@ class Round(
 
     return stringBuilder.toString()
 
-  }
-
-  private fun <E> List<E>.toLinkedHashSet(): LinkedHashSet<E> {
-    val linkedHashSet = linkedSetOf<E>()
-    linkedHashSet.addAll(this)
-    return linkedHashSet
   }
 
   private fun <E> MutableList<E>.addAfter(elementBefore: E, elementToAdd: E): Int {

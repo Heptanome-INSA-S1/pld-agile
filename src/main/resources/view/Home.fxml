@@ -13,10 +13,18 @@
         <GridPane>
             <children>
                 <MenuBar GridPane.columnIndex="0" GridPane.rowIndex="0" >
-                    <Menu text="File">
+                    <Menu text="Fichier">
                         <MenuItem fx:id="loadPlanMenuItem" text="Charger plan">
                         </MenuItem>
                         <MenuItem fx:id="loadRoundRequestMenuItem" text="Charger livraison">
+                        </MenuItem>
+                    </Menu>
+                </MenuBar>
+                <MenuBar GridPane.columnIndex="1" GridPane.rowIndex="0" >
+                    <Menu text="Editer">
+                        <MenuItem fx:id="undo" text="Annuler">
+                        </MenuItem>
+                        <MenuItem fx:id="redo" text="Refaire">
                         </MenuItem>
                     </Menu>
                 </MenuBar>

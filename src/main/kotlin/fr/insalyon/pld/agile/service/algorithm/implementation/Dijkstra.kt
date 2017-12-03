@@ -7,7 +7,7 @@ import fr.insalyon.pld.agile.lib.graph.model.Path
 import fr.insalyon.pld.agile.service.algorithm.api.Dijkstra
 import java.util.*
 
-class DijsktraImpl<N, out E : Measurable>(
+class Dijkstra<N, out E : Measurable>(
     private val graph: Graph<N, E>,
     override val source: N,
     visitor: ((N) -> Unit)? = null

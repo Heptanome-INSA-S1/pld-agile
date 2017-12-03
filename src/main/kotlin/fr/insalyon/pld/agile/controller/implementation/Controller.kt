@@ -1,10 +1,15 @@
 package fr.insalyon.pld.agile.controller.implementation
 
+import fr.insalyon.pld.agile.Config
+import fr.insalyon.pld.agile.controller.CommandList
 import fr.insalyon.pld.agile.controller.api.Command
 import fr.insalyon.pld.agile.controller.api.State
+import fr.insalyon.pld.agile.controller.commands.DebugCommand
+import fr.insalyon.pld.agile.model.Delivery
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.model.RoundRequest
+import fr.insalyon.pld.agile.util.Logger
 import fr.insalyon.pld.agile.view.Home
 import java.io.File
 
@@ -22,6 +27,7 @@ class Controller(val window: Home) {
     field = value
   }
   internal var round: Round? = null
+  internal val commands = CommandList()
 
   val INIT_STATE: State<Any> = InitState()
   val LOADED_PLAN_STATE: State<Plan> = LoadedPlanState()
@@ -30,6 +36,12 @@ class Controller(val window: Home) {
   val ERROR_STATE: State<Pair<Exception, State<Nothing>>> = ErrorState()
 
   private var currentState: State<Nothing> = INIT_STATE
+
+  init {
+    if(Config.LOGGER_LEVEL == Logger.Level.DEBUG) {
+      commands.add(DebugCommand())
+    }
+  }
 
   fun loadPlan(file: File){
     try {
@@ -72,16 +84,24 @@ class Controller(val window: Home) {
     }
   }
 
+  fun deleteDelivery(delivery: Delivery) {
+    try {
+      currentState.deleteDelivery(this, delivery)
+    } catch (e: Exception) {
+      e.catchWithErrorState()
+    }
+  }
+
   fun ok() {
     currentState.ok(this)
   }
 
-  fun undo(commands: List<Command>) {
-    currentState.undo(this, commands)
+  fun undo() {
+    commands.undo()
   }
 
-  fun redo(commands: List<Command>) {
-    currentState.redo(this, commands)
+  fun redo() {
+    commands.redo()
   }
 
   private fun Exception.catchWithErrorState() {

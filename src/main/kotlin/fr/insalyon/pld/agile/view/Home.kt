@@ -22,10 +22,16 @@ import javafx.scene.layout.StackPane
  */
 class Home : View() {
   override val root: BorderPane by fxml("/view/Home.fxml")
+
+  // Buttons
   private val loadPlanButton: Button by fxid()
   private val loadRoundRequestButton: Button by fxid()
   private val loadPlanMenuItem: MenuItem by fxid()
   private val loadRoundRequestMenuItem: MenuItem by fxid()
+  private val undo: MenuItem by fxid()
+  private val redo: MenuItem by fxid()
+
+  // Canvas
   private val centerBox: StackPane by fxid()
   private val rightBox: VBox by fxid()
   private val bottomBox: HBox by fxid()
@@ -43,6 +49,8 @@ class Home : View() {
         event.consume()
       }
     }
+
+    root.widthProperty().addListener{ _,_,_ -> refreshTimeLine() }
 
     centerBox.setOnDragDropped { event ->
       val db = event.dragboard
@@ -81,36 +89,56 @@ class Home : View() {
     loadRoundRequestMenuItem.setOnAction {
       controller.loadRoundRequest()
     }
+
+    redo.setOnAction {
+      controller.redo()
+    }
+
+    undo.setOnAction {
+      controller.undo()
+    }
+
+  }
+
+  fun refreshAll() {
+    refreshPlan()
+    refreshRound()
+    refreshTimeLine()
   }
 
   fun refreshPlan() {
     centerBox.clear()
-    Logger.info("Plan is printed")
+    Logger.info("Plan is refreshed")
     centerBox.add(PlanFragment::class, mapOf(
         PlanFragment::parentView to root,
+        PlanFragment::round to controller.round,
         PlanFragment::plan to controller.plan))
-    rightBox.clear()
-    rightBox.add(loadRoundRequestButton)
+  }
 
-    bottomBox.clear()
+  fun refreshTimeLine() {
+    Logger.info("Timeline is refreshed")
+    if(controller.round == null) {
+      bottomBox.clear()
+    } else {
+      bottomBox.clear()
+      bottomBox.add(TimelineFragment::class, mapOf(
+          TimelineFragment::parentView to root,
+          TimelineFragment::round to controller.round
+      ))
+    }
   }
 
   fun refreshRound() {
-    centerBox.clear()
-    centerBox.add(PlanFragment::class, mapOf(
-          PlanFragment::parentView to root,
-          PlanFragment::round to controller.round,
-          PlanFragment::plan to controller.plan))
-    rightBox.clear()
-    rightBox.add(RoundFragment::class, mapOf(
-        RoundFragment::parentView to root,
-        RoundFragment::round to controller.round))
-    bottomBox.clear()
-    bottomBox.add(TimelineFragment::class, mapOf(
-    TimelineFragment::parentView to root,
-    TimelineFragment::round to controller.round,
-    TimelineFragment::planSize to Pair<Double, Double>(controller.plan!!.width.toDouble(), controller.plan!!.height.toDouble())
-    ))
+    Logger.info("Round is refreshed")
+    if(controller.round == null) {
+      rightBox.clear()
+      rightBox.add(loadRoundRequestButton)
+    } else {
+      rightBox.clear()
+      rightBox.add(RoundFragment::class, mapOf(
+          RoundFragment::parentView to root,
+          RoundFragment::controller to controller))
+    }
   }
 
   fun errorPopUp(message: String?) {
@@ -118,7 +146,7 @@ class Home : View() {
     alert.title = "Erreur"
     alert.headerText = "Une erreur est survenu :"
     alert.contentText = message
-    alert.initOwner(this.currentWindow)
+    alert.initOwner(currentWindow)
     alert.initModality(Modality.APPLICATION_MODAL)
 
     alert.showAndWait()

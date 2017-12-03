@@ -17,7 +17,7 @@ class TspBenchmarkTest {
     val roads = mutableSetOf<Triple<Intersection, Path<Intersection, Junction>, Intersection>>()
 
     for(source: Intersection in roundRequest.intersections) {
-      val dijsktra = DijsktraImpl<Intersection, Junction>(plan, source)
+      val dijsktra = Dijkstra<Intersection, Junction>(plan, source)
       val destinations = roundRequest.intersections.filter { it != source }
       for(destination: Intersection in destinations) {
         nodes.add(source)
@@ -44,14 +44,10 @@ class TspBenchmarkTest {
     val roundRequestSerializer = RoundRequestSerializer(xmlRoundRequest, deliverySerializer, warehouseSerializer)
     val roundRequest = roundRequestSerializer.unserialize(xmlRoundRequest.documentElement)
 
-    val tsps = listOf<TSP>(TSP1(), TSPSumMin(roundRequest), TSPKruskal())
+    val tsps = listOf(TSP1WithTimeSlot(roundRequest), TSPSumMin(roundRequest))
 
-    val benchResults = mutableListOf<MutableList<Long>>()
-
-
-
-    for (i in 15..15) {
-      benchResults += mutableListOf<Long>()
+    for (i in 5..20) {
+      print("Round size : $i : ")
       tsps.forEachIndexed { tspIndex, tsp ->
         val roundRequestTest = RoundRequest(
             roundRequest.warehouse,
@@ -62,21 +58,18 @@ class TspBenchmarkTest {
 
         val res = fr.insalyon.pld.agile.benchmark {
           tsp.findSolution(
-              5.minutes.toMillis().toInt(),
+              10.minutes.toMillis().toInt(),
               i,
-              subPlan.adjacencyMatrix.map { row -> row.map { it -> (it * 15.km_h.to(Speed.DistanceUnit.DAM, Speed.DurationUnit.S).value).toLong() }.toLongArray() }.toTypedArray(),
+              subPlan.adjacencyMatrix.map { row -> row.map { it -> ((it.toDouble() / 15.km_h.to(Speed.DistanceUnit.M, Speed.DurationUnit.S).value)).toLong() }.toLongArray() }.toTypedArray(),
               roundRequest.durations.map { it.toSeconds() }.toLongArray()
           )
         }
-        benchResults.last() += res.first
-        benchResults.last() += if(!tsp.limitTimeReached!!) 1L else 0L
+        print(res.first.toString().fillLeft("              ") + "|")
+        print((if(!tsp.limitTimeReached!!) 1L else 0L).toString().fillLeft("              ") + "|")
       }
-    }
-    println("TSP 1  |Valid  |TSP Kru|Valid  |TSP SMi|Valid  ")
-    benchResults.forEach {
-      it.forEach { print(it.toString().fillLeft("       ") + "|") }
       println()
     }
+
 
   }
 

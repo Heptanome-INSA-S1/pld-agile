@@ -1,6 +1,7 @@
 package fr.insalyon.pld.agile.controller.implementation
 
 import fr.insalyon.pld.agile.controller.api.State
+import fr.insalyon.pld.agile.model.Delivery
 import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.model.seconds
 import fr.insalyon.pld.agile.util.Logger
@@ -11,7 +12,7 @@ class CalculatedRoundState : DefaultState<Round>(), State<Round> {
   override fun init(controller: Controller, element: Round) {
     controller.round = element
     Logger.info(controller.round!!.warehouse.departureHour + controller.round!!.length.seconds)
-    controller.window.refreshRound()
+    controller.window.refreshAll()
   }
 
   override fun loadRoundRequest(controller: Controller) {
@@ -28,6 +29,10 @@ class CalculatedRoundState : DefaultState<Round>(), State<Round> {
     } catch (e: Exception) {
       controller.manageException(e)
     }
-
   }
+
+  override fun deleteDelivery(controller: Controller, delivery: Delivery) {
+    defaultDeleteDelivery(controller, delivery)
+  }
+
 }
