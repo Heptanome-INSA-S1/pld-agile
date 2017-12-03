@@ -1,5 +1,6 @@
 package fr.insalyon.pld.agile.view.fragment
 
+import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.sumLongBy
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
@@ -63,18 +64,12 @@ class TimelineFragment: Fragment() {
         }
       }
       if(deplacement>30)
-        label("${secondsToString(time)}"){
-          id=idDelivery
-          layoutX=actualX-10.0
-          layoutY=middle-23
-          style{
-            fontSize=10.px
-      /*label(time.toFormattedString()) {
-        id = idDelivery
-        layoutX = actualX - 10.0
-        layoutY = middle - 23
-        style {
-          fontSize = 10.px
+        label(time.toFormattedString()) {
+          id = idDelivery
+          layoutX = actualX - 10.0
+          layoutY = middle - 23
+          style {
+            fontSize = 10.px
         }
       }
       if (index < round.deliveries().size) {
@@ -84,21 +79,9 @@ class TimelineFragment: Fragment() {
           layoutX = actualX - 10.0
           layoutY = middle + 10
           style {
-            fontSize = 10.px*/
+            fontSize = 10.px
           }
         }
-      if(index<round.deliveries().size){
-        val attente = round.deliveries().first { it.address.id.toString() == idDelivery }.duration.toSeconds().toDouble()
-        time+=attente.toLong()
-        if(transform(round.distancePathInMeters().elementAt(index+1).edges)>30)
-          label("${secondsToString(time)}"){
-            id=it1.nodes.last().id.toString()
-            layoutX=actualX-10.0
-            layoutY=middle+10
-            style{
-              fontSize=10.px
-            }
-          }
       }
     }
     stackpane {
