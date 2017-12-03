@@ -2,7 +2,6 @@ package fr.insalyon.pld.agile.view.fragment
 
 import fr.insalyon.pld.agile.controller.implementation.Controller
 import fr.insalyon.pld.agile.model.Delivery
-import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.util.txt.RoadSheetSerializer
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
@@ -126,7 +125,7 @@ class RoundFragment : Fragment(), Observer {
                   backgroundPosition += BackgroundPosition.CENTER
                 }
                 action {
-                  openEditor(it)
+                  openEditor(delivery)
                 }
               }
               button {
