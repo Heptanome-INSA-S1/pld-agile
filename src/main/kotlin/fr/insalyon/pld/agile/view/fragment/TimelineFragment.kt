@@ -47,7 +47,8 @@ class TimelineFragment: Fragment() {
     round.distancePathInMeters().forEachIndexed { index, it1 ->
       val deplacement = transform(it1.edges)
       actualX += deplacement
-      time += length(it1.edges).seconds
+      time += round.durationPathInSeconds()[index].length.seconds
+      println(time)
       val idDelivery = it1.nodes.last().id.toString()
       stackpane {
         id = idDelivery
