@@ -2,6 +2,7 @@ package fr.insalyon.pld.agile.service.roundcomputing.implementation
 
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1
+import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1WithTimeSlot
 import fr.insalyon.pld.agile.service.roundcomputing.api.RoundComputer
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -48,7 +49,7 @@ class RoundComputerImplTest {
   @Test
   fun compute() {
 
-    val roundComputer: RoundComputer = RoundComputerImpl(plan = plan,roundRequest =  roundRequest, tsp = TSP1(),speed = 15.km_h)
+    val roundComputer: RoundComputer = RoundComputerImpl(plan = plan,roundRequest =  roundRequest, tsp = TSP1WithTimeSlot(roundRequest), speed = 15.km_h)
     val round = roundComputer.round
 
     assertEquals(source, round.warehouse.address)

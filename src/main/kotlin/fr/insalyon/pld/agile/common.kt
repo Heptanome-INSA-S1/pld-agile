@@ -10,14 +10,8 @@ fun getResourcePath(path: String): String = Config.RESOURCE_FOLDER + path
 
 fun getTestResourcePath(path: String): String = Config.TEST_RESOURCE_FOLDER + path
 
-val Long.Companion.POSITIVE_INFINITY
-  get() = Long.MAX_VALUE - 1L
+val Int.Companion.POSITIVE_INFINITY
+  get() = Int.MAX_VALUE - 1
 
-val Long.Companion.NEGATIVE_INFINITY
-  get() = Long.MIN_VALUE + 1L
-
-fun <E> Iterable<E>.sumLongBy(selector: (E) -> Long): Long {
-  var sum = 0L
-  this.forEach{ sum += selector(it)}
-  return sum
-}
+val Int.Companion.NEGATIVE_INFINITY
+  get() = Int.MIN_VALUE + 1

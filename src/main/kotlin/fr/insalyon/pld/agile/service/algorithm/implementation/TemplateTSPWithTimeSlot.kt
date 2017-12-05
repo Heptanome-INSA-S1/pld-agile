@@ -2,6 +2,7 @@ package fr.insalyon.pld.agile.service.algorithm.implementation
 
 import fr.insalyon.pld.agile.model.Instant
 import fr.insalyon.pld.agile.model.RoundRequest
+import fr.insalyon.pld.agile.model.hours
 import fr.insalyon.pld.agile.model.seconds
 import fr.insalyon.pld.agile.service.algorithm.api.TSP
 import java.util.*
@@ -11,62 +12,69 @@ abstract class TemplateTSPWithTimeSlot(
 ) : TSP {
 
   protected var meilleureSolution: Array<Int?>? = null
-  protected var coutMeilleureSolution: Long = 0
+  protected var coutMeilleureSolution: Int = 0
   protected var tempsLimiteAtteint: Boolean? = null
 
   override fun getLimitTimeReached(): Boolean? = tempsLimiteAtteint
 
-  override fun findSolution(timeLimitInMs: Int, numberOfNodes: Int, coast: Array<LongArray>, durations: LongArray) {
+  override fun findSolution(timeLimitInMs: Int, numberOfNodes: Int, coast: Array<IntArray>, durations: IntArray) {
     tempsLimiteAtteint = false
-    coutMeilleureSolution = Long.MAX_VALUE
+    coutMeilleureSolution = 24.hours.toSeconds()
     meilleureSolution = arrayOfNulls(numberOfNodes)
     val nonVus = ArrayList<Int>()
     for (i in 1 until numberOfNodes) nonVus.add(i)
     val vus = ArrayList<Int>(numberOfNodes)
     vus.add(0) // le premier sommet visite est 0
-    branchAndBound(0, nonVus, vus, 0, coast, durations, System.currentTimeMillis(), timeLimitInMs,
-        roundRequest.warehouse.departureHour,
-        (listOf<Instant?>(roundRequest.warehouse.departureHour) + roundRequest.deliveries.map { it.startTime }).toTypedArray(),
-        (listOf<Instant?>(null) + roundRequest.deliveries.map { it.endTime }).toTypedArray())
+    val day = 24.hours.toSeconds()
+    branchAndBound(0, nonVus, vus, 0, coast, coast.map { it.min()!! }.toIntArray(), durations, System.currentTimeMillis(), timeLimitInMs,
+        roundRequest.warehouse.departureHour.toSeconds(),
+        (listOf(roundRequest.warehouse.departureHour.toSeconds()) + roundRequest.deliveries.map { if(it.startTime == null) 0 else it.startTime.toSeconds() }).toIntArray(),
+        (listOf(day) + roundRequest.deliveries.map { if(it.endTime == null) day else it.endTime.toSeconds() }).toIntArray())
   }
 
   override fun getBestSolution(i: Int): Int? {
     return if (meilleureSolution == null || i < 0 || i >= meilleureSolution!!.size) null else meilleureSolution!![i]
   }
 
-  override fun getBestSolutionCoast(): Long {
+  override fun getBestSolutionCoast(): Int {
     return coutMeilleureSolution
   }
 
   protected abstract fun bound(
       sommetCourant: Int,
       nonVus: ArrayList<Int>,
-      cout: Array<LongArray>,
-      duree: LongArray,
-      currentTime: Instant,
-      startTimes: Array<Instant?>,
-      endTimes: Array<Instant?>
-  ): Long
+      cout: Array<IntArray>,
+      minRow: IntArray,
+      duree: IntArray,
+      currentTime: Int,
+      startTimes: IntArray,
+      endTimes: IntArray,
+      bestCost: Int
+  ): Int
 
   protected abstract fun iterator(
       sommetCrt: Int,
       nonVus: ArrayList<Int>,
-      cout: Array<LongArray>,
-      duree: LongArray
+      cout: Array<IntArray>,
+      duree: IntArray,
+      currentTime: Int,
+      startTimes: IntArray,
+      endTimes: IntArray
   ): Iterator<Int>
 
   internal open fun branchAndBound(
       sommetCrt: Int,
       nonVus: ArrayList<Int>,
       vus: ArrayList<Int>,
-      coutVus: Long,
-      cout: Array<LongArray>,
-      duree: LongArray,
+      coutVus: Int,
+      cout: Array<IntArray>,
+      minRow: IntArray,
+      duree: IntArray,
       tpsDebut: Long,
       tpsLimite: Int,
-      currentTime: Instant,
-      startTimes: Array<Instant?>,
-      endTimes: Array<Instant?>
+      currentTime: Int,
+      startTimes: IntArray,
+      endTimes: IntArray
   ) {
     var coutVus = coutVus
     if (System.currentTimeMillis() - tpsDebut > tpsLimite) {
@@ -79,23 +87,22 @@ abstract class TemplateTSPWithTimeSlot(
         vus.toArray(meilleureSolution)
         coutMeilleureSolution = coutVus
       }
-    } else if (coutVus + bound(sommetCrt, nonVus, cout, duree, currentTime, startTimes, endTimes) < coutMeilleureSolution) {
-      val it = iterator(sommetCrt, nonVus, cout, duree)
+    } else if (coutVus + bound(sommetCrt, nonVus, cout, duree, minRow, currentTime, startTimes, endTimes, coutMeilleureSolution) < coutMeilleureSolution) {
+      val it = iterator(sommetCrt, nonVus, cout, duree, currentTime, startTimes, endTimes)
       for(prochainSommet in it) {
         vus.add(prochainSommet)
         nonVus.remove(prochainSommet)
-        var time = currentTime + cout[sommetCrt][prochainSommet].seconds
-        var waitingTime = 0.seconds
-        if(startTimes[prochainSommet] != null && currentTime < startTimes[prochainSommet]!!) {
-          waitingTime = startTimes[prochainSommet]!! - time
-          time = startTimes[prochainSommet]!!
+        var time = currentTime + cout[sommetCrt][prochainSommet]
+        var waitingTime = 0
+        if(currentTime < startTimes[prochainSommet]) {
+          waitingTime = startTimes[prochainSommet] - time
+          time = startTimes[prochainSommet]
         }
-        if(endTimes[prochainSommet] != null && endTimes[prochainSommet]!! < time + duree[prochainSommet].seconds) {
+        if(endTimes[prochainSommet] < time + duree[prochainSommet]) {
           // Do nothing
         } else {
-          time += duree[prochainSommet].seconds
-          branchAndBound(prochainSommet, nonVus, vus, coutVus + cout[sommetCrt][prochainSommet] + waitingTime.toSeconds() + duree[prochainSommet], cout, duree, tpsDebut, tpsLimite, time, startTimes, endTimes)
-          time -= duree[prochainSommet].seconds
+          time += duree[prochainSommet]
+          branchAndBound(prochainSommet, nonVus, vus, coutVus + cout[sommetCrt][prochainSommet] + waitingTime + duree[prochainSommet], cout, duree, minRow, tpsDebut, tpsLimite, time, startTimes, endTimes)
         }
         vus.remove(prochainSommet)
         nonVus.add(prochainSommet)

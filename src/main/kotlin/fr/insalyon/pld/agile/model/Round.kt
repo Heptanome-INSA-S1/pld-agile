@@ -3,7 +3,6 @@ package fr.insalyon.pld.agile.model
 import com.sun.javaws.exceptions.InvalidArgumentException
 import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
-import fr.insalyon.pld.agile.sumLongBy
 import java.util.*
 import kotlin.NoSuchElementException
 
@@ -14,20 +13,48 @@ class Round(
     val warehouse: Warehouse,
     deliveries: LinkedHashSet<Delivery>,
     durationPath: List<Measurable>,
-    distancePath: LinkedHashSet<Path<Intersection, Junction>>
-) : Observable(), Measurable{
+    distancePath: List<Path<Intersection, Junction>>
+) : Observable(), Measurable {
 
   private val _deliveries: MutableList<Delivery> = deliveries.toMutableList()
-  fun deliveries(): LinkedHashSet<Delivery> = _deliveries.toLinkedHashSet()
+  /**
+   * Return the ordered list of deliveries
+   */
+  fun deliveries(): List<Delivery> = _deliveries.toList()
 
+  /**
+   * Return the duration of the paths in the round
+   */
   private val _durationPath: MutableList<Measurable> = durationPath.toMutableList()
   fun durationPathInSeconds(): List<Duration> {
     return _durationPath.map { it.length.seconds }
   }
 
+  /**
+   * Return the distance paths (plan part) in the round
+   */
   private val _distancePath: MutableList<Path<Intersection, Junction>> = distancePath.toMutableList()
-  fun distancePathInMeters(): LinkedHashSet<Path<Intersection, Junction>> {
-    return _distancePath.toLinkedHashSet()
+  fun distancePathInMeters(): List<Path<Intersection, Junction>> {
+    return _distancePath
+  }
+
+  /**
+   * Return the waitingTimes for the deliveries in the round
+   */
+  fun getWaitingTimes(): List<Duration> {
+    var waitingTimes = mutableListOf<Duration>()
+    var currentTime = warehouse.departureHour
+    _deliveries.forEachIndexed { i, delivery ->
+      currentTime += _durationPath[i].length.seconds
+      if(delivery.startTime != null && delivery.startTime > currentTime) {
+        waitingTimes.add(delivery.startTime - currentTime)
+        currentTime  = delivery.startTime
+      } else {
+        waitingTimes.add(0.seconds)
+      }
+      currentTime += delivery.duration
+    }
+    return waitingTimes
   }
 
   fun addDelivery(subPath: SubPath) {
@@ -50,9 +77,17 @@ class Round(
     notifyObservers()
   }
 
+  fun removePath(i: Int) {
+    _durationPath.removeAt(i)
+    _distancePath.removeAt(i)
+  }
+
   fun modify(index: Int, startTime: Instant?, endTime: Instant?, duration: Duration) {
     val newDelivery = _deliveries[index].copy(startTime = startTime, endTime = endTime, duration = duration)
     _deliveries[index] = newDelivery
+
+    setChanged()
+    notifyObservers()
   }
 
   fun removeDelivery(delivery: Delivery, pathToReplaceWith: Path<Intersection, Junction>, duration: Duration) {
@@ -75,9 +110,9 @@ class Round(
     notifyObservers()
   }
 
-  val distance: Long = _distancePath.sumLongBy { it.length }
+  val distance: Int = _distancePath.sumBy { it.length }
 
-  override val length: Long
+  override val length: Int
     get() {
       var duration = Duration()
 
@@ -155,12 +190,6 @@ class Round(
 
     return stringBuilder.toString()
 
-  }
-
-  private fun <E> List<E>.toLinkedHashSet(): LinkedHashSet<E> {
-    val linkedHashSet = linkedSetOf<E>()
-    linkedHashSet.addAll(this)
-    return linkedHashSet
   }
 
   private fun <E> MutableList<E>.addAfter(elementBefore: E, elementToAdd: E): Int {

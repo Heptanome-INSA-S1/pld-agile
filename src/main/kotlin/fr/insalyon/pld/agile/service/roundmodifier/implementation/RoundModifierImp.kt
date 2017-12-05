@@ -1,9 +1,7 @@
 package fr.insalyon.pld.agile.service.roundmodifier.implementation
 
-import fr.insalyon.pld.agile.Config
-import fr.insalyon.pld.agile.lib.graph.model.Path
 import fr.insalyon.pld.agile.model.*
-import fr.insalyon.pld.agile.service.algorithm.implementation.DijsktraImpl
+import fr.insalyon.pld.agile.service.algorithm.implementation.Dijkstra
 import fr.insalyon.pld.agile.service.roundmodifier.api.RoundModifier
 import org.omg.CORBA.DynAnyPackage.InvalidValue
 
@@ -74,19 +72,21 @@ class RoundModifierImp(
 
   override fun removeDelivery(i: Int, round: Round, speed: Speed) {
 
-    var dijsktra: DijsktraImpl<Intersection, Junction>
-    if (i != 0)
-      dijsktra = DijsktraImpl<Intersection, Junction>(plan, round.deliveries().elementAt(i - 1).address)
-    else
-      dijsktra = DijsktraImpl<Intersection, Junction>(plan, round.warehouse.address)
-
-    if (i != round.deliveries().size - 1) {
-      val path = dijsktra.getShortestPath(round.deliveries().elementAt(i + 1).address)
-      round.removeDelivery(round.deliveries().elementAt(i), path, path.toDuration(speed))
+    var dijsktra: Dijkstra<Intersection, Junction>
+    if (i != 0) {
+      dijsktra = Dijkstra<Intersection, Junction>(plan, round.deliveries().elementAt(i - 1).address)
     } else {
-      val replacementPath = dijsktra.getShortestPath(round.warehouse.address)
-      round.removeDelivery(round.deliveries().elementAt(i), replacementPath, replacementPath.toDuration(speed))
+      dijsktra = Dijkstra<Intersection, Junction>(plan, round.warehouse.address)
     }
+
+    val path: Path<Intersection, Junction>
+    if (i != round.deliveries().size - 1) {
+      path = dijsktra.getShortestPath(round.deliveries().elementAt(i + 1).address)
+    } else {
+      path = dijsktra.getShortestPath(round.warehouse.address)
+    }
+    val durationOfPath = path.toDuration(speed)
+    round.removeDelivery(round.deliveries().elementAt(i), path, durationOfPath)
   }
 
   override fun modifyDelivery(delivery: Delivery, round: Round, i: Int) {
@@ -182,8 +182,8 @@ class RoundModifierImp(
    *
    * @return  the travelling time between the two given deliveries
    */
-  private fun computeTravellingTime(from: Delivery, to: Delivery, round: Round): Long {
-    var res = 0L
+  private fun computeTravellingTime(from: Delivery, to: Delivery, round: Round): Int {
+    var res = 0
     val index = round.deliveries().indexOf(to)
     return round.durationPathInSeconds().elementAt(index).toSeconds()
   }
@@ -195,8 +195,8 @@ class RoundModifierImp(
    *
    * @return  the travelling time between the two given deliveries
    */
-  private fun computeTravellingTime(from: Warehouse, to: Delivery, round: Round): Long {
-    var res = 0L
+  private fun computeTravellingTime(from: Warehouse, to: Delivery, round: Round): Int {
+    var res = 0
     return round.durationPathInSeconds().first().toSeconds()
   }
 
@@ -207,8 +207,8 @@ class RoundModifierImp(
    *
    * @return  the travelling time between the two given deliveries
    */
-  private fun computeTravellingTime(from: Delivery, to: Warehouse, round: Round): Long {
-    var res = 0L
+  private fun computeTravellingTime(from: Delivery, to: Warehouse, round: Round): Int {
+    var res = 0
     return round.durationPathInSeconds().last().toSeconds()
   }
 

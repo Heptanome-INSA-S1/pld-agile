@@ -1,6 +1,7 @@
 package fr.insalyon.pld.agile.util.txt
 
 import fr.insalyon.pld.agile.model.*
+import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1WithTimeSlot
 import fr.insalyon.pld.agile.service.roundcomputing.implementation.RoundComputerImpl
 import org.junit.Test
 
@@ -58,7 +59,7 @@ class RoadSheetSerializerTest(){
                 deliveries
         )
 
-        val round: Round = RoundComputerImpl(plan = plan, roundRequest = roundRequest, speed = 15.km_h).round
+        val round: Round = RoundComputerImpl(plan = plan, roundRequest = roundRequest, tsp = TSP1WithTimeSlot(roundRequest), speed = 15.km_h).round
         assert(round.deliveries().size==2)
 
         RoadSheetSerializer().serialize(round)

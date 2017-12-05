@@ -9,7 +9,7 @@ import fr.insalyon.pld.agile.POSITIVE_INFINITY
 open class Graph<N, out E : Measurable>(
     private val elements: Set<N> = emptySet(),
     private val edges: Set<Triple<N, E, N>> = emptySet(),
-    private val worstLength: Long = Long.POSITIVE_INFINITY
+    private val worstLength: Int = Int.POSITIVE_INFINITY
 ) {
   private val internalOutEdges = mutableListOf<MutableList<Edge<N, E>>>()
   private val internalInEdges = mutableListOf<MutableList<Edge<N, E>>>()
@@ -34,9 +34,9 @@ open class Graph<N, out E : Measurable>(
   /**
    * Return the adjacencyMatrix of the graph
    */
-  val adjacencyMatrix: Array<LongArray> by lazy {
+  val adjacencyMatrix: Array<IntArray> by lazy {
 
-    val matrix = Array<LongArray>(nodes.size, { _ -> LongArray(nodes.size, { _ -> worstLength }) })
+    val matrix = Array(nodes.size, { _ -> IntArray(nodes.size, { _ -> worstLength }) })
 
     for (i: Int in nodes.indices) {
       for(edge: Edge<N,E> in outEdges[i]) {
@@ -84,8 +84,8 @@ open class Graph<N, out E : Measurable>(
         elements,
         edges.map {
           val path = object : Measurable {
-            override val length: Long
-              get() = (it.second.length * coef.toDouble()).toLong()
+            override val length: Int
+              get() = (it.second.length * coef.toDouble()).toInt()
           }
           Triple(it.first, path, it.third) }.toSet(),
         worstLength

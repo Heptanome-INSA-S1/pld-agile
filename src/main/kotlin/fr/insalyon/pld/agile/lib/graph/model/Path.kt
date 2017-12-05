@@ -4,7 +4,6 @@ import fr.insalyon.pld.agile.POSITIVE_INFINITY
 import fr.insalyon.pld.agile.model.Duration
 import fr.insalyon.pld.agile.model.Speed
 import fr.insalyon.pld.agile.model.seconds
-import fr.insalyon.pld.agile.sumLongBy
 
 
 /**
@@ -29,8 +28,8 @@ data class Path<out N, out E : Measurable>(
     }
   }
 
-  override val length: Long by lazy {
-    if (edges.isEmpty()) Long.POSITIVE_INFINITY else edges.sumLongBy { it.length }
+  override val length: Int by lazy {
+    if (edges.isEmpty()) Int.POSITIVE_INFINITY else edges.sumBy { it.length }
   }
 
   override fun toString(): String {
@@ -51,7 +50,7 @@ data class Path<out N, out E : Measurable>(
   }
 
   fun toDuration(speed: Speed): Duration {
-    return (length * (1.0 / speed.to(Speed.DistanceUnit.M, Speed.DurationUnit.S).value)).toLong().seconds
+    return (length.toDouble() / speed.to(Speed.DistanceUnit.M, Speed.DurationUnit.S).value).toLong().seconds
   }
 
 
