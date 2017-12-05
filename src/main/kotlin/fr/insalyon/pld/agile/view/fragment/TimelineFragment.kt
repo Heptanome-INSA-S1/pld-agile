@@ -2,7 +2,6 @@ package fr.insalyon.pld.agile.view.fragment
 
 import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.model.*
-import fr.insalyon.pld.agile.sumLongBy
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import javafx.scene.Group
 import javafx.scene.control.Label
@@ -25,7 +24,7 @@ class TimelineFragment() : Fragment() {
 
   private val circleRadius = 10.0
 
-  private val TOTAL_LENGTH: Long by lazy {
+  private val TOTAL_LENGTH: Int by lazy {
     round.distance
   }
 
@@ -123,7 +122,7 @@ class TimelineFragment() : Fragment() {
     }
   }
 
-  private fun length(edges: List<Junction>): Long = edges.sumLongBy { it.length }
+  private fun length(edges: List<Junction>): Int = edges.sumBy { it.length }
 
   private fun transform(edges: List<Junction>): Double =
       length(edges).toDouble() / TOTAL_LENGTH.toDouble() * (parentView.bottom.boundsInLocal.width - 70.0)

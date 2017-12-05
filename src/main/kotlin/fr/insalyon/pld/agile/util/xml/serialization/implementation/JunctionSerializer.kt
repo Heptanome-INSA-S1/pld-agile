@@ -22,7 +22,7 @@ class JunctionSerializer(
 
   override fun unserialize(element: Element): Junction {
     return Junction(
-        element.getAttribute(XmlConfig.Junction.LENGTH).toDouble().toLong(),
+        element.getAttribute(XmlConfig.Junction.LENGTH).toDouble().toInt(),
         element.getAttribute(XmlConfig.Junction.NAME)
     )
   }

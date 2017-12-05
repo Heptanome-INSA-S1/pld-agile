@@ -4,13 +4,13 @@ import fr.insalyon.pld.agile.POSITIVE_INFINITY
 import fr.insalyon.pld.agile.service.algorithm.api.Kruskal
 
 typealias Node = Int
-typealias Length = Long
+typealias Length = Int
 typealias Set = BooleanArray
 
 class KruskalImpl(
     val nodes: ArrayList<Node>,
-    edges: Array<out LongArray>,
-    val noEdgeValue: Long = Long.POSITIVE_INFINITY
+    edges: Array<out IntArray>,
+    val noEdgeValue: Int = Int.POSITIVE_INFINITY
 ) : Kruskal {
 
   val edges = List<List<Triple<Node, Length, Node>>>(nodes.size, { departureIndex ->
@@ -48,10 +48,10 @@ class KruskalImpl(
 
   }
 
-  override fun getLength(): Long {
+  override fun getLength(): Int {
     // Sort all the edges by length (it.second)
     val edges = edges.flatten().sortedBy { it.second }.iterator()
-    var length = 0L
+    var length = 0
 
     // Create subset is already done
     var usedEdge = 0

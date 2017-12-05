@@ -59,7 +59,7 @@ class RoundModifierImpTest {
 
     @Test
     fun removeDeliveryAtFirstPosition(){
-        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1(), speed = 1.m_s)
+        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1WithTimeSlot(roundRequest), speed = 1.m_s)
         val round = roundComputer.round
 
         val roundModifier = RoundModifierImp(plan)
@@ -75,7 +75,7 @@ class RoundModifierImpTest {
 
     @Test
     fun removeDeliveryTestNotAtFirstPosition(){
-        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1(), speed = 1.m_s)
+        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1WithTimeSlot(roundRequest), speed = 1.m_s)
         val round = roundComputer.round
 
         val roundModifier = RoundModifierImp(plan)
@@ -88,7 +88,7 @@ class RoundModifierImpTest {
 
     @Test
     fun removeDeliveryTestLastPosition() {
-        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1(), speed = 1.m_s)
+        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1WithTimeSlot(roundRequest), speed = 1.m_s)
         val round = roundComputer.round
 
         val roundModifier = RoundModifierImp(plan)
@@ -137,7 +137,7 @@ class RoundModifierImpTest {
                 )
         )
 
-        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1(), speed = 1.m_s)
+        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1WithTimeSlot(roundRequest), speed = 1.m_s)
         val round = roundComputer.round
 
         val roundModifier = RoundModifierImp(plan)
@@ -183,7 +183,7 @@ class RoundModifierImpTest {
                 )
         )
 
-        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1(), speed = 1.m_s)
+        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequest, tsp = TSP1WithTimeSlot(roundRequest), speed = 1.m_s)
         val round = roundComputer.round
 
         val roundModifier = RoundModifierImp(plan)
@@ -225,7 +225,7 @@ class RoundModifierImpTest {
     @Test(expected = IllegalArgumentException::class)
     fun roundModifyCheckCannotStartBefore8h40(){
 
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1WithTimeSlot(roundRequest), speed = 1.m_s)
         val round = roundComputer.round
 
         val roundModifier = RoundModifierImp(planBis)
@@ -235,7 +235,7 @@ class RoundModifierImpTest {
     @Test
     fun roundModifyCheckCanStartAt8h40(){
 
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1WithTimeSlot(roundRequest), speed = 1.m_s)
         val round = roundComputer.round
 
         Logger.debug(round.toTrace())
@@ -247,7 +247,7 @@ class RoundModifierImpTest {
 
     @Test (expected= IllegalArgumentException::class)
     fun roundModifyCheckCannotFinishAfter10h30() {
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1WithTimeSlot(roundRequest), speed = 1.m_s)
         val round = roundComputer.round
 
         val roundModifier = RoundModifierImp(planBis)
@@ -256,7 +256,7 @@ class RoundModifierImpTest {
 
     @Test
     fun roundModifyCheckMustFinishMaxAt10h30() {
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 15.km_h)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1WithTimeSlot(roundRequest), speed = 15.km_h)
         val round = roundComputer.round
 
         val roundModifier = RoundModifierImp(planBis)
@@ -270,7 +270,7 @@ class RoundModifierImpTest {
     @Test(expected = IllegalArgumentException::class)
     fun roundModifyCheckDurationGreatherThanPreviousAndNextConstraints() {
 
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1WithTimeSlot(roundRequest), speed = 1.m_s)
         val round = roundComputer.round
 
         val roundModifier = RoundModifierImp(planBis)
@@ -284,7 +284,7 @@ class RoundModifierImpTest {
     @Test
     fun roundModifyCheckDurationWithRespectToConstraints() {
 
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1WithTimeSlot(roundRequest), speed = 1.m_s)
         val round = roundComputer.round
 
         val roundModifier = RoundModifierImp(planBis)
@@ -297,7 +297,7 @@ class RoundModifierImpTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun roundModifyFirstElementCannotStartBefore8h15() {
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1WithTimeSlot(roundRequest), speed = 1.m_s)
         val round = roundComputer.round
 
         val roundModifier = RoundModifierImp(planBis)
@@ -308,7 +308,7 @@ class RoundModifierImpTest {
 
     @Test
     fun roundModifyFirstElementCanStartAt8h15(){
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1WithTimeSlot(roundRequest), speed = 1.m_s)
         val round = roundComputer.round
 
         val roundModifier = RoundModifierImp(planBis)
@@ -320,7 +320,7 @@ class RoundModifierImpTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun roundModifyFirstElementCannotEndAfter9h35() {
-        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1(), speed = 1.m_s)
+        val roundComputer: RoundComputer = RoundComputerImpl(planBis, roundRequestBis, tsp = TSP1WithTimeSlot(roundRequest), speed = 1.m_s)
         val round = roundComputer.round
 
         val roundModifier = RoundModifierImp(planBis)

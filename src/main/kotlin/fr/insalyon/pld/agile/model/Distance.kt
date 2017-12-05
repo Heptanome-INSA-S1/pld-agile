@@ -1,7 +1,7 @@
 package fr.insalyon.pld.agile.model
 
 class Distance constructor (
-       val value: Long,
+       val value: Int,
        val distanceUnit: DistanceUnit
 ){
 
@@ -14,12 +14,11 @@ class Distance constructor (
     fun to(distanceUnit: Distance.DistanceUnit): Distance {
 
         val coef = (this.distanceUnit.coef /distanceUnit.coef)
-
-        return Distance((value * coef).toLong(), distanceUnit)
+        return Distance((value * coef).toInt(), distanceUnit)
     }
 
 }
 
-public val Long.km: Distance get() = Distance(this, Distance.DistanceUnit.KM)
-public val Long.dam: Distance get() = Distance(this, Distance.DistanceUnit.DAM)
-public val Long.m: Distance get() = Distance(this, Distance.DistanceUnit.M)
+public val Int.km: Distance get() = Distance(this, Distance.DistanceUnit.KM)
+public val Int.dam: Distance get() = Distance(this, Distance.DistanceUnit.DAM)
+public val Int.m: Distance get() = Distance(this, Distance.DistanceUnit.M)

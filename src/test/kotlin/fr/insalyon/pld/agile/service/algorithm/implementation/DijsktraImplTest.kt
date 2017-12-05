@@ -4,7 +4,6 @@ import fr.insalyon.pld.agile.lib.graph.model.Graph
 import fr.insalyon.pld.agile.model.Intersection
 import fr.insalyon.pld.agile.model.Junction
 import fr.insalyon.pld.agile.service.algorithm.api.Dijkstra
-import fr.insalyon.pld.agile.sumLongBy
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -56,7 +55,7 @@ class DijsktraImplTest {
 
     val path = dijkstra.getShortestPath(Intersection(id = 6))
     assertEquals(3, path.edges.size)
-    assertEquals(4, path.edges.sumLongBy { it.length })
+    assertEquals(4, path.edges.sumBy { it.length })
 
   }
 

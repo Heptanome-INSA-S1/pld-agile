@@ -20,7 +20,7 @@ class Plan(
         intersections = nodes.map { it -> it.element }.toHashSet(),
         junctions = inEdges.map{ edges ->
           edges.map{
-            val scaledEdge = Junction((x.toDouble() * it.element.length).toLong(), it.element.name)
+            val scaledEdge = Junction((x.toDouble() * it.element.length).toInt(), it.element.name)
             Triple(it.from.element, scaledEdge, it.to.element) }
         }.flatten().toSet()
     )

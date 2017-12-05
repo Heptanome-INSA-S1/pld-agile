@@ -125,8 +125,8 @@ class RoundModifierImp(
    *
    * @return  the travelling time between the two given deliveries
    */
-  private fun computeTravellingTime(from: Delivery, to: Delivery, round: Round): Long {
-    var res = 0L
+  private fun computeTravellingTime(from: Delivery, to: Delivery, round: Round): Int {
+    var res = 0
     val index = round.deliveries().indexOf(to)
     return round.durationPathInSeconds().elementAt(index).toSeconds()
   }
@@ -138,8 +138,8 @@ class RoundModifierImp(
    *
    * @return  the travelling time between the two given deliveries
    */
-  private fun computeTravellingTime(from: Warehouse, to: Delivery, round: Round): Long {
-    var res = 0L
+  private fun computeTravellingTime(from: Warehouse, to: Delivery, round: Round): Int {
+    var res = 0
     return round.durationPathInSeconds().first().toSeconds()
   }
 
@@ -150,8 +150,8 @@ class RoundModifierImp(
    *
    * @return  the travelling time between the two given deliveries
    */
-  private fun computeTravellingTime(from: Delivery, to: Warehouse, round: Round): Long {
-    var res = 0L
+  private fun computeTravellingTime(from: Delivery, to: Warehouse, round: Round): Int {
+    var res = 0
     return round.durationPathInSeconds().last().toSeconds()
   }
 

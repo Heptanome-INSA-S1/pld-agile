@@ -3,7 +3,6 @@ package fr.insalyon.pld.agile.model
 import com.sun.javaws.exceptions.InvalidArgumentException
 import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
-import fr.insalyon.pld.agile.sumLongBy
 import java.util.*
 
 /**
@@ -110,9 +109,9 @@ class Round(
     notifyObservers()
   }
 
-  val distance: Long = _distancePath.sumLongBy { it.length }
+  val distance: Int = _distancePath.sumBy { it.length }
 
-  override val length: Long
+  override val length: Int
     get() {
       var duration = Duration()
 
