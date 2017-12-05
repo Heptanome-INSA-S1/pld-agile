@@ -143,7 +143,6 @@ class PlanFragment : Fragment(){
 
   val scroll = scrollpane {
       shapeGroup.translateX=(parentView.center.boundsInLocal.width-MAP_SIZE)/2
-      println((parentView.center.boundsInLocal.width-MAP_SIZE)/2)
       shapeGroup.translateY=(parentView.center.boundsInLocal.height-MAP_SIZE)/2
       hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
       vbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
