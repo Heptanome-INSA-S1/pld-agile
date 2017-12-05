@@ -2,10 +2,10 @@ package fr.insalyon.pld.agile.view.fragment
 
 import fr.insalyon.pld.agile.controller.implementation.Controller
 import fr.insalyon.pld.agile.model.Delivery
-import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.util.txt.RoadSheetSerializer
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
+import fr.insalyon.pld.agile.view.model.DeliveryModel
 import javafx.scene.control.Button
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
@@ -18,6 +18,7 @@ class RoundFragment : Fragment(), Observer {
 
   val controller: Controller by param()
   val parentView: BorderPane by param()
+  val model: DeliveryModel by inject()
   val round = controller.round
   val roadSheetSerializer: RoadSheetSerializer = RoadSheetSerializer()
 
@@ -123,6 +124,9 @@ class RoundFragment : Fragment(), Observer {
                   backgroundRepeat += Pair(BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT)
                   backgroundPosition += BackgroundPosition.CENTER
                 }
+                action {
+                  openEditor(delivery)
+                }
               }
               button {
                 action { deleteDelivery(delivery) }
@@ -139,10 +143,10 @@ class RoundFragment : Fragment(), Observer {
         }
       }
     }
-    label("")
     label("Warehouse") {
-      paddingLeft = 30.0
-      style {
+      paddingTop=20.0
+      paddingLeft=30.0
+      style{
         fontWeight = FontWeight.BOLD
       }
     }
@@ -163,18 +167,18 @@ class RoundFragment : Fragment(), Observer {
       }
     }
     label("RoadSheet") {
-      paddingLeft = 30.0
-      paddingTop = 5.0
-      style {
+      paddingLeft=30.0
+      paddingTop=20.0
+      style{
         fontWeight = FontWeight.BOLD
       }
     }
     hbox {
-      paddingTop = 2
-      paddingLeft = 30.0
-      button("Browse") {
-        id = "" + round!!.warehouse.address.id
-        action {
+      paddingTop=10.0
+      paddingLeft=30.0
+      button("Browse"){
+        id=""+round!!.warehouse.address.id
+        action{
           roadSheetSerializer.serializeHTML(round!!)
         }
         style {
@@ -226,6 +230,11 @@ class RoundFragment : Fragment(), Observer {
                 }
               }
         }
+  }
+
+  private fun openEditor(delivery: Delivery?){
+    openInternalWindow(DeliveryEditor::class, params = mapOf(
+        DeliveryEditor::delivery to delivery))
   }
 
 }

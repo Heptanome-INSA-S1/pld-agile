@@ -3,9 +3,7 @@ package fr.insalyon.pld.agile.view.fragment
 import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
-import javafx.scene.Group
 import javafx.scene.control.Label
-import javafx.scene.control.ScrollPane
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
@@ -13,10 +11,9 @@ import javafx.scene.shape.Circle
 import javafx.scene.shape.Line
 import tornadofx.*
 
-class TimelineFragment() : Fragment() {
-
-  val parentView: BorderPane by param()
-  val round: Round by param()
+class TimelineFragment: Fragment() {
+  val parentView:BorderPane by param()
+  val round : Round by param()
   val planSize: Pair<Double, Double> by param()
 
   var idHighlight: String? = null
@@ -65,12 +62,13 @@ class TimelineFragment() : Fragment() {
           }
         }
       }
-      label(time.toFormattedString()) {
-        id = idDelivery
-        layoutX = actualX - 10.0
-        layoutY = middle - 23
-        style {
-          fontSize = 10.px
+      if(deplacement>30)
+        label(time.toFormattedString()) {
+          id = idDelivery
+          layoutX = actualX - 10.0
+          layoutY = middle - 23
+          style {
+            fontSize = 10.px
         }
       }
       if (index < round.deliveries().size) {
@@ -120,6 +118,22 @@ class TimelineFragment() : Fragment() {
     subscribe<HighlightLocationEvent> { event ->
       highlightLocation(event.id, event.isWarehouse)
     }
+  }
+  
+  private fun secondsToString(seconds:Int):String{
+    var secondes = seconds
+    if(secondes==0)
+      return "0s"
+    val hours : Int = secondes / 3600
+    secondes -= hours * 3600
+    val minutes : Int = secondes / 60
+    var res = ""
+    if(hours != 0)
+      res += ""+ hours + "h"
+    if (minutes < 10)
+      res += "0"
+    res += "" + minutes
+    return res
   }
 
   private fun length(edges: List<Junction>): Int = edges.sumBy { it.length }
