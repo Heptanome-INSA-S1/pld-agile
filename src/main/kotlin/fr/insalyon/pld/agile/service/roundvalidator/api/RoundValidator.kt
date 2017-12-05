@@ -6,6 +6,7 @@ import fr.insalyon.pld.agile.model.Round
 interface RoundValidator {
 
     fun isValid(delivery:Delivery, round: Round) = getInvalidatedConstraints(delivery, round).isEmpty()
-    fun getInvalidatedConstraints(delivery: Delivery, round: Round): Map<Delivery, String>
+    fun isValid(round: Round) = round.deliveries().all { isValid(it, round) }
+    fun getInvalidatedConstraints(delivery: Delivery, round: Round):  List<String>
 
 }

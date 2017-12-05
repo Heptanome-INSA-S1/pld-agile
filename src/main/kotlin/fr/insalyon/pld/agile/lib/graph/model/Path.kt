@@ -53,5 +53,11 @@ data class Path<out N, out E : Measurable>(
     return (length.toDouble() / speed.to(Speed.DistanceUnit.M, Speed.DurationUnit.S).value).toLong().seconds
   }
 
+  fun reversed(): Path<N, E> {
+    return Path(
+            nodes.reversed(),
+            edges.reversed()
+    )
+  }
 
 }

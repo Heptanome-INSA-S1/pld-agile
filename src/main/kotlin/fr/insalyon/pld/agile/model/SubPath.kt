@@ -9,4 +9,10 @@ class SubPath(
     val delivery: Delivery,
     val pathToNextDelivery: Path<Intersection, Junction>,
     val durationToNextDelivery: Duration
-)
+) {
+
+    fun totalDurationWithoutWaitingTime(): Duration {
+        return durationFromPreviousDelivery + delivery.duration + durationToNextDelivery
+    }
+
+}
