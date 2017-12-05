@@ -100,6 +100,12 @@ class Instant private constructor(
       else
         "$hour h $minutes m $seconds s"
   }
+  fun toShortFormattedString(): String {
+    return if(minutes<10)
+        "${hour}h0${minutes}"
+      else
+        "${hour}h${minutes}"
+  }
 
 
 }

@@ -45,7 +45,7 @@
         </VBox>
     </right>
     <bottom>
-        <HBox alignment="BASELINE_LEFT" minHeight="50" maxHeight="70" fx:id="bottomBox">
+        <HBox alignment="BASELINE_LEFT" minHeight="55" maxHeight="70" fx:id="bottomBox">
         </HBox>
     </bottom>
 </BorderPane>
