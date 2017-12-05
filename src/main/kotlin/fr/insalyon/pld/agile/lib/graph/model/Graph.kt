@@ -17,6 +17,7 @@ open class Graph<N, out E : Measurable>(
   /**
    * The wrapped nodes in the graph
    */
+
   val nodes = List(elements.size, { i -> Node(i, elements.elementAt(i)) })
 
   /**
@@ -89,6 +90,14 @@ open class Graph<N, out E : Measurable>(
           }
           Triple(it.first, path, it.third) }.toSet(),
         worstLength
+    )
+  }
+
+  fun reverse(): Graph<N, E> {
+    return Graph(
+            elements,
+            edges.map { Triple(it.third, it.second, it.first) }.toSet(),
+            worstLength
     )
   }
 

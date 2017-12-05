@@ -17,9 +17,6 @@ class Duration private constructor(
   operator fun plus(other: Duration): Duration = Duration(_seconds + other.toSeconds())
 
   operator fun minus(other: Duration): Duration {
-    if(other._seconds > this._seconds) {
-      throw IllegalStateException("Cannot compute negative duration")
-    }
     return Duration(_seconds - other._seconds)
   }
 
