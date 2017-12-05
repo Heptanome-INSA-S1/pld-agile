@@ -48,9 +48,16 @@ class RoadSheetSerializer(){
         round.distancePathInMeters().elementAt(j).edges.forEach { e -> append("\t|Take ${e.name} during e.length.dam.to(Distance.DistanceUnit.M).value} m\r\n")}
     }
 
+    /*
+        Method that implement the html roadsheet with the calculated round
+     */
     fun serializeHTML(round: Round) {
+
+        //Open the file TemplateFeuilleDeRoute.html and parses it to String
         val htmlTemplateFile = getResource("html/TemplateFeuilleDeRoute.html")
         var htmlString = FileUtils.readFileToString(htmlTemplateFile)
+
+        //Replacing fields in the template by the effective data
         val startTime = "" +round.warehouse.departureHour.toFormattedString()
         val nbDeliveries = "" + round.deliveries().size
         var currentTime = round.warehouse.departureHour
@@ -66,6 +73,9 @@ class RoadSheetSerializer(){
             "            </div>\n" +
             "        </div>"
         rows = rows.replace("timexxx", startTime)
+
+
+        //Getting all the roads that the delivery man will have to take to get to the first delivery point
         var y=0
         var infoL = "${round.warehouse.address.id}<br><br>"
         while(y<round.distancePathInMeters().size && round.deliveries().elementAt(0).address != round.distancePathInMeters().elementAt(y).nodes[0]) {
@@ -85,6 +95,8 @@ class RoadSheetSerializer(){
             y++
         }
         rows = rows.replace("numb", infoL)
+
+        //Getting all the roads that the delivery man will have to take to get to each delivery points except the first
         for (i in 0 until round.deliveries().size){
             if(i>0){
                 currentTime += round.deliveries().elementAt(i-1).duration
@@ -95,7 +107,7 @@ class RoadSheetSerializer(){
                 waitingTime = round.deliveries().elementAt(i).startTime!! - currentTime
                 currentTime = round.deliveries().elementAt(i).startTime!!
             }
-            var infoLivraison : String = "Livraison au point("+round.deliveries().elementAt(i).address.x!!+","+round.deliveries().elementAt(i).address.y+")<br><br>"
+            var infoLivraison : String = "Livraison au point("+round.deliveries().elementAt(i).address.x!!+","+round.deliveries().elementAt(i).address.y+") durant ${round.deliveries().elementAt(i).duration}<br><br>"
             var j=i+1
            while(j<round.distancePathInMeters().size && round.deliveries().elementAt(i).address != round.distancePathInMeters().elementAt(j-1).nodes[0]) {
                 var distance = 0.0
@@ -127,6 +139,8 @@ class RoadSheetSerializer(){
             rows = rows.replace("timexxx", ""+currentTime.toFormattedString())
             rows = rows.replace("localisationxxx", infoLivraison)
         }
+
+        //Getting the time when the delivery man will end his delivery and arrive at the warehouse
         currentTime += round.deliveries().last().duration
         currentTime += round.durationPathInSeconds().last()
         rows+= "<div class=\"row\">\n" +
@@ -142,13 +156,16 @@ class RoadSheetSerializer(){
             "        </div>"
         rows = rows.replace("timexxx", currentTime.toFormattedString())
         rows = rows.replace("numb", ""+round.warehouse.address.id)
-        val endTime = currentTime
         htmlString = htmlString.replace("\$startTime", startTime)
         htmlString = htmlString.replace("\$endTime", currentTime.toFormattedString())
         htmlString = htmlString.replace("\$rows", rows)
         htmlString = htmlString.replace("\$nbDeliveries", nbDeliveries)
+
+        //Writting the file FeuilleDeRoute.html with the implemented String
         val newHtmlFile = File("src/main/dist/FeuilleDeRoute.html")
         FileUtils.writeStringToFile(newHtmlFile, htmlString)
-       // Desktop.getDesktop().browse(newHtmlFile.toURI())
+
+        //Browsing the RoadSheet
+        Desktop.getDesktop().browse(newHtmlFile.toURI())
     }
 }
