@@ -18,6 +18,8 @@ object Config {
   val RESOURCE_FOLDER = System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/"
   val TEST_RESOURCE_FOLDER = System.getProperty("user.dir").replace("\\", "/") + "/src/test/resources/"
 
+  val WINDOW_IS_MAX_SIZE = false
+
   object Colors {
     val colorLine = Color.DARKGREEN
     val colorWarehouse = Color.INDIANRED

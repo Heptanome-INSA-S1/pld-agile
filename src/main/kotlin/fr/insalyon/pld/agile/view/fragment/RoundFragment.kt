@@ -58,7 +58,7 @@ class RoundFragment : Fragment(), Observer {
     vboxConstraints {
       paddingLeft = 30.0
     }
-    label("Warehouse") {
+    label("Entrepôt") {
       paddingLeft = 30.0
       style {
         fontWeight = FontWeight.BOLD
@@ -141,7 +141,7 @@ class RoundFragment : Fragment(), Observer {
         }
       }
     }
-    label("Warehouse") {
+    label("Entrepôt") {
       paddingTop=20.0
       paddingLeft=30.0
       style{
