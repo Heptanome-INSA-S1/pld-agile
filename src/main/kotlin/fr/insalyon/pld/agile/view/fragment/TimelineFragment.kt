@@ -46,7 +46,8 @@ class TimelineFragment: Fragment() {
     round.distancePathInMeters().forEachIndexed { index, it1 ->
       val deplacement = transform(it1.edges)
       actualX += deplacement
-      time += length(it1.edges).seconds
+      time += round.durationPathInSeconds()[index].length.seconds
+      println(time)
       val idDelivery = it1.nodes.last().id.toString()
       stackpane {
         id = idDelivery
@@ -63,7 +64,7 @@ class TimelineFragment: Fragment() {
         }
       }
       if(deplacement>30)
-        label(time.toFormattedString()) {
+        label(time.toShortFormattedString()) {
           id = idDelivery
           layoutX = actualX - 10.0
           layoutY = middle - 23
@@ -73,14 +74,15 @@ class TimelineFragment: Fragment() {
       }
       if (index < round.deliveries().size) {
         time += round.deliveries().first { it.address.id.toString() == idDelivery }.duration
-        label(time.toFormattedString()) {
-          id = it1.nodes.last().id.toString()
-          layoutX = actualX - 10.0
-          layoutY = middle + 10
-          style {
-            fontSize = 10.px
+        if(transform(round.distancePathInMeters().elementAt(index+1).edges)>30)
+          label(time.toShortFormattedString()) {
+            id = it1.nodes.last().id.toString()
+            layoutX = actualX - 10.0
+            layoutY = middle + 10
+            style {
+              fontSize = 10.px
+            }
           }
-        }
       }
     }
     stackpane {
@@ -98,7 +100,7 @@ class TimelineFragment: Fragment() {
         }
       }
     }
-    label(round.warehouse.departureHour.toFormattedString()) {
+    label(round.warehouse.departureHour.toShortFormattedString()) {
       id = round.warehouse.address.id.toString()
       layoutX = 15.0 - 10.0
       layoutY = middle + 10
