@@ -29,10 +29,10 @@ class Dijkstra<N, out E : Measurable>(
     parent[internalSourceNode.index] = internalSourceNode.index
     parent[internalSourceNode.index] = null
 
-    val threaten = Array<Boolean>(graph.nodes.size, { _ ->
+    val threaten = Array(graph.nodes.size, { _ ->
       false
     })
-    val d = Array<Double>(graph.nodes.size, { _ -> Double.POSITIVE_INFINITY })
+    val d = Array(graph.nodes.size, { _ -> Double.POSITIVE_INFINITY })
     d[internalSourceNode.index] = .0
 
     val nextNodes = PriorityQueue<Pair<Double, Int>>(kotlin.Comparator { o1, o2 -> o1.first.compareTo(o2.first) })

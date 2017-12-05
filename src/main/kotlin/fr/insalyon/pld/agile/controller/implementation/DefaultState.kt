@@ -10,6 +10,8 @@ import fr.insalyon.pld.agile.controller.commands.EditDelivery
 import fr.insalyon.pld.agile.controller.commands.RemoveDelivery
 import fr.insalyon.pld.agile.getResource
 import fr.insalyon.pld.agile.model.Delivery
+import fr.insalyon.pld.agile.model.Speed
+import fr.insalyon.pld.agile.service.algorithm.implementation.TSPAdvanced
 import fr.insalyon.pld.agile.service.algorithm.implementation.TSPSumMin
 import fr.insalyon.pld.agile.service.roundcomputing.implementation.RoundComputerImpl
 import fr.insalyon.pld.agile.service.roundmodifier.api.RoundModifier
@@ -174,14 +176,14 @@ abstract class DefaultState<in T> : State<T> {
   }
 
   protected fun defaultCalculateRoundImpl(controller: Controller) {
-    val round = RoundComputerImpl(plan = controller.plan!!, roundRequest = controller.roundRequest!!, tsp = TSPSumMin(controller.roundRequest!!), speed = DEFAULT_SPEED).round
+    val round = RoundComputerImpl(plan = controller.plan!!, roundRequest = controller.roundRequest!!, tsp = TSPAdvanced(controller.roundRequest!!), speed = DEFAULT_SPEED).round
     Logger.debug(round.toTrace())
     controller.commands.reset()
     controller.changeStateAndInit(controller.CALCULATED_ROUND_STATE, round)
   }
 
   protected fun defaultDeleteDelivery(controller: Controller, delivery: Delivery) {
-    val roundModifier = RoundModifierImp(controller.plan!!)
+    val roundModifier = RoundModifierImp(controller.round!!, controller.plan!!)
     val removeDeliveryCommand = RemoveDelivery(roundModifier, controller, delivery)
     controller.commands.add(removeDeliveryCommand)
     controller.changeStateAndInit(controller.CALCULATED_ROUND_STATE, controller.round!!)

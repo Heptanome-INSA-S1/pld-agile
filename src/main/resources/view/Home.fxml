@@ -19,8 +19,6 @@
                         <MenuItem fx:id="loadRoundRequestMenuItem" text="Charger livraison">
                         </MenuItem>
                     </Menu>
-                </MenuBar>
-                <MenuBar GridPane.columnIndex="1" GridPane.rowIndex="0" >
                     <Menu text="Editer">
                         <MenuItem fx:id="undo" text="Annuler">
                         </MenuItem>
@@ -28,6 +26,9 @@
                         </MenuItem>
                     </Menu>
                 </MenuBar>
+                <!--<MenuBar GridPane.columnIndex="1" GridPane.rowIndex="0" >
+
+                </MenuBar>-->
             </children>
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES"></ColumnConstraints>

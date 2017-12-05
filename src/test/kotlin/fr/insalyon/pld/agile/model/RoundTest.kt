@@ -124,13 +124,13 @@ class RoundTest {
             Delivery(Intersection(3), duration = 900.seconds)
         ), listOf(
         object : Measurable {
-          override val length = 500L
+          override val length = 500
         },
         object : Measurable {
-          override val length = 300L
+          override val length = 300
         },
         object : Measurable {
-          override val length = 400L
+          override val length = 400
         }
     ), listOf(
         Path(listOf(), listOf()),

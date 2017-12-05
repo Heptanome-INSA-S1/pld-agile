@@ -25,11 +25,30 @@ class Speed constructor(
 
   }
 
+  fun toMeterPerSeconds(): Speed {
+    return to(DistanceUnit.M, DurationUnit.S)
+  }
+
   override fun toString(): String {
     return "$value $distanceUnit/$durationUnit"
   }
 
+}
+
+fun String.toSpeed(): Speed {
+  val value = this.split(" ")[0].toDouble()
+  val rest = this.split(" ")[1]
+
+  val distanceUnit = rest.split("/")[0]
+  val durationUnit = rest.split("/")[1]
+
+  return Speed(
+          value,
+          Speed.DistanceUnit.valueOf(distanceUnit),
+          Speed.DurationUnit.valueOf(durationUnit)
+  )
 
 }
-val Number.km_h: Speed get() = Speed(this.toDouble(), Speed.DistanceUnit.KM, Speed.DurationUnit.H)
-val Number.m_s: Speed get() = Speed(this.toDouble(), Speed.DistanceUnit.M, Speed.DurationUnit.S)
+
+val Number.km_h: Speed get() = Speed(toDouble(), Speed.DistanceUnit.KM, Speed.DurationUnit.H)
+val Number.m_s: Speed get() = Speed(toDouble(), Speed.DistanceUnit.M, Speed.DurationUnit.S)

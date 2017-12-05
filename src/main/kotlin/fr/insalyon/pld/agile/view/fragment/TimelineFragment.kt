@@ -2,7 +2,6 @@ package fr.insalyon.pld.agile.view.fragment
 
 import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.model.*
-import fr.insalyon.pld.agile.sumLongBy
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import javafx.scene.control.Label
 import javafx.scene.layout.BorderPane
@@ -22,7 +21,7 @@ class TimelineFragment: Fragment() {
 
   private val circleRadius = 10.0
 
-  private val TOTAL_LENGTH: Long by lazy {
+  private val TOTAL_LENGTH: Int by lazy {
     round.distance
   }
 
@@ -122,22 +121,24 @@ class TimelineFragment: Fragment() {
       highlightLocation(event.id, event.isWarehouse)
     }
   }
-  private fun secondsToString(seconds:Long):String{
+  
+  private fun secondsToString(seconds:Int):String{
     var secondes = seconds
-    if(secondes==0L)
+    if(secondes==0)
       return "0s"
-    val hours : Long = secondes / 3600L
-    secondes -= hours * 3600L
-    val minutes : Long = secondes / 60L
+    val hours : Int = secondes / 3600
+    secondes -= hours * 3600
+    val minutes : Int = secondes / 60
     var res = ""
-    if(hours != 0L)
+    if(hours != 0)
       res += ""+ hours + "h"
     if (minutes < 10)
       res += "0"
     res += "" + minutes
     return res
   }
-  private fun length(edges: List<Junction>): Long = edges.sumLongBy { it.length }
+
+  private fun length(edges: List<Junction>): Int = edges.sumBy { it.length }
 
   private fun transform(edges: List<Junction>): Double =
       length(edges).toDouble() / TOTAL_LENGTH.toDouble() * (parentView.bottom.boundsInLocal.width - 70.0)

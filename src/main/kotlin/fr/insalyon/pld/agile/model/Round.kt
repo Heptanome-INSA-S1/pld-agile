@@ -3,8 +3,8 @@ package fr.insalyon.pld.agile.model
 import com.sun.javaws.exceptions.InvalidArgumentException
 import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
-import fr.insalyon.pld.agile.sumLongBy
 import java.util.*
+import kotlin.NoSuchElementException
 
 /**
  * A round is a computed round request
@@ -59,14 +59,18 @@ class Round(
 
   fun addDelivery(subPath: SubPath) {
 
-    val index: Int
+    var index: Int
     if(warehouse.address == subPath.pathFromPreviousDelivery.nodes.first()) {
       index = 0
       _deliveries.add(0, subPath.delivery)
     } else {
-      val deliveryBefore = _deliveries.first { it.address == subPath.pathFromPreviousDelivery.nodes.first() }
-      index = _deliveries.addAfter(deliveryBefore, subPath.delivery)
+        val deliveryBefore = _deliveries.first { it.address == subPath.pathFromPreviousDelivery.nodes.first() }
+        index = _deliveries.addAfter(deliveryBefore, subPath.delivery)
     }
+
+    _durationPath.removeAt(index)
+    _distancePath.removeAt(index)
+
     _durationPath.add(index, subPath.durationToNextDelivery)
     _durationPath.add(index, subPath.durationFromPreviousDelivery)
 
@@ -110,9 +114,10 @@ class Round(
     notifyObservers()
   }
 
-  val distance: Long = _distancePath.sumLongBy { it.length }
+  val distance: Int
+  get() { return _distancePath.sumBy { it.length } }
 
-  override val length: Long
+  override val length: Int
     get() {
       var duration = Duration()
 
@@ -200,6 +205,32 @@ class Round(
       add(indexOfElementBefore, elementToAdd)
     }
     return indexOfElementBefore
+  }
+
+  fun intersections(): List<Intersection> {
+    return listOf(warehouse.address) + deliveries().map { it.address }
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as Round
+
+    if (warehouse != other.warehouse) return false
+    if (_deliveries != other._deliveries) return false
+    if (_durationPath != other._durationPath) return false
+    if (_distancePath != other._distancePath) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = warehouse.hashCode()
+    result = 31 * result + _deliveries.hashCode()
+    result = 31 * result + _durationPath.hashCode()
+    result = 31 * result + _distancePath.hashCode()
+    return result
   }
 
 
