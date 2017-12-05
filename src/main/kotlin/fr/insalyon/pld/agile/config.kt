@@ -18,8 +18,8 @@ object Config {
   val DELIVERY_PLANNING_XSD = "xsd/delivery_planning.xsd"
 
   val prop: Properties = Properties()
-  val inputStream = FileInputStream(getResource("/config/config.properties"))
-  val outputStream = FileOutputStream(getResource("/config/config.properties"))
+ // val inputStream = FileInputStream(getResource("/config/config.properties"))
+  //val outputStream = FileOutputStream(getResource("/config/config.properties"))
 
   val DEFAULT_SPEED = 15.km_h
 
@@ -36,7 +36,7 @@ object Config {
     val colorLabelHoursHighlight = Color.DARKRED
   }
 
-  fun loadLastPlan() {
+  /*fun loadLastPlan() {
     prop.load(inputStream)
     DEFAULT_MAP = prop.getProperty("lastFilePath")
   }
@@ -45,5 +45,5 @@ object Config {
     prop.setProperty("lastFilePath",path!!)
 
     prop.store(outputStream, "")
-  }
+  }*/
 }
