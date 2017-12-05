@@ -328,4 +328,53 @@ class RoundModifierImpTest {
         Assert.assertEquals(600.seconds, round.deliveries().elementAt(0).duration)
         roundModifier.modifyDelivery(Delivery(address = node3, startTime = 8 h 15, duration = 600.seconds, endTime = 9 h 36),round, 0)
     }
+
+    // values to test add delivery
+    val planAddDelivery by lazy {
+
+        val roadOfLength15 = Junction(900, "")
+        val roadOfLength20 = Junction(1200, "")
+        val roadOfLength10 = Junction(600, "")
+        val roadOfLength8 = Junction(480, "")
+
+        Plan(
+                setOf<Intersection>(node1, source, node3, node4, node5, node6, node7),
+                setOf(
+                        //Triple(srcNode, road, destNode)
+                        Triple(source, roadOfLength15, node1),
+                        Triple(node1, roadOfLength15, node3),
+                        Triple(node3, roadOfLength20, node4),
+                        Triple(node4, roadOfLength10, source),
+                        Triple(node1, roadOfLength8, node7),
+                        Triple(node7, roadOfLength8, node1),
+                        Triple(node7, roadOfLength8, node3),
+                        Triple(node3, roadOfLength8, node7),
+                        Triple(node4, roadOfLength8, node7),
+                        Triple(node7, roadOfLength8, node4),
+                        Triple(node7, roadOfLength8, source),
+                        Triple(source, roadOfLength8, node7)
+                )
+        )
+    }
+
+    val roundRequestAddDelivery = RoundRequest(
+            Warehouse(address = source, departureHour = 8 h 0 m 0),
+            setOf(
+                    Delivery(node1, duration = 600.seconds, startTime = 8 h 10 m 0),
+                    Delivery(node3, duration = 600.seconds, startTime = 8 h 45 m 0, endTime = 10 h 0),
+                    Delivery(node4, duration = 600.seconds, startTime = 9 h 0 m 0, endTime = 11 h 0)
+            )
+    )
+
+    @Test
+    fun roundAddDeliveryDuration600() {
+        val roundComputer: RoundComputer = RoundComputerImpl(planAddDelivery, roundRequestAddDelivery, tsp = TSP1(), speed = 1.m_s)
+        val round = roundComputer.round
+
+        val roundModifier = RoundModifierImp(round,planAddDelivery)
+
+        Assert.assertEquals(600.seconds, round.deliveries().elementAt(0).duration)
+        roundModifier.addDelivery(Delivery(address = node7, duration = 600.seconds),round)
+        Assert.assertEquals(7,round.deliveries().elementAt(1).address.id)
+    }
 }

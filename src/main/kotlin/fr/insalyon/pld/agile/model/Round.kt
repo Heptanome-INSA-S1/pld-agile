@@ -5,6 +5,7 @@ import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
 import fr.insalyon.pld.agile.sumLongBy
 import java.util.*
+import kotlin.NoSuchElementException
 
 /**
  * A round is a computed round request
@@ -31,13 +32,13 @@ class Round(
 
   fun addDelivery(subPath: SubPath) {
 
-    val index: Int
+    var index: Int
     if(warehouse.address == subPath.pathFromPreviousDelivery.nodes.first()) {
       index = 0
       _deliveries.add(0, subPath.delivery)
     } else {
-      val deliveryBefore = _deliveries.first { it.address == subPath.pathFromPreviousDelivery.nodes.first() }
-      index = _deliveries.addAfter(deliveryBefore, subPath.delivery)
+        val deliveryBefore = _deliveries.first { it.address == subPath.pathFromPreviousDelivery.nodes.first() }
+        index = _deliveries.addAfter(deliveryBefore, subPath.delivery)
     }
     _durationPath.add(index, subPath.durationToNextDelivery)
     _durationPath.add(index, subPath.durationFromPreviousDelivery)

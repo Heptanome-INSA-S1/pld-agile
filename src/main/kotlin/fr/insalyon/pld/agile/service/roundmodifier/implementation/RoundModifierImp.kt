@@ -1,5 +1,6 @@
 package fr.insalyon.pld.agile.service.roundmodifier.implementation
 
+import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.lib.graph.model.Path
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.service.algorithm.implementation.DijsktraImpl
@@ -12,7 +13,63 @@ class RoundModifierImp(
 ) : RoundModifier {
 
   override fun addDelivery(delivery: Delivery, round: Round) {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+      if(isDeliveryValid(delivery)){
+
+          var dijsktra: DijsktraImpl<Intersection, Junction> =  DijsktraImpl<Intersection, Junction>(plan, delivery.address)
+          var prevShortestPath : Path<Intersection, Junction>? = null
+          var nextShortestPath : Path<Intersection, Junction>? = null
+          var listEarliestEndTime = getEarliestEndTime(round)
+          var listLatestEndTime = getLastestEndTime(round)
+          var listSubPath = mutableListOf<SubPath?>()
+
+          round.deliveries().forEachIndexed { i, d ->
+
+              if(i==0){
+                  prevShortestPath = dijsktra.getShortestPath(round.warehouse.address)
+                  nextShortestPath = dijsktra.getShortestPath(d.address)
+              }else if(i>0){
+                  prevShortestPath = dijsktra.getShortestPath(round.deliveries().elementAt(i-1).address)
+                  nextShortestPath = dijsktra.getShortestPath(round.deliveries().elementAt(i).address)
+              }
+
+              if((getNextNonNull(listLatestEndTime, i)!= null && prevShortestPath!!.length + delivery.duration.toSeconds() + nextShortestPath!!.length + round.deliveries().elementAt(i+1).duration.length < (getNextNonNull(listLatestEndTime, i)!!.toSeconds() - listEarliestEndTime[i]!!.toSeconds()))
+                       && ( delivery.startTime == null || (delivery.startTime != null && delivery.startTime!! < getNextNonNull(listLatestEndTime, i)!!))
+                       && (delivery.startTime== null ||  (delivery.startTime != null && delivery.startTime!! < listEarliestEndTime.get(i)))) {
+                  listSubPath.add(i, SubPath(prevShortestPath!!,prevShortestPath!!.toDuration(Config.defaultSpeed),delivery,nextShortestPath!!, nextShortestPath!!.toDuration(Config.defaultSpeed)))
+              }else {
+                  listSubPath.add(i, null)
+              }
+          }
+
+          // we add the subpath between the potentialy added delivery and the warehouse to end the round
+          listSubPath.add(listSubPath.size, SubPath(dijsktra.getShortestPath(round.deliveries().last().address),dijsktra.getShortestPath(round.deliveries().last().address).toDuration(15.km_h),delivery,dijsktra.getShortestPath(round.warehouse.address),dijsktra.getShortestPath(round.warehouse.address).toDuration(15.km_h)))
+
+          var subPath : SubPath? = listSubPath.elementAt(0)
+          var minLength : Long =0L
+
+          if (subPath != null) {
+              minLength = subPath.durationFromPreviousDelivery.toSeconds() + subPath.delivery.duration.toSeconds() + subPath.durationToNextDelivery.toSeconds()
+          }
+
+          listSubPath.forEach { sp ->
+              if (sp != null) {
+                  if(sp.durationFromPreviousDelivery.toSeconds() + sp.delivery.duration.toSeconds() + sp.durationToNextDelivery.toSeconds() < minLength){
+                      minLength = sp.durationFromPreviousDelivery.toSeconds() + sp.delivery.duration.toSeconds() + sp.durationToNextDelivery.toSeconds()
+                      subPath = sp
+                  }
+              }
+          }
+
+          if(subPath != null){
+              round.addDelivery(subPath!!)
+          } else {
+              throw IllegalArgumentException("The delivery cannot be added to the round.")
+          }
+
+
+      }else{
+          throw IllegalArgumentException("Check the values for the given delivery.")
+      }
   }
 
   override fun removeDelivery(i: Int, round: Round, speed: Speed) {
@@ -110,7 +167,7 @@ class RoundModifierImp(
   private fun getNextNonNull(list: List<Instant?>, i: Int): Instant? {
     var nextNonNullLatestEndTime: Instant? = null
     for (j: Int in i + 1..list.size) {
-      if (list[j] != null) {
+      if (j<list.size && list[j] != null) {
         nextNonNullLatestEndTime = list[j]
         break
       }
