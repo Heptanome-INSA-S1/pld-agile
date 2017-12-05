@@ -20,6 +20,19 @@ class Duration private constructor(
     return Duration(_seconds - other._seconds)
   }
 
+  val hours: Long
+  get() {
+    return _seconds / 3600L % 24
+  }
+  val minutes: Long
+  get() {
+    return _seconds / 60L % 60
+  }
+  val secondes: Long
+  get() {
+    return _seconds % 60
+  }
+
   fun toSeconds() = _seconds
 
   fun toMillis() = _seconds * 1000L
@@ -38,8 +51,16 @@ class Duration private constructor(
   override fun hashCode(): Int = _seconds.hashCode()
 
   override fun toString():String{
-    var secondes = _seconds
-    if(secondes==0)
+    var res = ""
+    if (hours != 0L)
+      res += hours.toString() + "h"
+
+    if (minutes != 0L)
+      res += minutes.toString() + "m"
+
+    res += secondes.toString() + "s"
+    /*var secondes = _seconds
+    if(secondes==0L)
       return "0s"
     val hours : Int = secondes / 3600
     secondes = secondes - hours * 3600
@@ -50,8 +71,8 @@ class Duration private constructor(
       res += ""+ hours + "h"
     if(minutes != 0)
       res += ""+ minutes + "m"
-    if(secondes != 0)
-      res += ""+ secondes + "s"
+    if(secondes != 0L)
+      res += ""+ secondes + "s"*/
     return res
   }
 

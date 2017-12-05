@@ -17,9 +17,8 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.scene.shape.Line
 import javafx.util.Duration
-import java.lang.Math.min
 import tornadofx.*
-import java.lang.Math.abs
+import java.lang.Math.*
 
 
 const val UP : Int = 0
@@ -187,6 +186,7 @@ class PlanFragment : Fragment(){
       onMousePressed = EventHandler { mouseEvent ->
           // record a delta distance for the drag and drop operation.
           cursor = Cursor.MOVE
+          //println(""+shapeGroup.translateX +" "+mouseEvent.sceneX+" "+ dragDelta.x)
           //println(""+parentView.center.boundsInLocal.width+" "+layoutX+" "+mouseEvent.sceneX)
           dragDelta.x = (shapeGroup.translateX - mouseEvent.sceneX)
           dragDelta.y = (shapeGroup.translateY - mouseEvent.sceneY)
@@ -196,9 +196,10 @@ class PlanFragment : Fragment(){
       }
       onMouseDragOver=EventHandler { mouseEvent ->
           //println(""+ mouseEvent.sceneX +" "+ dragDelta.x+" "+shapeGroup.scaleX+" "+(parentView.center.boundsInLocal.width/2)*(1-shapeGroup.scaleX)+" "+parentView.center.boundsInLocal.width)
-          if(abs(mouseEvent.sceneX + dragDelta.x)*MAP_SIZE/parentView.center.boundsInLocal.width<(parentView.center.boundsInLocal.width/2)*abs(1-shapeGroup.scaleX)+50||abs(mouseEvent.sceneX + dragDelta.x)<abs(shapeGroup.translateX))
+          //println(""+abs(mouseEvent.sceneX + dragDelta.x)*MAP_SIZE/pow(parentView.center.boundsInLocal.width,2.0)+" "+abs(shapeGroup.scaleX))
+          if(abs(mouseEvent.sceneX + dragDelta.x-(parentView.center.boundsInLocal.width-MAP_SIZE)/2)*parentView.center.boundsInLocal.width/ pow(MAP_SIZE,2.0)*2 <abs(shapeGroup.scaleX)||abs(mouseEvent.sceneX + dragDelta.x)<abs(shapeGroup.translateX))
             shapeGroup.translateX = mouseEvent.sceneX + dragDelta.x
-          if(abs(mouseEvent.sceneY + dragDelta.y)*MAP_SIZE/parentView.center.boundsInLocal.height<(parentView.center.boundsInLocal.height/2)*abs(1-shapeGroup.scaleY)+50||abs(mouseEvent.sceneY + dragDelta.y)<abs(shapeGroup.translateY))
+          if(abs(mouseEvent.sceneY + dragDelta.y-(parentView.center.boundsInLocal.height-MAP_SIZE)/2)*parentView.center.boundsInLocal.height/ pow(MAP_SIZE,2.0)*2 <abs(shapeGroup.scaleY)||abs(mouseEvent.sceneY + dragDelta.y)<abs(shapeGroup.translateY))
             shapeGroup.translateY = mouseEvent.sceneY + dragDelta.y
       }
       onMouseClicked = EventHandler { mouseEvent ->

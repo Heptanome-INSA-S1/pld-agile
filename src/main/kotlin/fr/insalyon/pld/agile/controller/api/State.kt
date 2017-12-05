@@ -44,6 +44,11 @@ interface State<in T> {
   fun deleteDelivery(controller: Controller, delivery: Delivery)
 
   /**
+   * Edit the delivery in the controller's round
+   */
+  fun editDelivery(controller: Controller, prevDelivery: Delivery, newDelivery: Delivery)
+
+  /**
    *
    */
   fun ok(controller: Controller)

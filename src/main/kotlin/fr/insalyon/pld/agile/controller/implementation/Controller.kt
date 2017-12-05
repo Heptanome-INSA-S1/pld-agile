@@ -34,6 +34,7 @@ class Controller(val window: Home) {
   val LOADED_DELIVERIES_STATE: State<RoundRequest> = LoadedDeliveriesState()
   val CALCULATED_ROUND_STATE: State<Round> = CalculatedRoundState()
   val ERROR_STATE: State<Pair<Exception, State<Nothing>>> = ErrorState()
+  val EDITING_DELIVERY_STATE: State<Delivery> = EditingDeliveryState()
 
   private var currentState: State<Nothing> = INIT_STATE
 
@@ -87,6 +88,14 @@ class Controller(val window: Home) {
   fun deleteDelivery(delivery: Delivery) {
     try {
       currentState.deleteDelivery(this, delivery)
+    } catch (e: Exception) {
+      e.catchWithErrorState()
+    }
+  }
+
+  fun editDelivery(prevDelivery: Delivery, newDelivery: Delivery){
+    try {
+      currentState.editDelivery(this, prevDelivery, newDelivery)
     } catch (e: Exception) {
       e.catchWithErrorState()
     }

@@ -1,8 +1,11 @@
 package fr.insalyon.pld.agile.view
 
 
+import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.controller.implementation.Controller
+import fr.insalyon.pld.agile.model.Delivery
 import fr.insalyon.pld.agile.util.Logger
+import fr.insalyon.pld.agile.view.fragment.DeliveryEditor
 import fr.insalyon.pld.agile.view.fragment.PlanFragment
 import fr.insalyon.pld.agile.view.fragment.RoundFragment
 import fr.insalyon.pld.agile.view.fragment.TimelineFragment
@@ -40,6 +43,7 @@ class Home : View() {
   val controller: Controller = Controller(this)
 
   init {
+    primaryStage.isMaximized=Config.WINDOW_IS_MAX_SIZE
     primaryStage.icons.add(Image("/image/app-icon.png"))
     root.setOnDragOver { event ->
       val db = event.dragboard
@@ -98,6 +102,14 @@ class Home : View() {
       controller.undo()
     }
 
+    shortcut("Ctrl+Z"){
+      controller.undo()
+    }
+
+    shortcut("Ctrl+Y"){
+      controller.redo()
+    }
+
   }
 
   fun refreshAll() {
@@ -153,6 +165,14 @@ class Home : View() {
     if (alert.result == ButtonType.OK) {
       controller.ok()
     }
+  }
+
+
+
+  fun openEditor(delivery: Delivery){
+    openInternalWindow(DeliveryEditor::class, params = mapOf(
+        DeliveryEditor::prevDelivery to delivery,
+        DeliveryEditor::parentView to this))
   }
 
   fun loadingPlan() {

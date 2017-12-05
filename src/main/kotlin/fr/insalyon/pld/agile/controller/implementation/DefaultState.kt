@@ -6,6 +6,7 @@ import fr.insalyon.pld.agile.Config.MAP_XSD
 import fr.insalyon.pld.agile.Config.DEFAULT_SPEED
 import fr.insalyon.pld.agile.controller.api.Command
 import fr.insalyon.pld.agile.controller.api.State
+import fr.insalyon.pld.agile.controller.commands.EditDelivery
 import fr.insalyon.pld.agile.controller.commands.RemoveDelivery
 import fr.insalyon.pld.agile.getResource
 import fr.insalyon.pld.agile.model.Delivery
@@ -13,6 +14,7 @@ import fr.insalyon.pld.agile.model.Speed
 import fr.insalyon.pld.agile.service.algorithm.implementation.TSPAdvanced
 import fr.insalyon.pld.agile.service.algorithm.implementation.TSPSumMin
 import fr.insalyon.pld.agile.service.roundcomputing.implementation.RoundComputerImpl
+import fr.insalyon.pld.agile.service.roundmodifier.api.RoundModifier
 import fr.insalyon.pld.agile.service.roundmodifier.implementation.RoundModifierImp
 import fr.insalyon.pld.agile.util.Logger
 import fr.insalyon.pld.agile.util.xml.XmlDocument
@@ -62,7 +64,11 @@ abstract class DefaultState<in T> : State<T> {
   }
 
   override fun deleteDelivery(controller: Controller, delivery: Delivery) {
-    Logger.warn("Delete delivery was calculated")
+    Logger.warn("Delete delivery was called")
+  }
+
+  override fun editDelivery(controller: Controller, prevDelivery: Delivery, newDelivery: Delivery) {
+    Logger.warn("Edit delivery was called")
   }
 
   override fun undo(controller: Controller, commands: List<Command>) {
@@ -180,6 +186,13 @@ abstract class DefaultState<in T> : State<T> {
     val roundModifier = RoundModifierImp(controller.round!!, controller.plan!!)
     val removeDeliveryCommand = RemoveDelivery(roundModifier, controller, delivery)
     controller.commands.add(removeDeliveryCommand)
+    controller.changeStateAndInit(controller.CALCULATED_ROUND_STATE, controller.round!!)
+  }
+
+  protected fun defaultEditDelivery(controller: Controller, prevDelivery: Delivery, newDelivery: Delivery) {
+    val roundModifier = RoundModifierImp(controller.plan!!)
+    val editDeliveryCommand = EditDelivery(roundModifier, controller, prevDelivery, newDelivery)
+    controller.commands.add(editDeliveryCommand)
     controller.changeStateAndInit(controller.CALCULATED_ROUND_STATE, controller.round!!)
   }
 
