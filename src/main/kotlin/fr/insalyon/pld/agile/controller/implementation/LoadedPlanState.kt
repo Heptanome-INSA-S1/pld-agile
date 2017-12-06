@@ -1,10 +1,12 @@
 package fr.insalyon.pld.agile.controller.implementation
 
-import fr.insalyon.pld.agile.model.Delivery
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.util.Logger
 import java.io.File
 
+/**
+ * The application state when a plan has been loaded
+ */
 class LoadedPlanState : DefaultState<Plan>(){
 
   override fun init(controller: Controller, element: Plan) {

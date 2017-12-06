@@ -5,6 +5,9 @@ import fr.insalyon.pld.agile.model.Instant
 import fr.insalyon.pld.agile.model.RoundRequest
 import java.util.*
 
+/**
+ * Basic heuristic with time slot checking
+ */
 class TSP1WithTimeSlot(
     roundRequest: RoundRequest
 ) : TemplateTSPWithTimeSlot(roundRequest) {

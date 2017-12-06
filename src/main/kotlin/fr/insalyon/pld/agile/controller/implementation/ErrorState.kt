@@ -4,6 +4,9 @@ import fr.insalyon.pld.agile.controller.api.State
 import fr.insalyon.pld.agile.util.Logger
 import java.io.File
 
+/**
+ * The application state when an error is raised
+ */
 class ErrorState : DefaultState<Pair<Exception, State<Nothing>>>(){
 
   var previousState: State<Nothing> = this

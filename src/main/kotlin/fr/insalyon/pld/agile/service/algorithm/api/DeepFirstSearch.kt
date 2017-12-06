@@ -3,6 +3,9 @@ package fr.insalyon.pld.agile.service.algorithm.api
 import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
 
+/**
+ * DeepFirstSearch Algorithm
+ */
 interface DeepFirstSearch<Node, out Edge : Measurable> {
 
   /**

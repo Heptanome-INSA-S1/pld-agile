@@ -5,6 +5,8 @@ import fr.insalyon.pld.agile.controller.implementation.Controller
 import fr.insalyon.pld.agile.lib.graph.model.Path
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.service.roundmodifier.implementation.RoundModifierImp
+import fr.insalyon.pld.agile.util.Logger
+import sun.rmi.runtime.Log
 
 class RemoveDelivery(
     private val roundModifier: RoundModifierImp,
@@ -36,11 +38,14 @@ class RemoveDelivery(
 
 
   override fun doCommand() {
+    Logger.debug(round.toTrace())
     roundModifier.removeDelivery(index, round)
+    Logger.debug(round.toTrace())
   }
 
   override fun undoCommand() {
-    round.removePath(index)
+    Logger.debug(round.toTrace())
     round.addDelivery(oldPath)
+    Logger.debug(round.toTrace())
   }
 }

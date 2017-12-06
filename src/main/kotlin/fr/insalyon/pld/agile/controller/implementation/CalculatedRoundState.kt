@@ -7,6 +7,9 @@ import fr.insalyon.pld.agile.model.seconds
 import fr.insalyon.pld.agile.util.Logger
 import java.io.File
 
+/**
+ * The application state when a round has been computed
+ */
 class CalculatedRoundState : DefaultState<Round>(), State<Round> {
 
   override fun init(controller: Controller, element: Round) {
@@ -32,6 +35,7 @@ class CalculatedRoundState : DefaultState<Round>(), State<Round> {
   }
 
   override fun deleteDelivery(controller: Controller, delivery: Delivery) {
+    if(controller.round!!.deliveries().size == 1) throw IllegalStateException("Cannot delete the last delivery")
     defaultDeleteDelivery(controller, delivery)
   }
 

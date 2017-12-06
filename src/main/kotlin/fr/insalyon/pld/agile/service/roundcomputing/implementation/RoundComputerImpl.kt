@@ -6,14 +6,14 @@ import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.service.algorithm.api.TSP
-import fr.insalyon.pld.agile.service.algorithm.api.TSPTimeWindow
 import fr.insalyon.pld.agile.service.algorithm.implementation.Dijkstra
-import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1WithTimeSlot
-import fr.insalyon.pld.agile.service.algorithm.implementation.TSP3
 import fr.insalyon.pld.agile.service.roundcomputing.api.RoundComputer
 import fr.insalyon.pld.agile.util.Logger
 import java.util.*
 
+/**
+ * Implantation of the RoundComputer interface
+ */
 class RoundComputerImpl(
     /**
      * The plan
@@ -31,6 +31,9 @@ class RoundComputerImpl(
 ) : RoundComputer {
 
   companion object {
+    /**
+     * Create a complete graph with the only intersections which are linked to the roundRequest
+     */
     fun getSubPlan(plan: Plan, roundRequest: RoundRequest): Graph<Intersection, Path<Intersection, Junction>> {
       val nodes = mutableSetOf<Intersection>()
       val roads = mutableSetOf<Triple<Intersection, Path<Intersection, Junction>, Intersection>>()

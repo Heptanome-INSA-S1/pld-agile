@@ -13,6 +13,9 @@ import fr.insalyon.pld.agile.util.Logger
 import fr.insalyon.pld.agile.view.Home
 import java.io.File
 
+/**
+ * The controller of the application
+ */
 class Controller(val window: Home) {
 
   internal var plan: Plan? = null
@@ -39,9 +42,7 @@ class Controller(val window: Home) {
   private var currentState: State<Nothing> = INIT_STATE
 
   init {
-    if(Config.LOGGER_LEVEL == Logger.Level.DEBUG) {
-      commands.add(DebugCommand())
-    }
+    commands.add(DebugCommand())
   }
 
   fun loadPlan(file: File){
@@ -113,12 +114,6 @@ class Controller(val window: Home) {
     commands.redo()
   }
 
-  private fun Exception.catchWithErrorState() {
-    val previousState = currentState
-    currentState = ERROR_STATE
-    ERROR_STATE.init(this@Controller, Pair(this, previousState))
-  }
-
   fun manageException(e: Exception) {
     e.catchWithErrorState()
   }
@@ -130,6 +125,13 @@ class Controller(val window: Home) {
 
   fun <T> changeState(nextState: State<T>) {
     currentState = nextState
+  }
+
+  // Extension functions
+  private fun Exception.catchWithErrorState() {
+    val previousState = currentState
+    currentState = ERROR_STATE
+    ERROR_STATE.init(this@Controller, Pair(this, previousState))
   }
 
 }

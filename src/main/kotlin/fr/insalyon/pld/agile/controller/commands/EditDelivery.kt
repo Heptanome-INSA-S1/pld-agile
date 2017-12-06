@@ -6,6 +6,9 @@ import fr.insalyon.pld.agile.model.Delivery
 import fr.insalyon.pld.agile.service.roundmodifier.implementation.RoundModifierImp
 import fr.insalyon.pld.agile.util.Logger
 
+/**
+ * The command to change a delivery
+ */
 class EditDelivery(
     private val roundModifier: RoundModifierImp,
     private val controller: Controller,
