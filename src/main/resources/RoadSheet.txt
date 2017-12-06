@@ -10,7 +10,7 @@ You have to :
 	It's now time to do the delivery 0 (x:10, y:20) - Details:
 		Start at : n/a
 		Finish at : n/a
-		Duration : 10m
+		Duration : 10m0s
 ________________________________________________________________________
 You have to : 
 
@@ -21,7 +21,7 @@ You have to :
 	It's now time to do the delivery 1 (x:10, y:15) - Details:
 		Start at : n/a
 		Finish at : n/a
-		Duration : 15m
+		Duration : 15m0s
 ________________________________________________________________________
 It's nearly finished, to come back at the warehouse : 
 

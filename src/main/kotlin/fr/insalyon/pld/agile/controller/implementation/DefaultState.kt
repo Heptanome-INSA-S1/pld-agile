@@ -183,7 +183,7 @@ abstract class DefaultState<in T> : State<T> {
   }
 
   protected fun defaultDeleteDelivery(controller: Controller, delivery: Delivery) {
-    val roundModifier = RoundModifierImp(controller.round!!, controller.plan!!)
+    val roundModifier = RoundModifierImp(controller.plan!!)
     val removeDeliveryCommand = RemoveDelivery(roundModifier, controller, delivery)
     controller.commands.add(removeDeliveryCommand)
     controller.changeStateAndInit(controller.CALCULATED_ROUND_STATE, controller.round!!)

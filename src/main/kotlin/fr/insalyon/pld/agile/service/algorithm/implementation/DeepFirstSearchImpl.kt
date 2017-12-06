@@ -6,6 +6,9 @@ import fr.insalyon.pld.agile.lib.graph.model.Path
 import fr.insalyon.pld.agile.service.algorithm.api.DeepFirstSearch
 import java.util.*
 
+/**
+ * DFS Implementation
+ */
 class DeepFirstSearchImpl<Node, out E : Measurable>(
     private val graph: Graph<Node, E>,
     override val source: Node,

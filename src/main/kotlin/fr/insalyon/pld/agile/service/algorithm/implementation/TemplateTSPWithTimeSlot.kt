@@ -1,12 +1,13 @@
 package fr.insalyon.pld.agile.service.algorithm.implementation
 
-import fr.insalyon.pld.agile.model.Instant
 import fr.insalyon.pld.agile.model.RoundRequest
 import fr.insalyon.pld.agile.model.hours
-import fr.insalyon.pld.agile.model.seconds
 import fr.insalyon.pld.agile.service.algorithm.api.TSP
 import java.util.*
 
+/**
+ * Abstract implementation of TSP with time slot constraint
+ */
 abstract class TemplateTSPWithTimeSlot(
     private val roundRequest: RoundRequest
 ) : TSP {

@@ -20,15 +20,15 @@ class Duration private constructor(
     return Duration(_seconds - other._seconds)
   }
 
-  val hours: Long
+  val hours: Int
   get() {
-    return _seconds / 3600L % 24
+    return _seconds / 3600 % 24
   }
-  val minutes: Long
+  val minutes: Int
   get() {
-    return _seconds / 60L % 60
+    return _seconds / 60 % 60
   }
-  val secondes: Long
+  val secondes: Int
   get() {
     return _seconds % 60
   }
@@ -52,10 +52,10 @@ class Duration private constructor(
 
   override fun toString():String{
     var res = ""
-    if (hours != 0L)
+    if (hours != 0)
       res += hours.toString() + "h"
 
-    if (minutes != 0L)
+    if (minutes != 0)
       res += minutes.toString() + "m"
 
     res += secondes.toString() + "s"

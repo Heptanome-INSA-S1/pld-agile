@@ -1,7 +1,11 @@
 package fr.insalyon.pld.agile.service.algorithm.implementation
 
 import fr.insalyon.pld.agile.POSITIVE_INFINITY
+import fr.insalyon.pld.agile.lib.graph.model.Graph
+import fr.insalyon.pld.agile.lib.graph.model.Measurable
+import fr.insalyon.pld.agile.lib.graph.model.Path
 import fr.insalyon.pld.agile.service.algorithm.api.Kruskal
+import fr.insalyon.pld.agile.util.Logger
 
 typealias Node = Int
 typealias Length = Int
@@ -12,6 +16,13 @@ class KruskalImpl(
     edges: Array<out IntArray>,
     val noEdgeValue: Int = Int.POSITIVE_INFINITY
 ) : Kruskal {
+
+
+
+  override fun <N, E : Measurable> getMinimumSpanningTree(graph: Graph<N, E>): Path<N, E> {
+    Logger.warn("Kruskal.getMinimumSpanningTree() is not implemented yet")
+    return Path.NO_WAY
+  }
 
   val edges = List<List<Triple<Node, Length, Node>>>(nodes.size, { departureIndex ->
     val outEdges = mutableListOf<Triple<Node, Length, Node>>()
