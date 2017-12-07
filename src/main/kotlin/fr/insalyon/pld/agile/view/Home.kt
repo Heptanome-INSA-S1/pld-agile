@@ -112,7 +112,7 @@ class Home : View() {
 
     if(Config.loadLastPlan().isNotEmpty()){
       val lastFile = File(Config.loadLastPlan())
-      if(lastFile.exists()){
+      if(lastFile.exists() && lastFile.extension == "xml"){
         controller.loadPlan(lastFile)
       }
     }
