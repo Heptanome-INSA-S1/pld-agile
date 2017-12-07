@@ -118,84 +118,62 @@ class RoundModifierImp(
   }
 
   override fun modifyDelivery(delivery: Delivery, round: Round, i: Int) {
-    val listEarliestEnd = getEarliestEndTime(round)
-    val listLatestEnd = getLastestEndTime(round)
+
+    val latestStartTime = getLatestStartTime(round)
+    val earliestEndTime = getEarliestEndTime(round)
 
     if (isDeliveryValid(delivery)) {
-      if (delivery.startTime != null && delivery.startTime < listEarliestEnd[i] + round.durationPathInSeconds().elementAt(i).length.seconds) {
-        throw  IllegalArgumentException("The start time is not valid and must be greater than " + (listEarliestEnd[i] + round.durationPathInSeconds().elementAt(i).length.seconds).toFormattedString())
+      if (delivery.startTime != null && delivery.startTime > latestStartTime[i+1]) {
+        throw  IllegalArgumentException("L'heure de début n'est pas valide, elle doit être inférieur à " + latestStartTime[i+1].toFormattedString())
       }
 
-      var nextNonNullLatestEndTime: Instant? = getNextNonNull(listLatestEnd, i)
-      if (delivery.startTime != null && nextNonNullLatestEndTime != null && delivery.startTime!! + delivery.duration > nextNonNullLatestEndTime!! - round.deliveries().elementAt(i + 1).duration.length.seconds - round.durationPathInSeconds().elementAt(i + 1).length.seconds) {
-        throw IllegalArgumentException("The sum of the start time and the duration cannot exceed " + (nextNonNullLatestEndTime!! - round.deliveries().elementAt(i + 1).duration.length.seconds
-            - round.durationPathInSeconds().elementAt(i + 1).length.seconds))
-      }
-
-      if (delivery.endTime != null && listLatestEnd[i + 1] != null && i < round.deliveries().size - 1 && delivery.endTime > listLatestEnd[i + 1]!! - round.deliveries().elementAt(i + 1).duration.length.seconds
-          - round.durationPathInSeconds().elementAt(i + 1).length.seconds) {
-
-        throw IllegalArgumentException("The end time cannot exceed " + (listLatestEnd[i + 1]!! - round.deliveries().elementAt(i + 1).duration.length.seconds
-            - round.durationPathInSeconds().elementAt(i + 1).length.seconds))
-      }
-
-      if (delivery.startTime == null && delivery.endTime == null) {
-        nextNonNullLatestEndTime = getNextNonNull(listEarliestEnd, i)
-
-        if (nextNonNullLatestEndTime != null && delivery.duration.toSeconds() > nextNonNullLatestEndTime!!.toSeconds() - listEarliestEnd[i].toSeconds()) {
-          throw IllegalArgumentException("The duration cannot exceed " + (nextNonNullLatestEndTime.toSeconds() - listEarliestEnd[i].toSeconds()))
-        }
+      if (delivery.endTime != null && delivery.endTime < earliestEndTime[i] ){
+        throw  IllegalArgumentException("L'heure de fin n'est pas valide, elle doit être supérieur à " + earliestEndTime[i].toFormattedString())
       }
 
       round.modify(i, delivery.startTime, delivery.endTime, delivery.duration)
     } else {
-      throw IllegalArgumentException("Check the values for the given delivery.")
+      throw IllegalArgumentException("Nous n'avons pas le temps d'effectuer la livraison.")
     }
   }
 
-  fun getLastestEndTime(round: Round): List<Instant?> {
+  /*
+   * Retourne la liste des plus grande heures de debut possible
+   */
 
-    val result = mutableListOf<Instant?>()
-    result.add(null)
+  fun getLatestStartTime(round: Round): List<Instant>{
+    val waitingTime = round.getWaitingTimes()
+    val result = mutableListOf<Instant>()
+    var pathDuration = round.durationPathInSeconds()[0]
+    var nextStartTime = round.warehouse.departureHour + pathDuration + waitingTime[0]
+    result += nextStartTime - pathDuration
 
-    round.deliveries().reversed().forEachIndexed { i, delivery ->
-
-      var index = round.deliveries().size - 1 - i
-      if (result.first() == null) {
-        result.add(0, delivery.endTime)
-      } else {
-        var lastestDeparture = result.first()!! - (round.deliveries().elementAt(index + 1).duration + round.durationPathInSeconds().elementAt(index + 1).length.seconds)
-        if (delivery.endTime != null && delivery.endTime < lastestDeparture) result.add(0, delivery.endTime) else result.add(0, lastestDeparture)
-      }
+    round.deliveries().forEachIndexed { i, delivery ->
+      pathDuration = round.durationPathInSeconds()[i+1]
+      nextStartTime =if (i < waitingTime.size - 1)  nextStartTime + delivery.duration + pathDuration + waitingTime[i+1]  else Config.DEFAULT_END_DELIVERING
+      result += nextStartTime - pathDuration - delivery.duration
     }
     return result
   }
+
+  /*
+   * Retourne la liste des plus petite heures de fin possible
+   */
 
   fun getEarliestEndTime(round: Round): List<Instant> {
-
     val result = mutableListOf<Instant>()
-    result += round.warehouse.departureHour
+    val waitingTime = round.getWaitingTimes()
+    var pathDuration = round.durationPathInSeconds()[0]
+    var previousEndTime = round.warehouse.departureHour
+    result += previousEndTime + pathDuration + round.deliveries()[0].duration
 
-    round.deliveries().forEachIndexed { index, delivery ->
-      val arrivalTime = result[index] + round.durationPathInSeconds().elementAt(index).length.seconds
-      val startDelivery = if (delivery.startTime != null && delivery.startTime > arrivalTime) delivery.startTime else arrivalTime
-      result += startDelivery + delivery.duration
+    round.deliveries().forEachIndexed { i, delivery ->
+      previousEndTime += pathDuration + waitingTime[i] + delivery.duration
+      pathDuration = round.durationPathInSeconds()[i+1]
+      result += previousEndTime + pathDuration + if(i < round.deliveries().size - 1) round.deliveries()[i+1].duration else 0.seconds
     }
-
-    val arrivalTime = result.last() + round.durationPathInSeconds().last().length.seconds
-    result += arrivalTime
 
     return result
-
-  }
-
-  private fun getNextNonNull(list: List<Instant?>, i: Int): Instant? {
-    for (j: Int in i + 1 until list.size) {
-      if (list[j] != null) {
-        return list[j]
-      }
-    }
-    return null
   }
 /*
     /**

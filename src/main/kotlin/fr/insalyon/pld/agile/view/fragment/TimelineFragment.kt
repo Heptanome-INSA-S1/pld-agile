@@ -43,10 +43,11 @@ class TimelineFragment: Fragment() {
       }
     }
     actualX = 15.0
+    val waitingTimeList = round.getWaitingTimes()
     round.distancePathInMeters().forEachIndexed { index, it1 ->
       val deplacement = transform(it1.edges)
       actualX += deplacement
-      time += round.durationPathInSeconds()[index].length.seconds
+      time += round.durationPathInSeconds()[index].length.seconds + if (index < waitingTimeList.size) waitingTimeList[index] else 0.seconds
       println(time)
       val idDelivery = it1.nodes.last().id.toString()
       stackpane {

@@ -22,7 +22,7 @@ class WarehouseSerializer(
 
     val intersectionId: Long = element.getAttribute(XmlConfig.Warehouse.ADDRESS).toLong()
     val intersection: Intersection = plan.nodes.first { it.element.id == intersectionId }.element
-    val departureTime: Instant = element.getAttribute(XmlConfig.Warehouse.DEPARTURE_HOUR).toInstant()
+    val departureTime: Instant = element.getAttribute(XmlConfig.Warehouse.DEPARTURE_HOUR).toInstant()!!
 
     return Warehouse(
         intersection,

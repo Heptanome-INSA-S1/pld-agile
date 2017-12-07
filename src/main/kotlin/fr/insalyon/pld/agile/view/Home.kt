@@ -128,6 +128,7 @@ class Home : View() {
   }
 
   fun refreshTimeLine() {
+    println(controller.round?.toTrace())
     Logger.info("Timeline is refreshed")
     if(controller.round == null) {
       bottomBox.clear()
@@ -135,7 +136,7 @@ class Home : View() {
       bottomBox.clear()
       bottomBox.add(TimelineFragment::class, mapOf(
           TimelineFragment::parentView to root,
-          TimelineFragment::round to controller.round
+          TimelineFragment::round to controller.round!!
       ))
     }
   }

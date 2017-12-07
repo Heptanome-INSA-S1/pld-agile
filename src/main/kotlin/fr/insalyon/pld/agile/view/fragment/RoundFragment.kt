@@ -123,7 +123,7 @@ class RoundFragment : Fragment(), Observer {
                   backgroundPosition += BackgroundPosition.CENTER
                 }
                 action {
-                  controller.changeStateAndInit(controller.EDITING_DELIVERY_STATE, delivery)
+                  controller.editingOfDelivery(delivery)
                 }
               }
               button {
@@ -196,6 +196,12 @@ class RoundFragment : Fragment(), Observer {
     var res = ""
     if (d.startTime != null && d.endTime != null) {
       res += " : " + d.startTime.toFormattedString() + "-" + d.endTime.toFormattedString()
+    }
+    else if (d.startTime != null) {
+      res += " A partir de : " + d.startTime.toFormattedString()
+    }
+    else if (d.endTime != null) {
+      res += " Jusqu'à : " + d.endTime.toFormattedString()
     }
     return res
   }

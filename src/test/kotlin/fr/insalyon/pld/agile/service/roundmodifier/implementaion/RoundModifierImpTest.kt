@@ -188,9 +188,9 @@ class RoundModifierImpTest {
         val round = roundComputer.round
 
         val roundModifier = RoundModifierImp(plan)
-        var listLatestEndTime = roundModifier.getLastestEndTime(round)
+        //var listLatestEndTime = roundModifier.getLastestEndTime(round)
 
-        Logger.debug(listLatestEndTime)
+        //Logger.debug(listLatestEndTime)
     }
 
     //Values for testing the modification of a delivery
