@@ -1,6 +1,8 @@
 package fr.insalyon.pld.agile.view.fragment
 
+import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.controller.implementation.Controller
+import fr.insalyon.pld.agile.getResource
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.util.Logger
@@ -237,6 +239,9 @@ class PlanFragment : Fragment(){
       setOnKeyPressed { event ->
           Logger.debug(event.character)
       }
+
+
+
    }
 
     private inner class ZoomHandler : EventHandler<ScrollEvent> {

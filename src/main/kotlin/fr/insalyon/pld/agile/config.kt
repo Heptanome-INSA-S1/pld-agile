@@ -4,6 +4,8 @@ import fr.insalyon.pld.agile.model.h
 import fr.insalyon.pld.agile.model.km_h
 import fr.insalyon.pld.agile.util.Logger
 import javafx.scene.paint.Color
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.util.*
 
 object Config {
@@ -41,18 +43,22 @@ object Config {
 
 
   val prop: Properties = Properties()
-  // val inputStream = FileInputStream(getResource("/config/config.properties"))
-  //val outputStream = FileOutputStream(getResource("/config/config.properties"))
 
 
-  /*fun loadLastPlan() {
+  fun loadLastPlan() : String {
+
+    val inputStream = FileInputStream(getResource("config/config.properties"))
     prop.load(inputStream)
-    DEFAULT_MAP = prop.getProperty("lastFilePath")
+    val pro = prop.getProperty("lastFilePath")
+    println(pro)
+    return pro
   }
 
   fun updateLastPlan(path: String ) {
+
+    val outputStream = FileOutputStream(getResource("config/config.properties"))
     prop.setProperty("lastFilePath",path!!)
 
     prop.store(outputStream, "")
-  }*/
+  }
 }

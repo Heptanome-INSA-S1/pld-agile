@@ -3,6 +3,7 @@ package fr.insalyon.pld.agile.view
 
 import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.controller.implementation.Controller
+import fr.insalyon.pld.agile.getResource
 import fr.insalyon.pld.agile.model.Delivery
 import fr.insalyon.pld.agile.model.Intersection
 import fr.insalyon.pld.agile.util.Logger
@@ -17,6 +18,7 @@ import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.stage.Modality
 import tornadofx.*
+import java.io.File
 
 /**
  * Default home screen
@@ -106,6 +108,13 @@ class Home : View() {
 
     shortcut("Ctrl+Y"){
       controller.redo()
+    }
+
+    if(Config.loadLastPlan().isNotEmpty()){
+      val lastFile = File(Config.loadLastPlan())
+      if(lastFile.exists()){
+        controller.loadPlan(lastFile)
+      }
     }
 
   }
