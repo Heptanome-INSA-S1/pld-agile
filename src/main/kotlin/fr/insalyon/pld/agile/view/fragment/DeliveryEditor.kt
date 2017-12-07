@@ -12,11 +12,19 @@ class DeliveryEditor: Fragment("Modification de livraison"){
   val prevDelivery : Delivery by param()
   val parentView: Home by param()
 
-  val startTime = textfield(prevDelivery.startTime.toString())
-  val endTime = textfield(prevDelivery.endTime.toString())
-  val hourDuration = textfield(prevDelivery.duration.hours.toString())
-  val minDuration = textfield(prevDelivery.duration.minutes.toString())
-
+  val startTime = textfield(if (prevDelivery.startTime != null) prevDelivery.startTime.toString() else ""){
+    promptText = "H:M:S"
+  }
+  val endTime = textfield(if (prevDelivery.endTime != null) prevDelivery.endTime.toString() else ""){
+    promptText = "H:M:S"
+  }
+  val hourDuration = textfield(prevDelivery.duration.hours.toString()){
+    promptText = "H"
+  }
+  val minDuration = textfield(prevDelivery.duration.minutes.toString()){
+    promptText = "M"
+  }
+  val that = this
   override val root: Form = form {
     fieldset("Créneau de livraison :") {
       field("Debut :") {
@@ -47,6 +55,7 @@ class DeliveryEditor: Fragment("Modification de livraison"){
         button("Valider") {
           action {
             parentView.controller.editDelivery(
+                that,
                 prevDelivery,
                 Delivery(
                     prevDelivery.address,
@@ -59,14 +68,13 @@ class DeliveryEditor: Fragment("Modification de livraison"){
                     )
                 )
             )
-            close()
           }
         }
       }
       right{
         button("Annuler") {
           action {
-            close()
+            parentView.controller.closeDeliveryEditor(that)
           }
         }
       }

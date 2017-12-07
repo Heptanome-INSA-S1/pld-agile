@@ -95,18 +95,24 @@ class RoundFragment : Fragment(), Observer {
               prefWidth = 30.0
               prefHeight = 30.0
               style {
-                backgroundImage += URI.create("image/add.png")
+                backgroundImage += URI.create("image/undo.png")
                 backgroundRepeat += Pair(BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT)
                 backgroundPosition += BackgroundPosition.CENTER
+              }
+              action {
+                controller.undo()
               }
             }
             button {
               prefWidth = 30.0
               prefHeight = 30.0
               style {
-                backgroundImage += URI.create("image/undo.png")
+                backgroundImage += URI.create("image/redo.png")
                 backgroundRepeat += Pair(BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT)
                 backgroundPosition += BackgroundPosition.CENTER
+              }
+              action {
+                controller.redo()
               }
             }
           }
@@ -123,7 +129,7 @@ class RoundFragment : Fragment(), Observer {
                   backgroundPosition += BackgroundPosition.CENTER
                 }
                 action {
-                  controller.changeStateAndInit(controller.EDITING_DELIVERY_STATE, delivery)
+                  controller.editingOfDelivery(delivery)
                 }
               }
               button {
@@ -196,6 +202,12 @@ class RoundFragment : Fragment(), Observer {
     var res = ""
     if (d.startTime != null && d.endTime != null) {
       res += " : " + d.startTime.toFormattedString() + "-" + d.endTime.toFormattedString()
+    }
+    else if (d.startTime != null) {
+      res += " A partir de : " + d.startTime.toFormattedString()
+    }
+    else if (d.endTime != null) {
+      res += " Jusqu'à : " + d.endTime.toFormattedString()
     }
     return res
   }
