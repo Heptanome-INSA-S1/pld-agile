@@ -1,10 +1,8 @@
 package fr.insalyon.pld.agile.view.fragment
 
 
-import fr.insalyon.pld.agile.model.Delivery
-import fr.insalyon.pld.agile.model.Duration
-import fr.insalyon.pld.agile.model.Round
-import fr.insalyon.pld.agile.model.toInstant
+import com.sun.javaws.exceptions.InvalidArgumentException
+import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.view.Home
 import javafx.scene.layout.BorderPane
 import tornadofx.*
@@ -52,8 +50,8 @@ class DeliveryEditor: Fragment("Modification de livraison"){
                 prevDelivery,
                 Delivery(
                     prevDelivery.address,
-                    startTime.text.toInstant(),
-                    endTime.text.toInstant(),
+                    startTime.text.toNullableInstant(),
+                    endTime.text.toNullableInstant(),
                     Duration(
                         hourDuration.text.toInt(),
                         minDuration.text.toInt(),
@@ -74,4 +72,15 @@ class DeliveryEditor: Fragment("Modification de livraison"){
       }
     }
   }
+
+  private fun String.toNullableInstant(): Instant? {
+    if(this.isNullOrBlank()) return null
+    if(this == "null") return null
+    try {
+      return this.toInstant()
+    } catch (e: Exception) {
+      throw InvalidArgumentException(arrayOf("Cannot parse $this to Instant. Please use the format HH:MM"))
+    }
+  }
+
 }

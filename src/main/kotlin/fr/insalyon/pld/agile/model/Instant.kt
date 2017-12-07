@@ -125,6 +125,6 @@ fun String.toInstant(delimiter: String = ":"): Instant {
   val splittedString = split(delimiter)
   val hourOfDay: Int = splittedString[0].toInt()
   val minutes: Int = splittedString[1].toInt()
-  val seconds: Int = splittedString[2].toInt()
+  val seconds: Int = if(splittedString.size == 3) splittedString[2].toInt() else 0
   return Instant(hourOfDay, minutes, seconds)
 }
