@@ -129,7 +129,7 @@ fun String.toInstant(delimiter: String = ":"): Instant? {
     return null
 
   val hourOfDay: Int = splittedString[0].toInt()
-  val minutes: Int = if (splittedString.size >= 2 && splittedString[1] != "") splittedString[1].toInt() else 0
-  val seconds: Int = if (splittedString.size >= 3 && splittedString[2] != "") splittedString[2].toInt() else 0
+  val minutes: Int = if (splittedString.size >= 2 && splittedString[1].isNotBlank()) splittedString[1].toInt() else 0
+  val seconds: Int = if (splittedString.size >= 3 && splittedString[2].isNotBlank()) splittedString[2].toInt() else 0
   return Instant(hourOfDay, minutes, seconds)
 }

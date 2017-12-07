@@ -168,8 +168,6 @@ class Home : View() {
     }
   }
 
-
-
   fun openEditor(delivery: Delivery){
     openInternalWindow(DeliveryEditor::class, params = mapOf(
         DeliveryEditor::prevDelivery to delivery,

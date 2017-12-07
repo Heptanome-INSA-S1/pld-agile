@@ -18,19 +18,20 @@ import java.io.File
  */
 class Controller(val window: Home) {
 
-  internal var plan: Plan? = null
+  var plan: Plan? = null
   set(value) {
     roundRequest = null
     round = null
     field = value
   }
-  internal var roundRequest: RoundRequest? = null
+  var roundRequest: RoundRequest? = null
   set(value) {
     round = null
     field = value
   }
-  internal var round: Round? = null
-  internal val commands = CommandList()
+  var round: Round? = null
+  internal set
+  val commands = CommandList()
 
   val INIT_STATE: State<Any> = InitState()
   val LOADED_PLAN_STATE: State<Plan> = LoadedPlanState()
