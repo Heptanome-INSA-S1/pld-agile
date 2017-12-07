@@ -4,11 +4,10 @@ package fr.insalyon.pld.agile.view
 import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.controller.implementation.Controller
 import fr.insalyon.pld.agile.model.Delivery
+import fr.insalyon.pld.agile.model.Intersection
+import fr.insalyon.pld.agile.model.seconds
 import fr.insalyon.pld.agile.util.Logger
-import fr.insalyon.pld.agile.view.fragment.DeliveryEditor
-import fr.insalyon.pld.agile.view.fragment.PlanFragment
-import fr.insalyon.pld.agile.view.fragment.RoundFragment
-import fr.insalyon.pld.agile.view.fragment.TimelineFragment
+import fr.insalyon.pld.agile.view.fragment.*
 import javafx.scene.control.*
 import javafx.scene.control.Alert.AlertType
 import javafx.scene.image.Image
@@ -123,6 +122,7 @@ class Home : View() {
     Logger.info("Plan is refreshed")
     centerBox.add(PlanFragment::class, mapOf(
         PlanFragment::parentView to root,
+        PlanFragment::controller to controller,
         PlanFragment::round to controller.round,
         PlanFragment::plan to controller.plan))
   }
@@ -175,6 +175,14 @@ class Home : View() {
         DeliveryEditor::prevDelivery to delivery,
         DeliveryEditor::parentView to this))
   }
+
+  fun openEditorNew(intersection: Intersection){
+    openInternalWindow(DeliveryAdd::class, params = mapOf(
+        DeliveryAdd::intersection to intersection,
+        DeliveryAdd::parentView to this))
+  }
+
+
 
   fun loadingPlan() {
     centerBox.clear()

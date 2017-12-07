@@ -1,5 +1,6 @@
 package fr.insalyon.pld.agile.view.fragment
 
+import fr.insalyon.pld.agile.controller.implementation.Controller
 import fr.insalyon.pld.agile.model.Plan
 import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.util.Logger
@@ -10,6 +11,7 @@ import javafx.event.EventHandler
 import javafx.scene.Cursor
 import javafx.scene.Group
 import javafx.scene.control.ScrollPane
+import javafx.scene.input.MouseButton
 import javafx.scene.input.ScrollEvent
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.StackPane
@@ -37,12 +39,13 @@ class PlanFragment : Fragment(){
     private val colorCircleHighlight :Color = Color.DARKBLUE
 
   val parentView: BorderPane by param()
+  val controller: Controller by param()
   val plan: Plan by param()
   val round: Round? by param()
 
   var MAP_SIZE=min(parentView.center.boundsInLocal.width,parentView.center.boundsInLocal.height)
 
-    var SIZE = 1.0
+    var SIZE = 1.5
 
   private fun transform(x: Number, y: Number): Pair<Double, Double> {
     val transformedX = (y.toDouble() / (plan.height.toDouble()) * MAP_SIZE)
@@ -55,11 +58,17 @@ class PlanFragment : Fragment(){
   val shapeGroup = group {
     plan.nodes.forEach {
       val (nodeX, nodeY) = transform(it.element.x, it.element.y)
-      circle {
-        centerX = nodeX
-        centerY = nodeY
-        radius = SIZE
-        fill = Color.WHITE
+      stackpane {
+        layoutX = nodeX - SIZE
+        layoutY = nodeY - SIZE
+        circle {
+          radius = SIZE
+          fill = Color.WHITE
+        }
+        setOnMouseClicked { mouseEvent ->
+          if (mouseEvent.button == MouseButton.SECONDARY)
+            controller.addDelivery(it.element)
+        }
       }
       plan.outEdges[it.index].forEach {
         val (endNodeX,endNodeY: Double) = transform(it.to.element.x, it.to.element.y)
@@ -111,7 +120,7 @@ class PlanFragment : Fragment(){
       circle {
         centerX = warehouseXPos
         centerY = warehouseYPos
-        radius = SIZE * 7
+        radius = SIZE * 5
         fill = colorWarehouse
         id = notNullRound.warehouse.address.id.toString()
         onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTCORAL)) }
@@ -121,12 +130,12 @@ class PlanFragment : Fragment(){
         val (nodeX, nodeY) = transform(it.address.x, it.address.y)
           stackpane {
               id = it.address.id.toString()
-              layoutX=nodeX-SIZE*7
-              layoutY=nodeY-SIZE*7
+              layoutX=nodeX-SIZE*5
+              layoutY=nodeY-SIZE*5
               onHover { fire(HighlightLocationInListEvent(id,Color.LIGHTGREEN)) }
               setOnMouseExited { fire(HighlightLocationInListEvent(id,Color.WHITE)) }
               circle {
-                  radius = SIZE * 7
+                  radius = SIZE * 5
                   fill = colorDelivery
               }
 
@@ -179,42 +188,50 @@ class PlanFragment : Fragment(){
           var y: Double = 0.toDouble()
       }
       val dragDelta = Delta()
-      onDragDetected=EventHandler {
+      onDragDetected=EventHandler { mouseEvent ->
+        if (mouseEvent.button == MouseButton.PRIMARY) {
           Logger.debug("onDragDetected")
           startFullDrag()
+        }
       }
       onMousePressed = EventHandler { mouseEvent ->
+        if (mouseEvent.button == MouseButton.PRIMARY) {
           // record a delta distance for the drag and drop operation.
           cursor = Cursor.MOVE
           //println(""+shapeGroup.translateX +" "+mouseEvent.sceneX+" "+ dragDelta.x)
           //println(""+parentView.center.boundsInLocal.width+" "+layoutX+" "+mouseEvent.sceneX)
           dragDelta.x = (shapeGroup.translateX - mouseEvent.sceneX)
           dragDelta.y = (shapeGroup.translateY - mouseEvent.sceneY)
+        }
       }
       onMouseReleased = EventHandler {
           cursor = Cursor.HAND
       }
       onMouseDragOver=EventHandler { mouseEvent ->
+        if (mouseEvent.button == MouseButton.PRIMARY) {
           //println(""+ mouseEvent.sceneX +" "+ dragDelta.x+" "+shapeGroup.scaleX+" "+(parentView.center.boundsInLocal.width/2)*(1-shapeGroup.scaleX)+" "+parentView.center.boundsInLocal.width)
           //println(""+abs(mouseEvent.sceneX + dragDelta.x)*MAP_SIZE/pow(parentView.center.boundsInLocal.width,2.0)+" "+abs(shapeGroup.scaleX))
-          if(abs(mouseEvent.sceneX + dragDelta.x-(parentView.center.boundsInLocal.width-MAP_SIZE)/2)*parentView.center.boundsInLocal.width/ pow(MAP_SIZE,2.0)*2 <abs(shapeGroup.scaleX)||abs(mouseEvent.sceneX + dragDelta.x)<abs(shapeGroup.translateX))
+          if (abs(mouseEvent.sceneX + dragDelta.x - (parentView.center.boundsInLocal.width - MAP_SIZE) / 2) * parentView.center.boundsInLocal.width / pow(MAP_SIZE, 2.0) * 2 < abs(shapeGroup.scaleX) || abs(mouseEvent.sceneX + dragDelta.x) < abs(shapeGroup.translateX))
             shapeGroup.translateX = mouseEvent.sceneX + dragDelta.x
-          if(abs(mouseEvent.sceneY + dragDelta.y-(parentView.center.boundsInLocal.height-MAP_SIZE)/2)*parentView.center.boundsInLocal.height/ pow(MAP_SIZE,2.0)*2 <abs(shapeGroup.scaleY)||abs(mouseEvent.sceneY + dragDelta.y)<abs(shapeGroup.translateY))
+          if (abs(mouseEvent.sceneY + dragDelta.y - (parentView.center.boundsInLocal.height - MAP_SIZE) / 2) * parentView.center.boundsInLocal.height / pow(MAP_SIZE, 2.0) * 2 < abs(shapeGroup.scaleY) || abs(mouseEvent.sceneY + dragDelta.y) < abs(shapeGroup.translateY))
             shapeGroup.translateY = mouseEvent.sceneY + dragDelta.y
+        }
       }
       onMouseClicked = EventHandler { mouseEvent ->
+        if (mouseEvent.button == MouseButton.PRIMARY) {
           if (mouseEvent.clickCount == 2) {
-              val tt = TranslateTransition(Duration.millis(500.0), shapeGroup)
-              if(abs(shapeGroup.translateX +(MAP_SIZE/2) - mouseEvent.sceneX)<(MAP_SIZE/2)*abs(1-shapeGroup.scaleX)+50 )
-                  tt.toX =  shapeGroup.translateX + (MAP_SIZE/2) - mouseEvent.sceneX
-              else
-                  tt.toX = ((MAP_SIZE/2)*abs(1-shapeGroup.scaleX)+50)*((MAP_SIZE/2)-mouseEvent.sceneX)/abs((MAP_SIZE/2)-mouseEvent.sceneX) //TODO chercher comment avoir le signe
-              if(abs(shapeGroup.translateY +(MAP_SIZE/2) - mouseEvent.sceneY)<(MAP_SIZE/2)*abs(1-shapeGroup.scaleY)+50)
-                  tt.toY = shapeGroup.translateY + (MAP_SIZE/2) - mouseEvent.sceneY
-              else
-                  tt.toY = ((MAP_SIZE/2)*abs(1-shapeGroup.scaleY)+50)*((MAP_SIZE/2)-mouseEvent.sceneY)/abs((MAP_SIZE/2)-mouseEvent.sceneY)
-              tt.play()
+            val tt = TranslateTransition(Duration.millis(500.0), shapeGroup)
+            if (abs(shapeGroup.translateX + (MAP_SIZE / 2) - mouseEvent.sceneX) < (MAP_SIZE / 2) * abs(1 - shapeGroup.scaleX) + 50)
+              tt.toX = shapeGroup.translateX + (MAP_SIZE / 2) - mouseEvent.sceneX
+            else
+              tt.toX = ((MAP_SIZE / 2) * abs(1 - shapeGroup.scaleX) + 50) * ((MAP_SIZE / 2) - mouseEvent.sceneX) / abs((MAP_SIZE / 2) - mouseEvent.sceneX) //TODO chercher comment avoir le signe
+            if (abs(shapeGroup.translateY + (MAP_SIZE / 2) - mouseEvent.sceneY) < (MAP_SIZE / 2) * abs(1 - shapeGroup.scaleY) + 50)
+              tt.toY = shapeGroup.translateY + (MAP_SIZE / 2) - mouseEvent.sceneY
+            else
+              tt.toY = ((MAP_SIZE / 2) * abs(1 - shapeGroup.scaleY) + 50) * ((MAP_SIZE / 2) - mouseEvent.sceneY) / abs((MAP_SIZE / 2) - mouseEvent.sceneY)
+            tt.play()
           }
+        }
       }
       setOnKeyPressed { event ->
           Logger.debug(event.character)

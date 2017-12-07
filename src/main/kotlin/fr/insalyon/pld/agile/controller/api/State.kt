@@ -2,6 +2,7 @@ package fr.insalyon.pld.agile.controller.api
 
 import fr.insalyon.pld.agile.controller.implementation.Controller
 import fr.insalyon.pld.agile.model.Delivery
+import fr.insalyon.pld.agile.model.Intersection
 import java.io.File
 
 /**
@@ -46,6 +47,23 @@ interface State<in T> {
    * Edit the delivery in the controller's round
    */
   fun editDelivery(controller: Controller, prevDelivery: Delivery, newDelivery: Delivery)
+
+  /**
+   * Open a popup to edit a delivery
+   */
+
+  fun openEditPopUp(controller: Controller, delivery: Delivery)
+
+  /**
+   * Open a popup to add a delivery
+   */
+
+  fun openAddPopUp(controller: Controller, intersection: Intersection)
+
+  /**
+   * Save the new delivery in the controller's round
+   */
+  fun saveDelivery(controller: Controller, delivery: Delivery)
 
   /**
    * The action to perform when was called

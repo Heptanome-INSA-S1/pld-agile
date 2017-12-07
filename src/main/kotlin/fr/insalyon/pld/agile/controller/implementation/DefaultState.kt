@@ -8,8 +8,10 @@ import fr.insalyon.pld.agile.controller.api.Command
 import fr.insalyon.pld.agile.controller.api.State
 import fr.insalyon.pld.agile.controller.commands.EditDelivery
 import fr.insalyon.pld.agile.controller.commands.RemoveDelivery
+import fr.insalyon.pld.agile.controller.commands.SaveDelivery
 import fr.insalyon.pld.agile.getResource
 import fr.insalyon.pld.agile.model.Delivery
+import fr.insalyon.pld.agile.model.Intersection
 import fr.insalyon.pld.agile.model.Speed
 import fr.insalyon.pld.agile.service.algorithm.implementation.TSPAdvanced
 import fr.insalyon.pld.agile.service.algorithm.implementation.TSPSumMin
@@ -67,8 +69,20 @@ abstract class DefaultState<in T> : State<T> {
     Logger.warn("Delete delivery was called")
   }
 
+  override fun saveDelivery(controller: Controller, delivery: Delivery) {
+    Logger.warn("Save delivery was called")
+  }
+
   override fun editDelivery(controller: Controller, prevDelivery: Delivery, newDelivery: Delivery) {
     Logger.warn("Edit delivery was called")
+  }
+
+  override fun openAddPopUp(controller: Controller, intersection: Intersection) {
+    Logger.warn("Add popup was called")
+  }
+
+  override fun openEditPopUp(controller: Controller, delivery: Delivery) {
+    Logger.warn("Edit popup was called")
   }
 
   override fun undo(controller: Controller, commands: List<Command>) {
@@ -194,6 +208,14 @@ abstract class DefaultState<in T> : State<T> {
     val editDeliveryCommand = EditDelivery(roundModifier, controller, prevDelivery, newDelivery)
     controller.commands.add(editDeliveryCommand)
     controller.changeStateAndInit(controller.CALCULATED_ROUND_STATE, controller.round!!)
+  }
+
+  protected  fun defaultSaveDelivery(controller: Controller, delivery: Delivery){
+    val roundModifier = RoundModifierImp(controller.plan!!)
+    val addDeliveryCommand = SaveDelivery(roundModifier, controller, delivery)
+    controller.commands.add(addDeliveryCommand)
+    controller.changeStateAndInit(controller.CALCULATED_ROUND_STATE, controller.round!!)
+
   }
 
 }

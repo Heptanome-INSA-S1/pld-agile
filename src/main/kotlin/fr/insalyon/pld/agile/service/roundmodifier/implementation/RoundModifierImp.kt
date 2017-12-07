@@ -81,11 +81,11 @@ class RoundModifierImp(
       if (bestPath != null) {
         round.addDelivery(bestPath)
       } else {
-        throw IllegalStateException("Cannot add this delivery to the round")
+        throw IllegalStateException("Impossible d'ajouter cette livraison à la tournée")
       }
 
     } else {
-      throw IllegalArgumentException("Check the values for the given delivery.")
+      throw IllegalArgumentException("Nous n'avons pas le temps d'effectuer la livraison.")
     }
   }
 
