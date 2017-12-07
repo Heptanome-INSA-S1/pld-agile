@@ -95,18 +95,24 @@ class RoundFragment : Fragment(), Observer {
               prefWidth = 30.0
               prefHeight = 30.0
               style {
-                backgroundImage += URI.create("image/add.png")
+                backgroundImage += URI.create("image/undo.png")
                 backgroundRepeat += Pair(BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT)
                 backgroundPosition += BackgroundPosition.CENTER
+              }
+              action {
+                controller.undo()
               }
             }
             button {
               prefWidth = 30.0
               prefHeight = 30.0
               style {
-                backgroundImage += URI.create("image/undo.png")
+                backgroundImage += URI.create("image/redo.png")
                 backgroundRepeat += Pair(BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT)
                 backgroundPosition += BackgroundPosition.CENTER
+              }
+              action {
+                controller.redo()
               }
             }
           }
