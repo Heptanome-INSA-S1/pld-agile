@@ -11,6 +11,8 @@ import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.model.RoundRequest
 import fr.insalyon.pld.agile.util.Logger
 import fr.insalyon.pld.agile.view.Home
+import fr.insalyon.pld.agile.view.fragment.DeliveryEditor
+import tornadofx.*
 import java.io.File
 
 /**
@@ -94,9 +96,14 @@ class Controller(val window: Home) {
     }
   }
 
-  fun editDelivery(prevDelivery: Delivery, newDelivery: Delivery){
+  fun editingOfDelivery(delivery: Delivery){
+    changeStateAndInit(EDITING_DELIVERY_STATE, delivery)
+  }
+
+  fun editDelivery(parentView: Fragment, prevDelivery: Delivery, newDelivery: Delivery){
     try {
       currentState.editDelivery(this, prevDelivery, newDelivery)
+      parentView.close()
     } catch (e: Exception) {
       e.catchWithErrorState()
     }
@@ -132,6 +139,11 @@ class Controller(val window: Home) {
     val previousState = currentState
     currentState = ERROR_STATE
     ERROR_STATE.init(this@Controller, Pair(this, previousState))
+  }
+
+  fun closeDeliveryEditor(view: DeliveryEditor) {
+    view.close()
+    changeState(CALCULATED_ROUND_STATE)
   }
 
 }

@@ -11,7 +11,7 @@ import fr.insalyon.pld.agile.util.Logger
  */
 class EditDelivery(
     private val roundModifier: RoundModifierImp,
-    private val controller: Controller,
+    controller: Controller,
     private val prevDelivery: Delivery,
     private val newDelivery: Delivery
 ) : Command{
