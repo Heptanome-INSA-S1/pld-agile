@@ -1,6 +1,6 @@
 package fr.insalyon.pld.agile.util
 
-import fr.insalyon.pld.agile.Config.LOGGER_LEVEL
+import fr.insalyon.pld.agile.Config.Util.LOGGER_LEVEL
 
 class Logger {
 

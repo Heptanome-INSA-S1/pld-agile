@@ -101,9 +101,9 @@ class InstantAndDurationTest {
   @Test
   fun stringToInstant() {
 
-    assertEquals((10 h 45).toSeconds(), "10:45:0".toInstant().toSeconds())
-    assertEquals((10 h 45 m 27).toSeconds(), "10:45:27".toInstant().toSeconds())
-    assertEquals((0 h 42 m 54).toSeconds(), "0:42:54".toInstant().toSeconds())
+    assertEquals((10 h 45).toSeconds(), "10:45:0".toInstant()!!.toSeconds())
+    assertEquals((10 h 45 m 27).toSeconds(), "10:45:27".toInstant()!!.toSeconds())
+    assertEquals((0 h 42 m 54).toSeconds(), "0:42:54".toInstant()!!.toSeconds())
 
   }
 

@@ -1,7 +1,5 @@
 package fr.insalyon.pld.agile.model
 
-import fr.insalyon.pld.agile.util.Logger
-
 /**
  * An instant of the day : HH:MM:ss
  * If the instant if after the current day it will threaten as "FUTURE"
@@ -125,8 +123,7 @@ infix fun Instant.m(seconds: Int): Instant {
 
 fun String.toInstant(delimiter: String = ":"): Instant? {
   val splittedString = split(delimiter)
-  if (splittedString.isEmpty() ||splittedString[0] == "")
-    return null
+  if (splittedString.isEmpty() ||splittedString[0].isBlank()) return null
 
   val hourOfDay: Int = splittedString[0].toInt()
   val minutes: Int = if (splittedString.size >= 2 && splittedString[1].isNotBlank()) splittedString[1].toInt() else 0

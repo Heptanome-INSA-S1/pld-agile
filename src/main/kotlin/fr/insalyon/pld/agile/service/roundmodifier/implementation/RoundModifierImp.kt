@@ -2,14 +2,13 @@ package fr.insalyon.pld.agile.service.roundmodifier.implementation
 
 import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.POSITIVE_INFINITY
-import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.service.algorithm.implementation.Dijkstra
 import fr.insalyon.pld.agile.service.roundmodifier.api.RoundModifier
 import fr.insalyon.pld.agile.service.roundvalidator.implementation.RoundValidatorImp
-import org.omg.CORBA.DynAnyPackage.InvalidValue
-import kotlin.math.max
+import fr.insalyon.pld.agile.util.max
+import fr.insalyon.pld.agile.util.toLinkedHashSet
 
 /**
  * Implementation of the round modifier interface
@@ -39,8 +38,8 @@ class RoundModifierImp(
             prevShortestPath = dijsktraOnReversed.getShortestPath(round.intersections().elementAt(i)).reversed()
             nextShortestPath = dijsktra.getShortestPath(round.intersections().elementAt(i + 1))
 
-            prevShortestPathDuration = prevShortestPath.toDuration(Config.DEFAULT_SPEED)
-            nextShortestPathDuration = nextShortestPath.toDuration(Config.DEFAULT_SPEED)
+            prevShortestPathDuration = prevShortestPath.toDuration(Config.Business.DEFAULT_SPEED)
+            nextShortestPathDuration = nextShortestPath.toDuration(Config.Business.DEFAULT_SPEED)
 
             val roundCopy = Round(
                 round.warehouse,
@@ -89,29 +88,20 @@ class RoundModifierImp(
     }
   }
 
-  fun <E> Iterable<E>.toLinkedHashSet(): LinkedHashSet<E> {
-    val linkedHashSet = LinkedHashSet<E>()
-
-    for (e in this) {
-      linkedHashSet.add(e)
-    }
-    return linkedHashSet
-  }
-
   override fun removeDelivery(i: Int, round: Round, speed: Speed) {
 
-    var dijsktra: Dijkstra<Intersection, Junction>
-    if (i != 0) {
-      dijsktra = Dijkstra(plan, round.deliveries().elementAt(i - 1).address)
+    val dijsktra: Dijkstra<Intersection, Junction>
+    dijsktra = if (i != 0) {
+      Dijkstra(plan, round.deliveries().elementAt(i - 1).address)
     } else {
-      dijsktra = Dijkstra(plan, round.warehouse.address)
+      Dijkstra(plan, round.warehouse.address)
     }
 
     val path: Path<Intersection, Junction>
-    if (i != round.deliveries().size - 1) {
-      path = dijsktra.getShortestPath(round.deliveries().elementAt(i + 1).address)
+    path = if (i != round.deliveries().size - 1) {
+      dijsktra.getShortestPath(round.deliveries().elementAt(i + 1).address)
     } else {
-      path = dijsktra.getShortestPath(round.warehouse.address)
+      dijsktra.getShortestPath(round.warehouse.address)
     }
     val durationOfPath = path.toDuration(speed)
     round.removeDelivery(round.deliveries().elementAt(i), path, durationOfPath)
@@ -119,22 +109,29 @@ class RoundModifierImp(
 
   override fun modifyDelivery(delivery: Delivery, round: Round, i: Int) {
 
-    val latestStartTime = getLatestStartTime(round)
-    val earliestEndTime = getEarliestEndTime(round)
+    val latestStartTime = round.getLatestArrivalTime()
+    val earliestStartTime = round.getEarliestArrivalTimes()
+    val earliestEndTime = round.getEarliestDepartureTime()
 
-    if (isDeliveryValid(delivery)) {
-      if (delivery.startTime != null && delivery.startTime > latestStartTime[i+1]) {
-        throw  IllegalArgumentException("L'heure de début n'est pas valide, elle doit être inférieur à " + latestStartTime[i+1].toFormattedString())
+
+      if (delivery.startTime != null && delivery.startTime > latestStartTime[i]) {
+        throw  IllegalArgumentException("L'heure de début n'est pas valide, elle doit être inférieure à ${latestStartTime[i].toFormattedString()}")
       }
 
       if (delivery.endTime != null && delivery.endTime < earliestEndTime[i] ){
-        throw  IllegalArgumentException("L'heure de fin n'est pas valide, elle doit être supérieur à " + earliestEndTime[i].toFormattedString())
+        throw  IllegalArgumentException("L'heure de fin n'est pas valide, elle doit être supérieure à  ${earliestEndTime[i].toFormattedString()}")
       }
 
+      if(delivery.startTime!= null && delivery.endTime!= null && delivery.endTime - delivery.startTime < delivery.duration) {
+        throw IllegalArgumentException("Impossible d'effectuer ces modifications. Le créneau horaire fournit est plus court que la durée de livraison.")
+      }
+
+      val startDeliveryTime = max(earliestStartTime[i], delivery.startTime)
+      if(startDeliveryTime + delivery.duration > latestStartTime[i+1]) {
+        throw IllegalArgumentException("Impossible de repousser le début du créneau horaire. Durée maximum = ${round.getLastestDepartureTime()[i] - startDeliveryTime}")
+      }
       round.modify(i, delivery.startTime, delivery.endTime, delivery.duration)
-    } else {
-      throw IllegalArgumentException("Nous n'avons pas le temps d'effectuer la livraison.")
-    }
+
   }
 
   /*
@@ -150,7 +147,7 @@ class RoundModifierImp(
 
     round.deliveries().forEachIndexed { i, delivery ->
       pathDuration = round.durationPathInSeconds()[i+1]
-      nextStartTime =if (i < waitingTime.size - 1)  nextStartTime + delivery.duration + pathDuration + waitingTime[i+1]  else Config.DEFAULT_END_DELIVERING
+      nextStartTime =if (i < waitingTime.size - 1)  nextStartTime + delivery.duration + pathDuration + waitingTime[i+1]  else Config.Business.DEFAULT_END_DELIVERING
       result += nextStartTime - pathDuration - delivery.duration
     }
     return result
@@ -175,48 +172,7 @@ class RoundModifierImp(
 
     return result
   }
-/*
-    /**
-     * @param from : the delivery from the one you want to compute the time
-     * @param to : the next delivery after from
-     * @param round : the round you have to consider
-     *
-     * @return  the travelling time between the two given deliveries
-     */
-    private fun computeTravellingTime(from: Delivery, to: Delivery, round: Round): Int {
-        var res = 0
-        val index = round.deliveries().indexOf(to)
-        return round.durationPathInSeconds().elementAt(index).toSeconds()
-    }
-*/
 
-/*
-  /**
-   * @param from : the warehouse from which you want to compute the time
-   * @param to : the next delivery after from
-   * @param round : the round you have to consider
-   *
-   * @return  the travelling time between the two given deliveries
-   */
-  private fun computeTravellingTime(from: Warehouse, to: Delivery, round: Round): Int {
-    var res = 0
-    return round.durationPathInSeconds().first().toSeconds()
-  }
-*/
-
-  /*
-  /**
-   * @param from : the delivery from the one you want to compute the time
-   * @param to : the warehouse you have to reach after from
-   * @param round : the round you have to consider
-   *
-   * @return  the travelling time between the two given deliveries
-   */
-  private fun computeTravellingTime(from: Delivery, to: Warehouse, round: Round): Int {
-    var res = 0
-    return round.durationPathInSeconds().last().toSeconds()
-  }
-*/
   private fun isDeliveryValid(delivery: Delivery): Boolean {
     if (delivery.startTime != null && delivery.endTime != null)
       if (delivery.startTime!! + delivery.duration > delivery.endTime) return false

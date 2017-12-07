@@ -1,19 +1,19 @@
 package fr.insalyon.pld.agile.service.algorithm.implementation
 
-import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.getResource
 import fr.insalyon.pld.agile.lib.graph.model.Graph
 import fr.insalyon.pld.agile.lib.graph.model.Path
 import fr.insalyon.pld.agile.model.*
-import fr.insalyon.pld.agile.service.algorithm.api.TSP
-import fr.insalyon.pld.agile.service.roundcomputing.implementation.RoundComputerImpl
-import fr.insalyon.pld.agile.util.xml.XmlDocument
-import fr.insalyon.pld.agile.util.xml.serialization.implementation.*
+import fr.insalyon.pld.agile.util.toPlan
+import fr.insalyon.pld.agile.util.toRoundRequest
 import org.junit.Ignore
 import org.junit.Test
 
 @Ignore
 class TspBenchmarkTest {
+
+  val plan = getResource("xml/planLyonGrand.xml").toPlan()
+  val roundRequest = getResource("xml/DLgrand20.xml").toRoundRequest(plan)
 
   fun getSubPlan(roundRequest: RoundRequest, plan: Plan): Graph<Intersection, Path<Intersection, Junction>> {
     val nodes = mutableSetOf<Intersection>()
@@ -33,19 +33,8 @@ class TspBenchmarkTest {
 
 
   @Test
-  fun benchmark() {
+  fun benchmarkTsp() {
 
-    val xmlPlan = XmlDocument.open(getResource("xml/planLyonGrand.xml"))
-    val intersectionSerializer = IntersectionSerializer(xmlPlan)
-    val junctionSerializer = JunctionSerializer(xmlPlan)
-    val planSerializer = PlanSerializer(xmlPlan, intersectionSerializer, junctionSerializer)
-    val plan = planSerializer.unserialize(xmlPlan.documentElement)
-
-    val xmlRoundRequest = XmlDocument.open(getResource("xml/DLgrand20.xml"))
-    val warehouseSerializer = WarehouseSerializer(xmlRoundRequest, plan)
-    val deliverySerializer = DeliverySerializer(xmlRoundRequest, plan)
-    val roundRequestSerializer = RoundRequestSerializer(xmlRoundRequest, deliverySerializer, warehouseSerializer)
-    val roundRequest = roundRequestSerializer.unserialize(xmlRoundRequest.documentElement)
 
     val tsps = listOf(TSPAdvanced(roundRequest)/*, TSPSumMin(roundRequest), TSPKruskal(roundRequest)*/)
 
@@ -72,6 +61,12 @@ class TspBenchmarkTest {
       }
       println()
     }
+
+  }
+
+  @Test
+  fun testCompute() {
+      val roundRequest = getResource("xml/DLmoyen10TW3.xml").toRoundRequest(plan)
 
   }
 

@@ -72,6 +72,7 @@ class PlanFragment : Fragment(){
       }
       plan.outEdges[it.index].forEach {
         val (endNodeX,endNodeY: Double) = transform(it.to.element.x, it.to.element.y)
+
         line {
           startX = nodeX
           startY = nodeY
