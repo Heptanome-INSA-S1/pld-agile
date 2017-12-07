@@ -48,39 +48,6 @@ class TspBenchmarkTest {
     val roundRequest = roundRequestSerializer.unserialize(xmlRoundRequest.documentElement)
 
     val tsps = listOf(TSPAdvanced(roundRequest)/*, TSPSumMin(roundRequest), TSPKruskal(roundRequest)*/)
-    val tspAurore = TSP3()
-
-    val subPlan = getSubPlan(roundRequest, plan)
-
-    val timeSlot = Array(roundRequest.deliveries.size + 1, { _ -> intArrayOf(-1, -1)})
-    for(i in roundRequest.deliveries.indices) {
-      val start = roundRequest.deliveries.elementAt(i).startTime?.toSeconds() ?: -1
-      val end = roundRequest.deliveries.elementAt(i).endTime?.toSeconds() ?: -1
-      timeSlot[i+1] = intArrayOf(start, end)
-    }
-
-    for(i in 15..15) {
-
-      val roundRequestTest = RoundRequest(
-          roundRequest.warehouse,
-          roundRequest.deliveries.filterIndexed { index, _ -> index <= i }.toSet()
-      )
-
-      val subPlan = getSubPlan(roundRequestTest, plan)
-
-      val ms = fr.insalyon.pld.agile.benchmark {
-        tspAurore.chercheSolution(
-            10.minutes.toMillis().toInt(),
-            roundRequestTest.intersections.size,
-            subPlan.adjacencyMatrix.map { row -> row.map { it -> ((it.toDouble() / 15.km_h.to(Speed.DistanceUnit.M, Speed.DurationUnit.S).value)).toInt() }.toIntArray() }.toTypedArray(),
-            roundRequestTest.durations.map { it.toSeconds() }.toIntArray(),
-            timeSlot,
-            roundRequestTest.warehouse.departureHour.toSeconds()
-        )
-      }
-      print("Round size : ${i.toString().fillLeft("  ")} : ")
-      println(ms.first.toString().fillLeft("              ") + "|")
-    }
 
     for (i in 10..17) {
       print("Round size : ${i.toString().fillLeft("  ")} : ")

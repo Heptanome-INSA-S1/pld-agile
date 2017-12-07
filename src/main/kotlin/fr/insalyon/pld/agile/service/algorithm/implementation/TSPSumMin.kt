@@ -9,6 +9,9 @@ import fr.insalyon.pld.agile.util.Logger
 import java.util.*
 import kotlin.math.min
 
+/**
+ * TSP heuristic that add the `k` minimal edges where `k` is the minimum edges to link all the nonVus nodes
+ */
 class TSPSumMin(
     roundRequest: RoundRequest
 ) : TemplateTSPWithTimeSlot(

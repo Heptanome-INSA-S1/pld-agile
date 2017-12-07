@@ -49,9 +49,21 @@ data class Path<out N, out E : Measurable>(
     return stringBuilder.toString()
   }
 
+  /**
+   * Transforms the current path (expected in meters) to a Duration
+   */
   fun toDuration(speed: Speed): Duration {
     return (length.toDouble() / speed.to(Speed.DistanceUnit.M, Speed.DurationUnit.S).value).toLong().seconds
   }
 
+  /**
+   * Returns a copy of the reversed copy of the path
+   */
+  fun reversed(): Path<N, E> {
+    return Path(
+            nodes.reversed(),
+            edges.reversed()
+    )
+  }
 
 }

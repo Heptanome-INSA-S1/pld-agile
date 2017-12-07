@@ -5,7 +5,6 @@ import fr.insalyon.pld.agile.model.Delivery
 import fr.insalyon.pld.agile.util.txt.RoadSheetSerializer
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
-import fr.insalyon.pld.agile.view.model.DeliveryModel
 import javafx.scene.control.Button
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
@@ -18,7 +17,6 @@ class RoundFragment : Fragment(), Observer {
 
   val controller: Controller by param()
   val parentView: BorderPane by param()
-  val model: DeliveryModel by inject()
   val round = controller.round
   val roadSheetSerializer: RoadSheetSerializer = RoadSheetSerializer()
 
@@ -97,18 +95,24 @@ class RoundFragment : Fragment(), Observer {
               prefWidth = 30.0
               prefHeight = 30.0
               style {
-                backgroundImage += URI.create("image/add.png")
+                backgroundImage += URI.create("image/undo.png")
                 backgroundRepeat += Pair(BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT)
                 backgroundPosition += BackgroundPosition.CENTER
+              }
+              action {
+                controller.undo()
               }
             }
             button {
               prefWidth = 30.0
               prefHeight = 30.0
               style {
-                backgroundImage += URI.create("image/undo.png")
+                backgroundImage += URI.create("image/redo.png")
                 backgroundRepeat += Pair(BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT)
                 backgroundPosition += BackgroundPosition.CENTER
+              }
+              action {
+                controller.redo()
               }
             }
           }
@@ -125,7 +129,7 @@ class RoundFragment : Fragment(), Observer {
                   backgroundPosition += BackgroundPosition.CENTER
                 }
                 action {
-                  openEditor(delivery)
+                  controller.editingOfDelivery(delivery)
                 }
               }
               button {
@@ -199,6 +203,12 @@ class RoundFragment : Fragment(), Observer {
     if (d.startTime != null && d.endTime != null) {
       res += " : " + d.startTime.toFormattedString() + "-" + d.endTime.toFormattedString()
     }
+    else if (d.startTime != null) {
+      res += " A partir de : " + d.startTime.toFormattedString()
+    }
+    else if (d.endTime != null) {
+      res += " Jusqu'à : " + d.endTime.toFormattedString()
+    }
     return res
   }
 
@@ -231,10 +241,4 @@ class RoundFragment : Fragment(), Observer {
               }
         }
   }
-
-  private fun openEditor(delivery: Delivery?){
-    openInternalWindow(DeliveryEditor::class, params = mapOf(
-        DeliveryEditor::delivery to delivery))
-  }
-
 }

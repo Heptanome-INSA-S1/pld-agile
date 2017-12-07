@@ -28,3 +28,30 @@ class Plan(
   }
 
 }
+
+fun String.toPlan(): Plan {
+
+    var lines = trim().split("\n")
+    val regex = "([0-9]+) ?-> ?([0-9]+) ?: ?([0-9]+)".toRegex()
+
+    val speed = (lines[0].toSpeed().to(Speed.DistanceUnit.M, Speed.DurationUnit.M).value).toInt()
+    lines = lines.map { it.replace(" ", "") }
+    val points = lines[1].split(";").map { Intersection(it.toLong()) }.toSet()
+
+    var edges = mutableSetOf<Triple<Intersection, Junction, Intersection>>()
+    for(line in lines.filterIndexed{ i, _ -> i > 1}) {
+
+        val regexResult = regex.matchEntire(line)!!.groupValues
+        val from = points.first { it.id == regexResult[1].toLong() }
+        val to = points.first { it.id == regexResult[2].toLong() }
+        val length = regexResult[3].toInt()
+
+        edges.add(Triple(from, Junction(length * speed, ""), to))
+    }
+
+    return Plan(
+            points,
+            edges
+    )
+
+}

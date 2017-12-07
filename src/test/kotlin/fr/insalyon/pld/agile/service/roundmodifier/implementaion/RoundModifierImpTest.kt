@@ -1,5 +1,6 @@
 package fr.insalyon.pld.agile.service.roundmodifier.implementaion
 
+import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1
 import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1WithTimeSlot
@@ -187,9 +188,9 @@ class RoundModifierImpTest {
         val round = roundComputer.round
 
         val roundModifier = RoundModifierImp(plan)
-        var listLatestEndTime = roundModifier.getLastestEndTime(round)
+        //var listLatestEndTime = roundModifier.getLastestEndTime(round)
 
-        Logger.debug(listLatestEndTime)
+        //Logger.debug(listLatestEndTime)
     }
 
     //Values for testing the modification of a delivery
@@ -328,4 +329,125 @@ class RoundModifierImpTest {
         Assert.assertEquals(600.seconds, round.deliveries().elementAt(0).duration)
         roundModifier.modifyDelivery(Delivery(address = node3, startTime = 8 h 15, duration = 600.seconds, endTime = 9 h 36),round, 0)
     }
+
+    // values to test add delivery
+    val planAddDelivery by lazy {
+
+        val roadOfLength15 = Junction( (900 * Config.DEFAULT_SPEED.toMeterPerSeconds().value).toInt(), "")
+        val roadOfLength20 = Junction( (1200 * Config.DEFAULT_SPEED.toMeterPerSeconds().value).toInt(), "")
+        val roadOfLength10 = Junction( (600 * Config.DEFAULT_SPEED.toMeterPerSeconds().value).toInt(), "")
+        val roadOfLength8 = Junction( (480 * Config.DEFAULT_SPEED.toMeterPerSeconds().value).toInt(), "")
+
+        Plan(
+                setOf<Intersection>(node1, source, node3, node4, node5, node6, node7),
+                setOf(
+                        //Triple(srcNode, road, destNode)
+                        Triple(source, roadOfLength15, node1),
+                        Triple(node1, roadOfLength15, node3),
+                        Triple(node3, roadOfLength20, node4),
+                        Triple(node4, roadOfLength10, source),
+                        Triple(node1, roadOfLength8, node7),
+                        Triple(node7, roadOfLength8, node1),
+                        Triple(node7, roadOfLength8, node3),
+                        Triple(node3, roadOfLength8, node7),
+                        Triple(node4, roadOfLength8, node7),
+                        Triple(node7, roadOfLength8, node4),
+                        Triple(node7, roadOfLength8, source),
+                        Triple(source, roadOfLength8, node7)
+                )
+        )
+    }
+
+    val roundRequestAddDelivery = RoundRequest(
+            Warehouse(address = source, departureHour = 8 h 0 m 0),
+            setOf(
+                    Delivery(node1, duration = 600.seconds, startTime = 8 h 10 m 0),
+                    Delivery(node3, duration = 600.seconds, startTime = 8 h 45 m 0, endTime = 10 h 0),
+                    Delivery(node4, duration = 600.seconds, startTime = 9 h 0 m 0, endTime = 11 h 0)
+            )
+    )
+
+    @Test
+    fun roundAddDeliveryInFirstPlace() {
+        val roundComputer: RoundComputer = RoundComputerImpl(planAddDelivery, roundRequestAddDelivery, tsp = TSP1(), speed = Config.DEFAULT_SPEED)
+        val round = roundComputer.round
+
+        val roundModifier = RoundModifierImp(planAddDelivery)
+
+        Assert.assertEquals(600.seconds, round.deliveries().elementAt(0).duration)
+        roundModifier.addDelivery(Delivery(address = node7, duration = 600.seconds),round)
+        Assert.assertEquals(7,round.deliveries().elementAt(0).address.id)
+
+    }
+
+    @Test
+    fun roundAddDeliveryInSecondPlace() {
+
+        val plan = """
+            ${Config.DEFAULT_SPEED}
+            1;2;3;4;5;6;7
+            2 -> 1 : 15
+            2 -> 7 : 8
+            7 -> 1 : 8
+            1 -> 7 : 4
+            7 -> 3 : 4
+            3 -> 7 : 8
+            7 -> 4 : 8
+            1 -> 3 : 15
+            3 -> 4 : 20
+            4 -> 2 : 10
+            """.toPlan()
+
+        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequestAddDelivery, tsp = TSP1(), speed = Config.DEFAULT_SPEED)
+        val round = roundComputer.round
+
+        val roundModifier = RoundModifierImp(plan)
+
+        Logger.debug(round.toTrace())
+
+        Assert.assertEquals(600.seconds, round.deliveries().elementAt(0).duration)
+        roundModifier.addDelivery(Delivery(address = node7, duration = 600.seconds),round)
+
+        Logger.debug(round.toTrace())
+
+        Assert.assertEquals(7,round.deliveries().elementAt(1).address.id)
+
+    }
+
+    @Test
+    fun roundAddDeliveryWithEndTimeConstraint() {
+
+        val plan = """
+            ${Config.DEFAULT_SPEED}
+            1;2;3;4;5;6;7
+            2 -> 1 : 15
+            2 -> 7 : 8
+            7 -> 1 : 8
+            1 -> 7 : 4
+            7 -> 3 : 4
+            3 -> 7 : 8
+            7 -> 4 : 8
+            1 -> 3 : 15
+            3 -> 4 : 20
+            4 -> 2 : 10
+            """.toPlan()
+
+        val roundComputer: RoundComputer = RoundComputerImpl(plan, roundRequestAddDelivery, tsp = TSP1(), speed = Config.DEFAULT_SPEED)
+        val round = roundComputer.round
+
+        val roundModifier = RoundModifierImp(plan)
+
+        Logger.debug(round.toTrace())
+
+        Assert.assertEquals(600.seconds, round.deliveries().elementAt(0).duration)
+        roundModifier.addDelivery(Delivery(address = node7, endTime = 8 h 30, duration = 600.seconds),round)
+
+        Logger.debug(round.toTrace())
+
+        Assert.assertEquals(7,round.deliveries().elementAt(0).address.id)
+
+
+
+    }
+
 }

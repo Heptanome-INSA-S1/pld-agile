@@ -4,6 +4,9 @@ import fr.insalyon.pld.agile.model.RoundRequest
 import fr.insalyon.pld.agile.util.Logger
 import java.io.File
 
+/**
+ * The application state when a round request was loaded
+ */
 class LoadedDeliveriesState : DefaultState<RoundRequest>() {
 
   override fun init(controller: Controller, element: RoundRequest) {

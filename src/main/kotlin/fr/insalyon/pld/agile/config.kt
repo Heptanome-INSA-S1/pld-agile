@@ -1,5 +1,7 @@
 package fr.insalyon.pld.agile
 
+import fr.insalyon.pld.agile.model.Instant
+import fr.insalyon.pld.agile.model.h
 import fr.insalyon.pld.agile.model.km_h
 import fr.insalyon.pld.agile.util.Logger
 import javafx.scene.paint.Color
@@ -22,6 +24,8 @@ object Config {
   //val outputStream = FileOutputStream(getResource("/config/config.properties"))
 
   val DEFAULT_SPEED = 15.km_h
+
+  val DEFAULT_END_DELIVERING = Instant(18)
 
   val RESOURCE_FOLDER = System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/"
   val TEST_RESOURCE_FOLDER = System.getProperty("user.dir").replace("\\", "/") + "/src/test/resources/"

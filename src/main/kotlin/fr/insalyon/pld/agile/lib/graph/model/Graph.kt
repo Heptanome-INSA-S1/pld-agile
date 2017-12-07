@@ -17,6 +17,7 @@ open class Graph<N, out E : Measurable>(
   /**
    * The wrapped nodes in the graph
    */
+
   val nodes = List(elements.size, { i -> Node(i, elements.elementAt(i)) })
 
   /**
@@ -71,14 +72,27 @@ open class Graph<N, out E : Measurable>(
 
   }
 
+  /**
+   * Return the output adjacency list for the node `node`
+   */
   fun outEdgesOf(node: N): List<Edge<N, E>> = outEdges[nodes.first { it.element == node }.index]
 
+  /**
+   * Returns the input adjacency list of the node `node`
+   */
   fun inEdgesOf(node: N): List<Edge<N, E>> = inEdges[nodes.first { it.element == node }.index]
 
+  /**
+   * Returns an edge between the node `from` and `to` (this can be null). If they are different edges between the two nodes,
+   * this function will return the first one.
+   */
   fun edgeBetween(from: N, to: N): Edge<N, E>? = outEdges[nodes.first { it.element == from }.index].find { it.to.element == to }
 
   override fun toString(): String = "Graph(nodes=$nodes, internalOutEdges=$internalOutEdges)"
 
+  /**
+   * Create a copy of the graph with applying the coefficient to the length of all the edges.
+   */
   fun rescale(coef: Number): Graph<N, Measurable> {
     return Graph(
         elements,
@@ -89,6 +103,17 @@ open class Graph<N, out E : Measurable>(
           }
           Triple(it.first, path, it.third) }.toSet(),
         worstLength
+    )
+  }
+
+  /**
+   * Return a copy of the graph where all the edges are reversed. Ex: {A,B,C}, {A->B, B->C} will return {A,B,C} {B->A, C->B}
+   */
+  fun reverse(): Graph<N, E> {
+    return Graph(
+            elements,
+            edges.map { Triple(it.third, it.second, it.first) }.toSet(),
+            worstLength
     )
   }
 

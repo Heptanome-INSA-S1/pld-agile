@@ -7,6 +7,9 @@ import fr.insalyon.pld.agile.model.hours
 import java.util.ArrayList
 import kotlin.math.max
 
+/**
+ * Advanced TSP heuristic based on this paper : http://cs.indstate.edu/cpothineni/alg.pdf
+ */
 class TSPAdvanced(
     roundRequest: RoundRequest
 ) : TemplateTSPWithTimeSlot(roundRequest) {

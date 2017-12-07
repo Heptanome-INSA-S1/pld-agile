@@ -17,10 +17,20 @@ class Duration private constructor(
   operator fun plus(other: Duration): Duration = Duration(_seconds + other.toSeconds())
 
   operator fun minus(other: Duration): Duration {
-    if(other._seconds > this._seconds) {
-      throw IllegalStateException("Cannot compute negative duration")
-    }
     return Duration(_seconds - other._seconds)
+  }
+
+  val hours: Int
+  get() {
+    return _seconds / 3600 % 24
+  }
+  val minutes: Int
+  get() {
+    return _seconds / 60 % 60
+  }
+  val secondes: Int
+  get() {
+    return _seconds % 60
   }
 
   fun toSeconds() = _seconds
@@ -41,8 +51,16 @@ class Duration private constructor(
   override fun hashCode(): Int = _seconds.hashCode()
 
   override fun toString():String{
-    var secondes = _seconds
-    if(secondes==0)
+    var res = ""
+    if (hours != 0)
+      res += hours.toString() + "h"
+
+    if (minutes != 0)
+      res += minutes.toString() + "m"
+
+    res += secondes.toString() + "s"
+    /*var secondes = _seconds
+    if(secondes==0L)
       return "0s"
     val hours : Int = secondes / 3600
     secondes = secondes - hours * 3600
@@ -53,8 +71,8 @@ class Duration private constructor(
       res += ""+ hours + "h"
     if(minutes != 0)
       res += ""+ minutes + "m"
-    if(secondes != 0)
-      res += ""+ secondes + "s"
+    if(secondes != 0L)
+      res += ""+ secondes + "s"*/
     return res
   }
 

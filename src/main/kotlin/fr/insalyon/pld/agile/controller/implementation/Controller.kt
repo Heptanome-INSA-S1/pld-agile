@@ -5,42 +5,46 @@ import fr.insalyon.pld.agile.controller.CommandList
 import fr.insalyon.pld.agile.controller.api.Command
 import fr.insalyon.pld.agile.controller.api.State
 import fr.insalyon.pld.agile.controller.commands.DebugCommand
-import fr.insalyon.pld.agile.model.Delivery
-import fr.insalyon.pld.agile.model.Plan
-import fr.insalyon.pld.agile.model.Round
-import fr.insalyon.pld.agile.model.RoundRequest
+import fr.insalyon.pld.agile.model.*
 import fr.insalyon.pld.agile.util.Logger
 import fr.insalyon.pld.agile.view.Home
+import fr.insalyon.pld.agile.view.fragment.DeliveryAdd
+import fr.insalyon.pld.agile.view.fragment.DeliveryEditor
+import tornadofx.*
 import java.io.File
 
+/**
+ * The controller of the application
+ */
 class Controller(val window: Home) {
 
-  internal var plan: Plan? = null
+  var plan: Plan? = null
   set(value) {
     roundRequest = null
     round = null
     field = value
   }
-  internal var roundRequest: RoundRequest? = null
+  var roundRequest: RoundRequest? = null
   set(value) {
     round = null
     field = value
   }
-  internal var round: Round? = null
-  internal val commands = CommandList()
+  var round: Round? = null
+  internal set
+  val commands = CommandList()
 
   val INIT_STATE: State<Any> = InitState()
   val LOADED_PLAN_STATE: State<Plan> = LoadedPlanState()
   val LOADED_DELIVERIES_STATE: State<RoundRequest> = LoadedDeliveriesState()
   val CALCULATED_ROUND_STATE: State<Round> = CalculatedRoundState()
   val ERROR_STATE: State<Pair<Exception, State<Nothing>>> = ErrorState()
+  val EDITING_DELIVERY_STATE: State<Delivery> = EditingDeliveryState()
+  val CREATE_DELIVERY_STATE: State<Intersection> = CreateDeliveryState()
 
   private var currentState: State<Nothing> = INIT_STATE
 
   init {
-    if(Config.LOGGER_LEVEL == Logger.Level.DEBUG) {
-      commands.add(DebugCommand())
-    }
+    commands.add(DebugCommand())
   }
 
   fun loadPlan(file: File){
@@ -92,6 +96,40 @@ class Controller(val window: Home) {
     }
   }
 
+  fun editingOfDelivery(delivery: Delivery){
+    try {
+      currentState.openEditPopUp(this, delivery)
+    } catch (e: Exception) {
+      e.catchWithErrorState()
+    }
+  }
+
+  fun editDelivery(parentView: Fragment, prevDelivery: Delivery, newDelivery: Delivery){
+    try {
+      currentState.editDelivery(this, prevDelivery, newDelivery)
+      parentView.close()
+    } catch (e: Exception) {
+      e.catchWithErrorState()
+    }
+  }
+
+  fun addDelivery(intersection: Intersection){
+    try {
+      currentState.openAddPopUp(this, intersection)
+    } catch (e: Exception) {
+      e.catchWithErrorState()
+    }
+  }
+
+  fun saveNewDelivery(parentView: Fragment, delivery : Delivery){
+    try {
+      currentState.saveDelivery(this, delivery)
+      parentView.close()
+    } catch (e: Exception) {
+      e.catchWithErrorState()
+    }
+  }
+
   fun ok() {
     currentState.ok(this)
   }
@@ -102,12 +140,6 @@ class Controller(val window: Home) {
 
   fun redo() {
     commands.redo()
-  }
-
-  private fun Exception.catchWithErrorState() {
-    val previousState = currentState
-    currentState = ERROR_STATE
-    ERROR_STATE.init(this@Controller, Pair(this, previousState))
   }
 
   fun manageException(e: Exception) {
@@ -121,6 +153,23 @@ class Controller(val window: Home) {
 
   fun <T> changeState(nextState: State<T>) {
     currentState = nextState
+  }
+
+  // Extension functions
+  private fun Exception.catchWithErrorState() {
+    val previousState = currentState
+    currentState = ERROR_STATE
+    ERROR_STATE.init(this@Controller, Pair(this, previousState))
+  }
+
+  fun closeDeliveryEditor(view: DeliveryEditor) {
+    view.close()
+    changeState(CALCULATED_ROUND_STATE)
+  }
+
+  fun closeDeliveryAdd(view: DeliveryAdd) {
+    view.close()
+    changeState(CALCULATED_ROUND_STATE)
   }
 
 }
