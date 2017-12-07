@@ -107,7 +107,7 @@ class RoadSheetSerializer(){
                 waitingTime = round.deliveries().elementAt(i).startTime!! - currentTime
                 currentTime = round.deliveries().elementAt(i).startTime!!
             }
-            var infoLivraison : String = "Livraison au point("+round.deliveries().elementAt(i).address.x!!+","+round.deliveries().elementAt(i).address.y+") durant ${round.deliveries().elementAt(i).duration}<br><br>"
+            var infoLivraison : String = "Livraison au point("+round.deliveries().elementAt(i).address.x!!+","+round.deliveries().elementAt(i).address.y+") durant ${round.deliveries().elementAt(i).duration}  -- Temps d'attente : ${waitingTime}<br><br>"
             var j=i+1
            while(j<round.distancePathInMeters().size && round.deliveries().elementAt(i).address != round.distancePathInMeters().elementAt(j-1).nodes[0]) {
                 var distance = 0.0
