@@ -1,10 +1,9 @@
 package fr.insalyon.pld.agile.service.algorithm.implementation
 
 import fr.insalyon.pld.agile.POSITIVE_INFINITY
-import fr.insalyon.pld.agile.model.Instant
 import fr.insalyon.pld.agile.model.RoundRequest
 import fr.insalyon.pld.agile.model.hours
-import java.util.ArrayList
+import java.util.*
 import kotlin.math.max
 
 /**
@@ -20,12 +19,6 @@ class TSPAdvanced(
       if(arrivalTime + duree[nonVu] > endTimes[nonVu]) return Int.POSITIVE_INFINITY
     }
     return bound(sommetCourant, nonVus, cout, duree, bestCost)
-  }
-
-  override fun iterator(sommetCrt: Int, nonVus: ArrayList<Int>, cout: Array<IntArray>, duree: IntArray, currentTime: Int, startTimes: IntArray, endTimes: IntArray): Iterator<Int> {
-    return IteratorSeq(nonVus.sortedBy {
-      max(currentTime + cout[sommetCrt][it], startTimes[it])
-    }, sommetCrt)
   }
 
   private fun bound(sommetCrt: Int, nonVus: ArrayList<Int>, cout: Array<IntArray>, duree: IntArray, bestCost: Int): Int {

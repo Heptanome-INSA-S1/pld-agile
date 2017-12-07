@@ -1,7 +1,10 @@
 package fr.insalyon.pld.agile.view.fragment
 
 import fr.insalyon.pld.agile.Config
-import fr.insalyon.pld.agile.model.*
+import fr.insalyon.pld.agile.model.Junction
+import fr.insalyon.pld.agile.model.Round
+import fr.insalyon.pld.agile.model.seconds
+import fr.insalyon.pld.agile.util.Logger
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import javafx.scene.control.Label
 import javafx.scene.layout.BorderPane
@@ -39,7 +42,7 @@ class TimelineFragment: Fragment() {
         startY = middle
         endX = actualX
         endY = middle
-        stroke = Config.Colors.colorLine
+        stroke = Config.Util.Colors.colorLine
       }
     }
     actualX = 15.0
@@ -48,7 +51,7 @@ class TimelineFragment: Fragment() {
       val deplacement = transform(it1.edges)
       actualX += deplacement
       time += round.durationPathInSeconds()[index].length.seconds + if (index < waitingTimeList.size) waitingTimeList[index] else 0.seconds
-      println(time)
+      Logger.debug(time)
       val idDelivery = it1.nodes.last().id.toString()
       stackpane {
         id = idDelivery
@@ -56,11 +59,11 @@ class TimelineFragment: Fragment() {
         layoutY = middle - circleRadius
         circle {
           radius = circleRadius
-          fill = if (index == round.deliveries().size) Config.Colors.colorWarehouse else Config.Colors.colorDelivery
+          fill = if (index == round.deliveries().size) Config.Util.Colors.colorWarehouse else Config.Util.Colors.colorDelivery
         }
         label("${index + 2}") {
           style {
-            textFill = Config.Colors.colorLabel
+            textFill = Config.Util.Colors.colorLabel
           }
         }
       }
@@ -92,12 +95,12 @@ class TimelineFragment: Fragment() {
       layoutY = middle - circleRadius
       circle {
         radius = circleRadius
-        fill = Config.Colors.colorWarehouse
+        fill = Config.Util.Colors.colorWarehouse
         tooltip { "Test " + actualX }
       }
       label("1") {
         style {
-          textFill = Config.Colors.colorLabel
+          textFill = Config.Util.Colors.colorLabel
         }
       }
     }
@@ -149,7 +152,7 @@ class TimelineFragment: Fragment() {
       shapeGroup.children
           .filter { it.id != null && it is Line && it.id == idHighlight }
           .forEach {
-            (it as Line).stroke = Config.Colors.colorLine
+            (it as Line).stroke = Config.Util.Colors.colorLine
             it.strokeWidth = 1.0
           }
       shapeGroup.children
@@ -175,25 +178,25 @@ class TimelineFragment: Fragment() {
             if (it is StackPane) {
               val circle = it.getChildList()!!.first() as Circle
               circle.style {
-                fill = Config.Colors.colorCircleHighlight
+                fill = Config.Util.Colors.colorCircleHighlight
               }
             } else if (it is Label) {
               it.style {
                 fontSize = 10.px
-                textFill = Config.Colors.colorLabelHoursHighlight
+                textFill = Config.Util.Colors.colorLabelHoursHighlight
               }
             }
           }
       shapeGroup.children
           .filter { it.id != null && it is Line && it.id == idToHighlight }
           .forEach {
-            (it as Line).stroke = Config.Colors.colorLineHighlight
+            (it as Line).stroke = Config.Util.Colors.colorLineHighlight
             it.strokeWidth = 2.0
           }
     }
     if (idHighlight != idToHighlight) {
       idHighlight = idToHighlight
-      colorHighlight = if (isWarehouse) Config.Colors.colorWarehouse else Config.Colors.colorDelivery
+      colorHighlight = if (isWarehouse) Config.Util.Colors.colorWarehouse else Config.Util.Colors.colorDelivery
     } else {
       idHighlight = null
     }

@@ -28,4 +28,9 @@ data class Delivery(
 ) : Measurable {
   override val length: Int
     get() = duration.toSeconds()
+
+  fun hasStartTime() = startTime != null
+  fun hasEndTime() = endTime != null
+  fun hasNotStartTime() = startTime == null
+  fun hasNotEndTime() = endTime == null
 }

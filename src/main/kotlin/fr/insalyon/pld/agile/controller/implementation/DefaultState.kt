@@ -2,8 +2,8 @@ package fr.insalyon.pld.agile.controller.implementation
 
 import com.sun.media.sound.InvalidFormatException
 import fr.insalyon.pld.agile.Config
-import fr.insalyon.pld.agile.Config.MAP_XSD
-import fr.insalyon.pld.agile.Config.DEFAULT_SPEED
+import fr.insalyon.pld.agile.Config.Business.DEFAULT_SPEED
+import fr.insalyon.pld.agile.Config.Util.MAP_XSD
 import fr.insalyon.pld.agile.controller.api.Command
 import fr.insalyon.pld.agile.controller.api.State
 import fr.insalyon.pld.agile.controller.commands.EditDelivery
@@ -12,15 +12,13 @@ import fr.insalyon.pld.agile.controller.commands.SaveDelivery
 import fr.insalyon.pld.agile.getResource
 import fr.insalyon.pld.agile.model.Delivery
 import fr.insalyon.pld.agile.model.Intersection
-import fr.insalyon.pld.agile.model.Speed
 import fr.insalyon.pld.agile.service.algorithm.implementation.TSPAdvanced
-import fr.insalyon.pld.agile.service.algorithm.implementation.TSPSumMin
 import fr.insalyon.pld.agile.service.roundcomputing.implementation.RoundComputerImpl
-import fr.insalyon.pld.agile.service.roundmodifier.api.RoundModifier
 import fr.insalyon.pld.agile.service.roundmodifier.implementation.RoundModifierImp
 import fr.insalyon.pld.agile.util.Logger
 import fr.insalyon.pld.agile.util.xml.XmlDocument
 import fr.insalyon.pld.agile.util.xml.serialization.implementation.*
+import fr.insalyon.pld.agile.util.xml.validator.api.XmlValidator
 import fr.insalyon.pld.agile.util.xml.validator.implementation.XmlValidatorImpl
 import javafx.stage.FileChooser
 import java.io.File
@@ -102,6 +100,9 @@ abstract class DefaultState<in T> : State<T> {
     if (sourceFile.extension != "xml") throw InvalidFormatException("The file ${sourceFile.name} is not a xml file")
     if (!validator.isValid(sourceFile, xsdFile)) throw InvalidFormatException("The file ${sourceFile.name} does not match the valid pattern")
 
+    println(sourceFile.path)
+    Config.updateLastPlan(sourceFile.path)
+
     controller.window.loadingPlan()
     val xmlDocument = XmlDocument.open(sourceFile)
     val intersectionSerializer = IntersectionSerializer(xmlDocument)
@@ -117,13 +118,16 @@ abstract class DefaultState<in T> : State<T> {
   }
 
   protected fun fileLoadPlanImpl(controller: Controller, sourceFile: File) {
-    val validator: XmlValidatorImpl = XmlValidatorImpl()
+    val validator: XmlValidator = XmlValidatorImpl()
     val xsdFile = getResource(MAP_XSD)
 
     if (!sourceFile.exists()) throw FileNotFoundException("The file ${sourceFile.name} was not found")
     if (sourceFile.extension != "xml") throw InvalidFormatException("The file ${sourceFile.name} is not a xml file")
     if (!validator.isValid(sourceFile, xsdFile)) throw InvalidFormatException("The file ${sourceFile.name} does not match the valid pattern")
     controller.window.loadingPlan()
+
+    println(sourceFile.path)
+    Config.updateLastPlan(sourceFile.path)
 
     val xmlDocument = XmlDocument.open(sourceFile)
     val intersectionSerializer = IntersectionSerializer(xmlDocument)
@@ -144,7 +148,7 @@ abstract class DefaultState<in T> : State<T> {
 
   protected fun defaultLoadRoundRequestImpl(controller: Controller) {
     val validator: XmlValidatorImpl = XmlValidatorImpl()
-    val xsdFile = getResource(Config.DELIVERY_PLANNING_XSD)
+    val xsdFile = getResource(Config.Util.DELIVERY_PLANNING_XSD)
     val file = openXmlFileFromDialog() ?: return
 
 
@@ -168,7 +172,7 @@ abstract class DefaultState<in T> : State<T> {
 
   protected fun fileLoadRoundRequestImpl(controller: Controller, file: File) {
     val validator: XmlValidatorImpl = XmlValidatorImpl()
-    val xsdFile = getResource(Config.DELIVERY_PLANNING_XSD)
+    val xsdFile = getResource(Config.Util.DELIVERY_PLANNING_XSD)
 
     if (file.extension != "xml") throw InvalidFormatException("The file ${file.name} is not a xml file")
     if (!validator.isValid(file, xsdFile)) throw InvalidFormatException("The file ${file.name} does not match the valid pattern")
@@ -190,6 +194,7 @@ abstract class DefaultState<in T> : State<T> {
   }
 
   protected fun defaultCalculateRoundImpl(controller: Controller) {
+   // val round = RoundComputerGreedy(plan = controller.plan!!, roundRequest = controller.roundRequest!!, speed = DEFAULT_SPEED).round
     val round = RoundComputerImpl(plan = controller.plan!!, roundRequest = controller.roundRequest!!, tsp = TSPAdvanced(controller.roundRequest!!), speed = DEFAULT_SPEED).round
     Logger.debug(round.toTrace())
     controller.commands.reset()

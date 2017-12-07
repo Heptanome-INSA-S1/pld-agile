@@ -9,7 +9,7 @@ fun <T> benchmark(
   val startTime = System.currentTimeMillis()
   val result = func()
   val endTime = System.currentTimeMillis()
-  if(printStream != null) printStream.println("Duration: ${endTime - startTime} ms")
+  printStream?.println("Duration: ${endTime - startTime} ms")
   return Pair(endTime - startTime, result)
 }
 
@@ -21,6 +21,6 @@ fun benchmark(
   val startTime = System.currentTimeMillis()
   func()
   val endTime = System.currentTimeMillis()
-  if(printStream != null) printStream.println("Duration: ${endTime - startTime} ms")
+  printStream?.println("Duration: ${endTime - startTime} ms")
   return Pair(endTime - startTime, Unit)
 }
