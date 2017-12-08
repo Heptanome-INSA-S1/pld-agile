@@ -1,10 +1,11 @@
 package fr.insalyon.pld.agile.model
 
 import com.sun.javaws.exceptions.InvalidArgumentException
+import fr.insalyon.pld.agile.Config
 import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
+import fr.insalyon.pld.agile.util.min
 import java.util.*
-import kotlin.NoSuchElementException
 
 /**
  * A round is a computed round request
@@ -13,7 +14,8 @@ class Round(
     val warehouse: Warehouse,
     deliveries: LinkedHashSet<Delivery>,
     durationPath: List<Measurable>,
-    distancePath: List<Path<Intersection, Junction>>
+    distancePath: List<Path<Intersection, Junction>>,
+    val latestArrivalAtWarehouse: Instant = Config.Business.DEFAULT_END_DELIVERING
 ) : Observable(), Measurable {
 
   private val _deliveries: MutableList<Delivery> = deliveries.toMutableList()
@@ -38,23 +40,53 @@ class Round(
     return _distancePath
   }
 
+  fun getEarliestArrivalTimes(): List<Instant> {
+    val earliestArrivalTimes: MutableList<Instant> = mutableListOf()
+    var currentTime = warehouse.departureHour
+    _deliveries.forEachIndexed { i, delivery ->
+      currentTime += _durationPath[i].length.seconds
+      earliestArrivalTimes.add(currentTime)
+      if(delivery.startTime != null && delivery.startTime > currentTime) {
+        currentTime  = delivery.startTime
+      }
+      currentTime += delivery.duration
+    }
+    return earliestArrivalTimes
+  }
+
+  fun getEarliestDepartureTime(): List<Instant> {
+    return getEarliestArrivalTimes().mapIndexed{ i, it -> it + _deliveries[i].duration } + listOf(latestArrivalAtWarehouse)
+  }
+
+  fun getLatestArrivalTime(): List<Instant> {
+    return getLastestDepartureTime().mapIndexed{ i, it -> it - _deliveries[i].duration} + listOf(latestArrivalAtWarehouse)
+  }
+
+  fun getLastestDepartureTime(): List<Instant> {
+    val latestDepartureTime: MutableList<Instant> = mutableListOf()
+    var currentTime = latestArrivalAtWarehouse
+    currentTime -= _durationPath.last().length.seconds
+    latestDepartureTime.add(0, currentTime)
+    for(i in _deliveries.size - 2 downTo 0) {
+      currentTime -= _deliveries[i+1].duration
+      currentTime -= _durationPath[i+1].length.seconds
+      currentTime = min(currentTime, _deliveries[i].endTime)
+      latestDepartureTime.add(0, currentTime)
+    }
+    return latestDepartureTime
+  }
+
   /**
    * Return the waitingTimes for the deliveries in the round
    */
   fun getWaitingTimes(): List<Duration> {
-    var waitingTimes = mutableListOf<Duration>()
-    var currentTime = warehouse.departureHour
-    _deliveries.forEachIndexed { i, delivery ->
-      currentTime += _durationPath[i].length.seconds
-      if(delivery.startTime != null && delivery.startTime > currentTime) {
-        waitingTimes.add(delivery.startTime - currentTime)
-        currentTime  = delivery.startTime
+    return getEarliestArrivalTimes().mapIndexed { i, it ->
+      if(_deliveries[i].startTime != null && _deliveries[i].startTime!! > it) {
+        _deliveries[i].startTime!! - it
       } else {
-        waitingTimes.add(0.seconds)
+        0.seconds
       }
-      currentTime += delivery.duration
     }
-    return waitingTimes
   }
 
   fun addDelivery(subPath: SubPath) {
@@ -79,11 +111,6 @@ class Round(
 
     setChanged()
     notifyObservers()
-  }
-
-  fun removePath(i: Int) {
-    _durationPath.removeAt(i)
-    _distancePath.removeAt(i)
   }
 
   fun modify(index: Int, startTime: Instant?, endTime: Instant?, duration: Duration) {

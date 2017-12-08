@@ -1,55 +1,57 @@
 package fr.insalyon.pld.agile
 
-import fr.insalyon.pld.agile.model.Instant
 import fr.insalyon.pld.agile.model.h
 import fr.insalyon.pld.agile.model.km_h
 import fr.insalyon.pld.agile.util.Logger
 import javafx.scene.paint.Color
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.InputStream
 import java.util.*
 
 object Config {
 
-  val LOGGER_LEVEL = Logger.DEBUG
-
-  var DEFAULT_MAP: String = ""
-  val DEFAULT_DELIVERY = null
-  val MAP_XSD = "xsd/map.xsd"
-  val DELIVERY_PLANNING_XSD = "xsd/delivery_planning.xsd"
-
-  val prop: Properties = Properties()
- // val inputStream = FileInputStream(getResource("/config/config.properties"))
-  //val outputStream = FileOutputStream(getResource("/config/config.properties"))
-
-  val DEFAULT_SPEED = 15.km_h
-
-  val DEFAULT_END_DELIVERING = Instant(18)
-
-  val RESOURCE_FOLDER = System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/"
-  val TEST_RESOURCE_FOLDER = System.getProperty("user.dir").replace("\\", "/") + "/src/test/resources/"
-
-  val WINDOW_IS_MAX_SIZE = false
-
-  object Colors {
-    val colorLine = Color.DARKGREEN
-    val colorWarehouse = Color.INDIANRED
-    val colorDelivery = Color.BLUE
-    val colorCircleHighlight = Color.RED
-    val colorLineHighlight = Color.DARKRED
-    val colorLabel = Color.WHITE
-    val colorLabelHoursHighlight = Color.DARKRED
+  object Business {
+    val DEFAULT_SPEED = 15.km_h
+    val DEFAULT_END_DELIVERING = 18 h 0
   }
 
-  /*fun loadLastPlan() {
+  object Util {
+    val LOGGER_LEVEL = Logger.DEBUG
+    val MAP_XSD = "xsd/map.xsd"
+    val DELIVERY_PLANNING_XSD = "xsd/delivery_planning.xsd"
+
+    val WINDOW_IS_MAX_SIZE = false
+
+    object Colors {
+      val colorLine = Color.DARKGREEN!!
+      val colorWarehouse = Color.INDIANRED!!
+      val colorDelivery = Color.BLUE!!
+      val colorCircleHighlight = Color.RED!!
+      val colorLineHighlight = Color.DARKRED!!
+      val colorLabel = Color.WHITE!!
+      val colorLabelHoursHighlight = Color.DARKRED!!
+    }
+
+    val RESOURCE_FOLDER = System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/"
+    val TEST_RESOURCE_FOLDER = System.getProperty("user.dir").replace("\\", "/") + "/src/test/resources/"
+
+  }
+
+  private val prop: Properties = Properties()
+
+
+  fun loadLastPlan() : String {
+
+    val inputStream = FileInputStream(getResource("config/config.properties"))
     prop.load(inputStream)
-    DEFAULT_MAP = prop.getProperty("lastFilePath")
+    return prop.getProperty("lastFilePath")
   }
 
   fun updateLastPlan(path: String ) {
-    prop.setProperty("lastFilePath",path!!)
+
+    val outputStream = FileOutputStream(getResource("config/config.properties"))
+    prop.setProperty("lastFilePath",path)
 
     prop.store(outputStream, "")
-  }*/
+  }
 }

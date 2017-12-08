@@ -2,7 +2,6 @@ package fr.insalyon.pld.agile.model
 
 import fr.insalyon.pld.agile.lib.graph.model.Measurable
 import fr.insalyon.pld.agile.lib.graph.model.Path
-import fr.insalyon.pld.agile.util.Logger
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -153,32 +152,100 @@ class RoundTest {
 
   @Test
   fun testWaitingTimeDuration() {
-
-
     val round = Round(
         Warehouse(Intersection(1), 8 h 0),
         linkedSetOf(
             Delivery(Intersection(2), startTime = 8 h 20, duration = 5.minutes),
             Delivery(Intersection(3), startTime = 8 h 40, duration = 15.minutes)
-        ), listOf(
-        object : Measurable {
-          override val length = 10.minutes.toSeconds()
-        },
-        object : Measurable {
-          override val length = 10.minutes.toSeconds()
-        },
-        object : Measurable {
-          override val length = 20.minutes.toSeconds()
-        }
-        ), listOf(
-            Path(listOf(), listOf()),
-            Path(listOf(), listOf()),
-            Path(listOf(), listOf())
-        )
+        ), listOf(10.minutes, 10.minutes, 20.minutes), listOf(
+        Path(listOf(), listOf()),
+        Path(listOf(), listOf()),
+        Path(listOf(), listOf())
+    )
     )
     assertEquals(listOf(10.minutes, 5.minutes), round.getWaitingTimes())
   }
 
+  @Test
+  fun testEarliestArrivalTime() {
 
+    /*    15m     20m      10m
+       W ---> D1 ----> D2 -----> W
+     8:0    [10m]     [30m]
+     */
+
+    val round = Round(
+        Warehouse(Intersection(1L), 8 h 0),
+        linkedSetOf(
+            Delivery(Intersection(2L), null, null, 10.minutes),
+            Delivery(Intersection(3L), null, null, 30.minutes)
+        ), listOf(15.minutes, 20.minutes, 10.minutes), listOf()
+    )
+
+    assertEquals(listOf(8 h 15, 8 h 45), round.getEarliestArrivalTimes())
+
+  }
+
+  @Test
+  fun testEarliestDepartureTime() {
+
+    /*    15m     20m      10m
+       W ---> D1 ----> D2 -----> W
+     8:0    [10m]     [30m]
+     */
+
+    val round = Round(
+        Warehouse(Intersection(1L), 8 h 0),
+        linkedSetOf(
+            Delivery(Intersection(2L), null, null, 10.minutes),
+            Delivery(Intersection(3L), null, null, 30.minutes)
+        ), listOf(15.minutes, 20.minutes, 10.minutes), listOf()
+    )
+
+    assertEquals(listOf(8 h 25, 9 h 15), round.getEarliestDepartureTime())
+
+  }
+
+  @Test
+  fun testLatestDepartureTime() {
+
+
+    /*    15m     20m      10m
+       W ---> D1 ----> D2 -----> W
+     8:0    [10m]     [30m]    <=18:0
+     */
+
+    val round = Round(
+        Warehouse(Intersection(1L), 8 h 0),
+        linkedSetOf(
+            Delivery(Intersection(2L), null, null, 10.minutes),
+            Delivery(Intersection(3L), null, null, 30.minutes)
+        ), listOf(15.minutes, 20.minutes, 10.minutes), listOf()
+    )
+
+    assertEquals(listOf(17 h 0, 17 h 50), round.getLastestDepartureTime())
+
+  }
+
+  @Test
+  fun testLatestArrivalTime() {
+
+
+    /*    15m     20m      10m
+       W ---> D1 ----> D2 -----> W
+     8:0    [10m]     [30m]    <=18:0
+     */
+
+    val round = Round(
+        Warehouse(Intersection(1L), 8 h 0),
+        linkedSetOf(
+            Delivery(Intersection(2L), null, null, 10.minutes),
+            Delivery(Intersection(3L), null, null, 30.minutes)
+        ), listOf(15.minutes, 20.minutes, 10.minutes), listOf()
+    )
+
+    assertEquals(listOf(16 h 50, 17 h 20), round.getLatestArrivalTime())
+
+  }
 
 }

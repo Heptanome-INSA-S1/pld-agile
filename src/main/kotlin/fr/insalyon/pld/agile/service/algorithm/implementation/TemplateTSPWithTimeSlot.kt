@@ -4,6 +4,7 @@ import fr.insalyon.pld.agile.model.RoundRequest
 import fr.insalyon.pld.agile.model.hours
 import fr.insalyon.pld.agile.service.algorithm.api.TSP
 import java.util.*
+import kotlin.math.max
 
 /**
  * Abstract implementation of TSP with time slot constraint
@@ -20,17 +21,17 @@ abstract class TemplateTSPWithTimeSlot(
 
   override fun findSolution(timeLimitInMs: Int, numberOfNodes: Int, coast: Array<IntArray>, durations: IntArray) {
     tempsLimiteAtteint = false
-    coutMeilleureSolution = 24.hours.toSeconds()
+    coutMeilleureSolution = roundRequest.warehouseLatestArrival.toSeconds()
     meilleureSolution = arrayOfNulls(numberOfNodes)
     val nonVus = ArrayList<Int>()
     for (i in 1 until numberOfNodes) nonVus.add(i)
     val vus = ArrayList<Int>(numberOfNodes)
     vus.add(0) // le premier sommet visite est 0
-    val day = 24.hours.toSeconds()
+    val unreachable = 24.hours.toSeconds()
     branchAndBound(0, nonVus, vus, 0, coast, coast.map { it.min()!! }.toIntArray(), durations, System.currentTimeMillis(), timeLimitInMs,
         roundRequest.warehouse.departureHour.toSeconds(),
-        (listOf(roundRequest.warehouse.departureHour.toSeconds()) + roundRequest.deliveries.map { if(it.startTime == null) 0 else it.startTime.toSeconds() }).toIntArray(),
-        (listOf(day) + roundRequest.deliveries.map { if(it.endTime == null) day else it.endTime.toSeconds() }).toIntArray())
+        (listOf(roundRequest.warehouse.departureHour.toSeconds()) + roundRequest.deliveries.map { if (it.startTime == null) 0 else it.startTime.toSeconds() }).toIntArray(),
+        (listOf(unreachable) + roundRequest.deliveries.map { if (it.endTime == null) unreachable else it.endTime.toSeconds() }).toIntArray())
   }
 
   override fun getBestSolution(i: Int): Int? {
@@ -45,15 +46,15 @@ abstract class TemplateTSPWithTimeSlot(
       sommetCourant: Int,
       nonVus: ArrayList<Int>,
       cout: Array<IntArray>,
-      minRow: IntArray,
       duree: IntArray,
+      minRow: IntArray,
       currentTime: Int,
       startTimes: IntArray,
       endTimes: IntArray,
       bestCost: Int
   ): Int
 
-  protected abstract fun iterator(
+  fun iterator(
       sommetCrt: Int,
       nonVus: ArrayList<Int>,
       cout: Array<IntArray>,
@@ -61,7 +62,12 @@ abstract class TemplateTSPWithTimeSlot(
       currentTime: Int,
       startTimes: IntArray,
       endTimes: IntArray
-  ): Iterator<Int>
+  ): Iterator<Int> {
+    return IteratorSeq(nonVus.sortedBy {
+      max(currentTime + cout[sommetCrt][it], startTimes[it])
+    }, sommetCrt)
+  }
+
 
   internal open fun branchAndBound(
       sommetCrt: Int,
@@ -77,29 +83,30 @@ abstract class TemplateTSPWithTimeSlot(
       startTimes: IntArray,
       endTimes: IntArray
   ) {
-    var coutVus = coutVus
+    var costView = coutVus
     if (System.currentTimeMillis() - tpsDebut > tpsLimite) {
       tempsLimiteAtteint = true
       return
     }
     if (nonVus.size == 0) { // tous les sommets ont ete visites
-      coutVus += cout[sommetCrt][0]
+      costView += cout[sommetCrt][0]
       if (coutVus < coutMeilleureSolution) { // on a trouve une solution meilleure que meilleureSolution
         vus.toArray(meilleureSolution)
         coutMeilleureSolution = coutVus
       }
     } else if (coutVus + bound(sommetCrt, nonVus, cout, duree, minRow, currentTime, startTimes, endTimes, coutMeilleureSolution) < coutMeilleureSolution) {
+
       val it = iterator(sommetCrt, nonVus, cout, duree, currentTime, startTimes, endTimes)
-      for(prochainSommet in it) {
+      for (prochainSommet in it) {
         vus.add(prochainSommet)
         nonVus.remove(prochainSommet)
         var time = currentTime + cout[sommetCrt][prochainSommet]
         var waitingTime = 0
-        if(currentTime < startTimes[prochainSommet]) {
+        if (currentTime < startTimes[prochainSommet]) {
           waitingTime = startTimes[prochainSommet] - time
           time = startTimes[prochainSommet]
         }
-        if(endTimes[prochainSommet] < time + duree[prochainSommet]) {
+        if (endTimes[prochainSommet] < time + duree[prochainSommet]) {
           // Do nothing
         } else {
           time += duree[prochainSommet]

@@ -16,6 +16,8 @@
                     <Menu text="Fichier">
                         <MenuItem fx:id="loadPlanMenuItem" text="Charger plan">
                         </MenuItem>
+                        <MenuItem fx:id="loadPreviousPlanMenuItem" text="Charger plan précédent">
+                        </MenuItem>
                         <MenuItem fx:id="loadRoundRequestMenuItem" text="Charger livraison">
                         </MenuItem>
                     </Menu>
@@ -36,9 +38,10 @@
         </GridPane>
     </top>
     <center>
-        <StackPane alignment="CENTER"  fx:id="centerBox" minWidth="800" minHeight="800" >
-            <Button text="Charger map" fx:id="loadPlanButton"/>
-        </StackPane>
+        <VBox alignment="CENTER"  fx:id="centerBox" minWidth="800" minHeight="800" spacing="10">
+            <Button text="Charger plan" fx:id="loadPlanButton"/>
+            <Button text="Charger plan précédent" fx:id="loadPreviousPlanButton"/>
+        </VBox>
     </center>
     <right>
         <VBox alignment="CENTER" minWidth="400" fx:id="rightBox">
