@@ -13,6 +13,7 @@ class LoadedPlanState : DefaultState<Plan>(){
     Logger.info("Etat actuel = LOADED_PLAN_STATE")
     Logger.info("The plan has been well loaded")
     controller.plan = element
+    Logger.info(element.height)
     controller.window.refreshAll()
   }
 

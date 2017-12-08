@@ -125,8 +125,6 @@ abstract class DefaultState<in T> : State<T> {
     if (sourceFile.extension != "xml") throw InvalidFormatException("The file ${sourceFile.name} is not a xml file")
     if (!validator.isValid(sourceFile, xsdFile)) throw InvalidFormatException("The file ${sourceFile.name} does not match the valid pattern")
     controller.window.loadingPlan()
-
-    println(sourceFile.path)
     Config.updateLastPlan(sourceFile.path)
 
     val xmlDocument = XmlDocument.open(sourceFile)
@@ -141,8 +139,6 @@ abstract class DefaultState<in T> : State<T> {
     } catch (e: Exception) {
       Logger.error(e.localizedMessage)
       controller.manageException(RuntimeException("Something went wrong during plan parsing"))
-    } finally {
-      //dialog.close()
     }
   }
 

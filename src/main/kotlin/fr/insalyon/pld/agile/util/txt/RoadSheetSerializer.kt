@@ -58,8 +58,8 @@ class RoadSheetSerializer(){
     var htmlString = FileUtils.readFileToString(htmlTemplateFile)
 
     //Replacing fields in the template by the effective data
-    val startTime = "" +round.warehouse.departureHour.toFormattedString()
-    val nbDeliveries = "" + round.deliveries().size
+    val startTime = round.warehouse.departureHour.toFormattedString()
+    val nbDeliveries = round.deliveries().size.toString()
     var currentTime = round.warehouse.departureHour
     var rows = "<div class=\"row\">\n" +
         "            <div class=\"time left\">\n" +
@@ -74,15 +74,17 @@ class RoadSheetSerializer(){
         "        </div>"
     rows = rows.replace("timexxx", startTime)
 
+    val waitingTimeList = round.getWaitingTimes()
+
 
     //Getting all the roads that the delivery man will have to take to get to the first delivery point
     var y=0
     var infoL = "${round.warehouse.address.id}<br><br>"
-    while(y<round.distancePathInMeters().size && round.deliveries().elementAt(0).address != round.distancePathInMeters().elementAt(y).nodes[0]) {
+    while(y<round.distancePathInMeters().size && round.deliveries()[0].address != round.distancePathInMeters()[y].nodes[0]) {
       var distance = 0.0
-      round.distancePathInMeters().elementAt(y).edges.forEachIndexed { index, it ->
+      round.distancePathInMeters()[y].edges.forEachIndexed { index, it ->
         distance += it.length.toDouble()
-        if (!(index + 1 < round.distancePathInMeters().elementAt(y).edges.size && it.name.equals(round.distancePathInMeters().elementAt(y).edges.elementAt(index + 1).name))) {
+        if (!(index + 1 < round.distancePathInMeters()[y].edges.size && it.name.equals(round.distancePathInMeters()[y].edges[index + 1].name))) {
           var distances = "${distance} m"
           if(distance > 999){
             distance /= 1000.0
@@ -99,21 +101,18 @@ class RoadSheetSerializer(){
     //Getting all the roads that the delivery man will have to take to get to each delivery points except the first
     for (i in 0 until round.deliveries().size){
       if(i>0){
-        currentTime += round.deliveries().elementAt(i-1).duration
+        currentTime += round.deliveries()[i-1].duration
       }
-      currentTime += round.durationPathInSeconds().elementAt(i)
-      var waitingTime: Duration? = null
-      if(round.deliveries().elementAt(i).startTime != null && round.deliveries().elementAt(i).startTime!! > currentTime) {
-        waitingTime = round.deliveries().elementAt(i).startTime!! - currentTime
-        currentTime = round.deliveries().elementAt(i).startTime!!
-      }
-      var infoLivraison : String = "Livraison au point("+round.deliveries().elementAt(i).address.x!!+","+round.deliveries().elementAt(i).address.y+") durant ${round.deliveries().elementAt(i).duration}  -- Temps d'attente : ${waitingTime}<br><br>"
+      currentTime += round.durationPathInSeconds()[i]
+      val waitingTime = waitingTimeList[i]
+      currentTime += waitingTime
+      var infoLivraison : String = "Livraison au point( "+round.deliveries()[i].address.x!!+", "+round.deliveries()[i].address.y+" ) durant ${round.deliveries()[i].duration}  -- Temps d'attente : ${waitingTime}<br><br>"
       var j=i+1
-      while(j<round.distancePathInMeters().size && round.deliveries().elementAt(i).address != round.distancePathInMeters().elementAt(j-1).nodes[0]) {
+      while(j<round.distancePathInMeters().size && round.deliveries()[i].address != round.distancePathInMeters()[j-1].nodes[0]) {
         var distance = 0.0
-        round.distancePathInMeters().elementAt(j).edges.forEachIndexed { index, it ->
+        round.distancePathInMeters()[j].edges.forEachIndexed { index, it ->
           distance += it.length.toDouble()
-          if (!(index + 1 < round.distancePathInMeters().elementAt(j).edges.size && it.name.equals(round.distancePathInMeters().elementAt(j).edges.elementAt(index + 1).name))) {
+          if (!(index + 1 < round.distancePathInMeters()[j].edges.size && it.name.equals(round.distancePathInMeters()[j].edges[index + 1].name))) {
             var distances = "${distance} m"
             if(distance > 999){
               distance /= 1000.0

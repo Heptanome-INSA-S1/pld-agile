@@ -23,13 +23,13 @@ object Config {
     val WINDOW_IS_MAX_SIZE = false
 
     object Colors {
-      val colorLine = Color.DARKGREEN
-      val colorWarehouse = Color.INDIANRED
-      val colorDelivery = Color.BLUE
-      val colorCircleHighlight = Color.RED
-      val colorLineHighlight = Color.DARKRED
-      val colorLabel = Color.WHITE
-      val colorLabelHoursHighlight = Color.DARKRED
+      val colorLine = Color.DARKGREEN!!
+      val colorWarehouse = Color.INDIANRED!!
+      val colorDelivery = Color.BLUE!!
+      val colorCircleHighlight = Color.RED!!
+      val colorLineHighlight = Color.DARKRED!!
+      val colorLabel = Color.WHITE!!
+      val colorLabelHoursHighlight = Color.DARKRED!!
     }
 
     val RESOURCE_FOLDER = System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/"
@@ -37,27 +37,20 @@ object Config {
 
   }
 
-  object Errors {
-
-  }
-
-
-  val prop: Properties = Properties()
+  private val prop: Properties = Properties()
 
 
   fun loadLastPlan() : String {
 
     val inputStream = FileInputStream(getResource("config/config.properties"))
     prop.load(inputStream)
-    val pro = prop.getProperty("lastFilePath")
-    println(pro)
-    return pro
+    return prop.getProperty("lastFilePath")
   }
 
   fun updateLastPlan(path: String ) {
 
     val outputStream = FileOutputStream(getResource("config/config.properties"))
-    prop.setProperty("lastFilePath",path!!)
+    prop.setProperty("lastFilePath",path)
 
     prop.store(outputStream, "")
   }

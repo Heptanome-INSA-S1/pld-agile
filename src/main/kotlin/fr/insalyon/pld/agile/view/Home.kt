@@ -28,14 +28,16 @@ class Home : View() {
 
   // Buttons
   private val loadPlanButton: Button by fxid()
+  private val loadPreviousPlanButton: Button by fxid()
   private val loadRoundRequestButton: Button by fxid()
   private val loadPlanMenuItem: MenuItem by fxid()
+  private val loadPreviousPlanMenuItem: MenuItem by fxid()
   private val loadRoundRequestMenuItem: MenuItem by fxid()
   private val undo: MenuItem by fxid()
   private val redo: MenuItem by fxid()
 
   // Canvas
-  private val centerBox: StackPane by fxid()
+  private val centerBox: VBox by fxid()
   private val rightBox: VBox by fxid()
   private val bottomBox: HBox by fxid()
   private val progressIndicator = ProgressIndicator()
@@ -82,8 +84,16 @@ class Home : View() {
       controller.loadPlan()
     }
 
+    loadPreviousPlanButton.setOnAction {
+      controller.loadPreviousPlan()
+    }
+
     loadPlanMenuItem.setOnAction {
       controller.loadPlan()
+    }
+
+    loadPreviousPlanMenuItem.setOnAction {
+      controller.loadPreviousPlan()
     }
 
     loadRoundRequestButton.setOnAction {
@@ -108,13 +118,6 @@ class Home : View() {
 
     shortcut("Ctrl+Y"){
       controller.redo()
-    }
-
-    if(Config.loadLastPlan().isNotEmpty()){
-      val lastFile = File(Config.loadLastPlan())
-      if(lastFile.exists() && lastFile.extension == "xml"){
-        controller.loadPlan(lastFile)
-      }
     }
 
   }
