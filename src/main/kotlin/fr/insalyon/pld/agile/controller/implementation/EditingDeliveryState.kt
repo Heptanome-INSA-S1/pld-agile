@@ -8,7 +8,7 @@ import fr.insalyon.pld.agile.util.Logger
  */
 class EditingDeliveryState: DefaultState<Delivery>(){
   override fun init(controller: Controller, element: Delivery) {
-    Logger.info("Etat actuelle : EDITING_DELIVERY_STATE")
+    Logger.info("Etat actuel : EDITING_DELIVERY_STATE")
     controller.window.openEditor(element)
   }
 
