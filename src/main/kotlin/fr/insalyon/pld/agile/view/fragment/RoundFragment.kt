@@ -35,6 +35,10 @@ class RoundFragment : Fragment(), Observer {
           fontWeight = FontWeight.BOLD
         }
       }
+
+      region{
+        hgrow=Priority.ALWAYS
+      }
       button {
         prefWidth = 30.0
         prefHeight = 30.0
