@@ -45,9 +45,9 @@ class TimelineFragment: Fragment() {
         endY = middle
         stroke = Config.Util.Colors.colorLine
       }
-      if(index < round.getWaitingTimes().size && axes.second > round.getWaitingTimes()[index].toString().length*6){
-        label(round.getWaitingTimes()[index].toString()){
-          layoutX = actualX + (axes.second/2) - (round.getWaitingTimes()[index].toString().length * 6)
+      if(index < round.getWaitingTimes().size && axes.second > round.getWaitingTimes()[index].toShortFormattedString().length*6){
+        label(round.getWaitingTimes()[index].toShortFormattedString()){
+          layoutX = actualX + (axes.second/2) - (round.getWaitingTimes()[index].toShortFormattedString().length * 6)
           layoutY = middle + 10
           style {
             fontSize = 10.px
