@@ -36,7 +36,7 @@ class TspBenchmarkTest {
   fun benchmarkTsp() {
 
 
-    val tsps = listOf(TSPAdvanced(roundRequest)/*, TSPSumMin(roundRequest), TSPKruskal(roundRequest)*/)
+    val tsps = listOf(TSPAdvanced(roundRequest), TSPSumMin(roundRequest)/*, TSP1WithTimeSlot(roundRequest)*/)
 
     for (i in 10..17) {
       print("Round size : ${i.toString().fillLeft("  ")} : ")
@@ -47,7 +47,6 @@ class TspBenchmarkTest {
         )
 
         val subPlan = getSubPlan(roundRequestTest, plan)
-
         val res = fr.insalyon.pld.agile.benchmark {
           tsp.findSolution(
               20.minutes.toMillis().toInt(),
@@ -61,12 +60,6 @@ class TspBenchmarkTest {
       }
       println()
     }
-
-  }
-
-  @Test
-  fun testCompute() {
-      val roundRequest = getResource("xml/DLmoyen10TW3.xml").toRoundRequest(plan)
 
   }
 

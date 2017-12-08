@@ -28,7 +28,7 @@ abstract class TemplateTSPWithTimeSlot(
     val vus = ArrayList<Int>(numberOfNodes)
     vus.add(0) // le premier sommet visite est 0
     val unreachable = 24.hours.toSeconds()
-    branchAndBound(0, nonVus, vus, 0, coast, coast.map { it.min()!! }.toIntArray(), durations, System.currentTimeMillis(), timeLimitInMs,
+    branchAndBound(0, nonVus, vus, 0, coast, durations, System.currentTimeMillis(), timeLimitInMs,
         roundRequest.warehouse.departureHour.toSeconds(),
         (listOf(roundRequest.warehouse.departureHour.toSeconds()) + roundRequest.deliveries.map { if (it.startTime == null) 0 else it.startTime.toSeconds() }).toIntArray(),
         (listOf(unreachable) + roundRequest.deliveries.map { if (it.endTime == null) unreachable else it.endTime.toSeconds() }).toIntArray())
@@ -47,7 +47,6 @@ abstract class TemplateTSPWithTimeSlot(
       nonVus: ArrayList<Int>,
       cout: Array<IntArray>,
       duree: IntArray,
-      minRow: IntArray,
       currentTime: Int,
       startTimes: IntArray,
       endTimes: IntArray,
@@ -75,7 +74,6 @@ abstract class TemplateTSPWithTimeSlot(
       vus: ArrayList<Int>,
       coutVus: Int,
       cout: Array<IntArray>,
-      minRow: IntArray,
       duree: IntArray,
       tpsDebut: Long,
       tpsLimite: Int,
@@ -83,26 +81,25 @@ abstract class TemplateTSPWithTimeSlot(
       startTimes: IntArray,
       endTimes: IntArray
   ) {
-    var costView = coutVus
+    var coutVus = coutVus
     if (System.currentTimeMillis() - tpsDebut > tpsLimite) {
       tempsLimiteAtteint = true
       return
     }
     if (nonVus.size == 0) { // tous les sommets ont ete visites
-      costView += cout[sommetCrt][0]
+      coutVus += cout[sommetCrt][0]
       if (coutVus < coutMeilleureSolution) { // on a trouve une solution meilleure que meilleureSolution
         vus.toArray(meilleureSolution)
         coutMeilleureSolution = coutVus
       }
-    } else if (coutVus + bound(sommetCrt, nonVus, cout, duree, minRow, currentTime, startTimes, endTimes, coutMeilleureSolution) < coutMeilleureSolution) {
-
+    } else if (coutVus + bound(sommetCrt, nonVus, cout, duree, currentTime, startTimes, endTimes, coutMeilleureSolution) < coutMeilleureSolution) {
       val it = iterator(sommetCrt, nonVus, cout, duree, currentTime, startTimes, endTimes)
       for (prochainSommet in it) {
         vus.add(prochainSommet)
         nonVus.remove(prochainSommet)
         var time = currentTime + cout[sommetCrt][prochainSommet]
         var waitingTime = 0
-        if (currentTime < startTimes[prochainSommet]) {
+        if (time < startTimes[prochainSommet]) {
           waitingTime = startTimes[prochainSommet] - time
           time = startTimes[prochainSommet]
         }
@@ -110,7 +107,7 @@ abstract class TemplateTSPWithTimeSlot(
           // Do nothing
         } else {
           time += duree[prochainSommet]
-          branchAndBound(prochainSommet, nonVus, vus, coutVus + cout[sommetCrt][prochainSommet] + waitingTime + duree[prochainSommet], cout, duree, minRow, tpsDebut, tpsLimite, time, startTimes, endTimes)
+          branchAndBound(prochainSommet, nonVus, vus, coutVus + cout[sommetCrt][prochainSommet] + waitingTime + duree[prochainSommet], cout, duree, tpsDebut, tpsLimite, time, startTimes, endTimes)
         }
         vus.remove(prochainSommet)
         nonVus.add(prochainSommet)

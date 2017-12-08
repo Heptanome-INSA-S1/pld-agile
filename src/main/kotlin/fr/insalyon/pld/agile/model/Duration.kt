@@ -59,20 +59,6 @@ class Duration private constructor(
       res += minutes.toString() + "m"
 
     res += secondes.toString() + "s"
-    /*var secondes = _seconds
-    if(secondes==0L)
-      return "0s"
-    val hours : Int = secondes / 3600
-    secondes = secondes - hours * 3600
-    val minutes : Int = secondes / 60
-    secondes = secondes - minutes * 60
-    var res = ""
-    if(hours != 0)
-      res += ""+ hours + "h"
-    if(minutes != 0)
-      res += ""+ minutes + "m"
-    if(secondes != 0L)
-      res += ""+ secondes + "s"*/
     return res
   }
 

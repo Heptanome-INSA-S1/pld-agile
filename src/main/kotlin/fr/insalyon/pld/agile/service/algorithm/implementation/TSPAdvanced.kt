@@ -12,7 +12,7 @@ import kotlin.math.max
 class TSPAdvanced(
     roundRequest: RoundRequest
 ) : TemplateTSPWithTimeSlot(roundRequest) {
-  override fun bound(sommetCourant: Int, nonVus: ArrayList<Int>, cout: Array<IntArray>, duree: IntArray, minRow: IntArray, currentTime: Int, startTimes: IntArray, endTimes: IntArray, bestCost: Int): Int {
+  override fun bound(sommetCourant: Int, nonVus: ArrayList<Int>, cout: Array<IntArray>, duree: IntArray, currentTime: Int, startTimes: IntArray, endTimes: IntArray, bestCost: Int): Int {
 
     for(nonVu in nonVus) {
       val arrivalTime = max(currentTime + cout[sommetCourant][nonVu], startTimes[nonVu])
@@ -37,8 +37,6 @@ class TSPAdvanced(
       sumRow += minRow
     }
 
-    if (sumRow > bestCost) return 24.hours.toSeconds()
-
     var sumCol = 0
     for (j in indicies) {
       var minCol = Int.POSITIVE_INFINITY
@@ -47,10 +45,9 @@ class TSPAdvanced(
           minCol = cout[i][j] - minsRow[indicies.indexOf(i)]
         }
       }
-      sumCol += minCol + if(j != 0) duree[j] else 0
+      sumCol += minCol
     }
-
-    return sumRow + sumCol
+    return sumRow + sumCol + nonVus.sumBy { duree[it] }
 
   }
 }

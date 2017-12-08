@@ -127,7 +127,7 @@ class RoundModifierImp(
       }
 
       val startDeliveryTime = max(earliestStartTime[i], delivery.startTime)
-      if(startDeliveryTime + delivery.duration > latestStartTime[i+1]) {
+      if(startDeliveryTime + delivery.duration > latestStartTime[i]) {
         throw IllegalArgumentException("Impossible de repousser le début du créneau horaire. Durée maximum = ${round.getLastestDepartureTime()[i] - startDeliveryTime}")
       }
       round.modify(i, delivery.startTime, delivery.endTime, delivery.duration)

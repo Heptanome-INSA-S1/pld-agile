@@ -202,7 +202,7 @@ class RoundTest {
         ), listOf(15.minutes, 20.minutes, 10.minutes), listOf()
     )
 
-    assertEquals(listOf(8 h 25, 9 h 15), round.getEarliestDepartureTime())
+    assertEquals(listOf(8 h 25, 9 h 15, 18 h 0), round.getEarliestDepartureTime())
 
   }
 
@@ -244,7 +244,7 @@ class RoundTest {
         ), listOf(15.minutes, 20.minutes, 10.minutes), listOf()
     )
 
-    assertEquals(listOf(16 h 50, 17 h 20), round.getLatestArrivalTime())
+    assertEquals(listOf(16 h 50, 17 h 20, 18 h 0), round.getLatestArrivalTime())
 
   }
 

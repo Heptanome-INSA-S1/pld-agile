@@ -12,7 +12,9 @@ import fr.insalyon.pld.agile.controller.commands.SaveDelivery
 import fr.insalyon.pld.agile.getResource
 import fr.insalyon.pld.agile.model.Delivery
 import fr.insalyon.pld.agile.model.Intersection
+import fr.insalyon.pld.agile.service.algorithm.implementation.TSP1WithTimeSlot
 import fr.insalyon.pld.agile.service.algorithm.implementation.TSPAdvanced
+import fr.insalyon.pld.agile.service.algorithm.implementation.TSPSumMin
 import fr.insalyon.pld.agile.service.roundcomputing.implementation.RoundComputerImpl
 import fr.insalyon.pld.agile.service.roundmodifier.implementation.RoundModifierImp
 import fr.insalyon.pld.agile.util.Logger
@@ -191,7 +193,7 @@ abstract class DefaultState<in T> : State<T> {
 
   protected fun defaultCalculateRoundImpl(controller: Controller) {
    // val round = RoundComputerGreedy(plan = controller.plan!!, roundRequest = controller.roundRequest!!, speed = DEFAULT_SPEED).round
-    val round = RoundComputerImpl(plan = controller.plan!!, roundRequest = controller.roundRequest!!, tsp = TSPAdvanced(controller.roundRequest!!), speed = DEFAULT_SPEED).round
+    val round = RoundComputerImpl(plan = controller.plan!!, roundRequest = controller.roundRequest!!, tsp = TSPSumMin(controller.roundRequest!!), speed = DEFAULT_SPEED).round
     Logger.debug(round.toTrace())
     controller.commands.reset()
     controller.changeStateAndInit(controller.CALCULATED_ROUND_STATE, round)

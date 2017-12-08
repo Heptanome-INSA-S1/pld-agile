@@ -12,10 +12,8 @@ class RoundComputerGreedyTest {
   fun testCalculateRound() {
 
     val plan = getTestResource("fichiersXML/planLyonMoyen.xml").toPlan()
-    val roundRequest = getTestResource("fichiersXML/DLMoyen5TW4.xml").toRoundRequest(plan)
-
+    val roundRequest = getTestResource("fichiersXML/DLmoyen5TW4.xml").toRoundRequest(plan)
     val roundComputer = RoundComputerGreedy(plan, roundRequest, Config.Business.DEFAULT_SPEED)
-
     val round = roundComputer.round
 
 
