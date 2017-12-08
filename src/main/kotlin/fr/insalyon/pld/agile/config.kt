@@ -56,8 +56,6 @@ object Config {
   }
 
   fun updateLastPlan(path: String ) {
-    val file = File(configFile)
-    file.createNewFile()
     val outputStream = FileOutputStream(getResource(configFile))
     prop.setProperty("lastFilePath",path)
 
