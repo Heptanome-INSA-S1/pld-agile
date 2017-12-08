@@ -38,7 +38,7 @@ class KruskalImpl(
   private fun find(node: Node): Node {
     var current: Node? = node
     while(parent[current!!] != null) current = parent[current]
-    return current!!
+    return current
   }
 
   private fun union(x: Node, y: Node) {

@@ -46,15 +46,15 @@ abstract class TemplateTSPWithTimeSlot(
       sommetCourant: Int,
       nonVus: ArrayList<Int>,
       cout: Array<IntArray>,
-      minRow: IntArray,
       duree: IntArray,
+      minRow: IntArray,
       currentTime: Int,
       startTimes: IntArray,
       endTimes: IntArray,
       bestCost: Int
   ): Int
 
-  inline fun iterator(
+  fun iterator(
       sommetCrt: Int,
       nonVus: ArrayList<Int>,
       cout: Array<IntArray>,
@@ -83,13 +83,13 @@ abstract class TemplateTSPWithTimeSlot(
       startTimes: IntArray,
       endTimes: IntArray
   ) {
-    var coutVus = coutVus
+    var costView = coutVus
     if (System.currentTimeMillis() - tpsDebut > tpsLimite) {
       tempsLimiteAtteint = true
       return
     }
     if (nonVus.size == 0) { // tous les sommets ont ete visites
-      coutVus += cout[sommetCrt][0]
+      costView += cout[sommetCrt][0]
       if (coutVus < coutMeilleureSolution) { // on a trouve une solution meilleure que meilleureSolution
         vus.toArray(meilleureSolution)
         coutMeilleureSolution = coutVus
