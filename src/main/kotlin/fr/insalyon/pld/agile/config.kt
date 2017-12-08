@@ -5,8 +5,12 @@ import fr.insalyon.pld.agile.model.km_h
 import fr.insalyon.pld.agile.util.Logger
 import javafx.scene.paint.Color
 import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.util.*
+import java.io.File
+
+
 
 object Config {
 
@@ -38,18 +42,23 @@ object Config {
   }
 
   private val prop: Properties = Properties()
+  private val configFile :String = "config.properties"
 
 
-  fun loadLastPlan() : String {
-
-    val inputStream = FileInputStream(getResource("config/config.properties"))
-    prop.load(inputStream)
-    return prop.getProperty("lastFilePath")
+  fun loadLastPlan() : String? {
+    return try {
+      var inputStream = FileInputStream(getResource(configFile))
+      prop.load(inputStream)
+      prop.getProperty("lastFilePath")
+    }catch (e: FileNotFoundException){
+      null
+    }
   }
 
   fun updateLastPlan(path: String ) {
-
-    val outputStream = FileOutputStream(getResource("config/config.properties"))
+    val file = File(configFile)
+    file.createNewFile()
+    val outputStream = FileOutputStream(getResource(configFile))
     prop.setProperty("lastFilePath",path)
 
     prop.store(outputStream, "")
