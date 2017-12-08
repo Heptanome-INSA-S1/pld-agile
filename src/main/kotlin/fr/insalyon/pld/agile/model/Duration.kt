@@ -62,6 +62,18 @@ class Duration private constructor(
     return res
   }
 
+  fun toShortFormattedString(): String {
+    var res = ""
+    if (hours > 0)
+      res += "${hours}h"
+    if (minutes > 9)
+      res += "${minutes}m"
+    else
+      res += "0${minutes}m"
+
+    return res
+  }
+
 }
 
 val Int.hours: Duration get() = Duration(hour = this)
