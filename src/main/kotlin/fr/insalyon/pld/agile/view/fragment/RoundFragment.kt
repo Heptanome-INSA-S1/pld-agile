@@ -5,6 +5,7 @@ import fr.insalyon.pld.agile.model.Delivery
 import fr.insalyon.pld.agile.util.txt.RoadSheetSerializer
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import fr.insalyon.pld.agile.view.event.HighlightLocationInListEvent
+import javafx.geometry.Pos
 import javafx.scene.control.Button
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
@@ -21,13 +22,46 @@ class RoundFragment : Fragment(), Observer {
   val roadSheetSerializer: RoadSheetSerializer = RoadSheetSerializer()
 
   val list = vbox {
-    label("Livraisons") {
-      paddingTop = 5.0
-      prefHeight = 30.0
-      paddingBottom = 15.0
-      paddingLeft = 30.0
-      style {
-        fontWeight = FontWeight.BOLD
+
+    hbox {
+      spacing = 3.0
+      paddingBottom = 10.0
+      label("Livraisons") {
+        paddingTop = 5.0
+        prefHeight = 30.0
+        paddingBottom = 15.0
+        paddingLeft = 30.0
+        style {
+          fontWeight = FontWeight.BOLD
+        }
+      }
+
+      region{
+        hgrow=Priority.ALWAYS
+      }
+      button {
+        prefWidth = 30.0
+        prefHeight = 30.0
+        style {
+          backgroundImage += URI.create("image/undo.png")
+          backgroundRepeat += Pair(BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT)
+          backgroundPosition += BackgroundPosition.CENTER
+        }
+        action {
+          controller.undo()
+        }
+      }
+      button {
+        prefWidth = 30.0
+        prefHeight = 30.0
+        style {
+          backgroundImage += URI.create("image/redo.png")
+          backgroundRepeat += Pair(BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT)
+          backgroundPosition += BackgroundPosition.CENTER
+        }
+        action {
+          controller.redo()
+        }
       }
     }
     round!!.deliveries().forEachIndexed { i, delivery ->
@@ -48,6 +82,36 @@ class RoundFragment : Fragment(), Observer {
         }
         label(deliveryToText(delivery)) {
           paddingTop = 4
+        }
+        region{
+          hgrow=Priority.ALWAYS
+        }
+        hbox {
+          alignment= Pos.BASELINE_RIGHT
+          spacing = 3.0
+          paddingLeft = 3.0
+          button {
+            prefWidth = 30.0
+            prefHeight = 30.0
+            style {
+              backgroundImage += URI.create("image/edit.png")
+              backgroundRepeat += Pair(BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT)
+              backgroundPosition += BackgroundPosition.CENTER
+            }
+            action {
+              controller.editingOfDelivery(delivery)
+            }
+          }
+          button {
+            action { deleteDelivery(delivery) }
+            prefWidth = 30.0
+            prefHeight = 30.0
+            style {
+              backgroundImage += URI.create("image/delete.png")
+              backgroundRepeat += Pair(BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT)
+              backgroundPosition += BackgroundPosition.CENTER
+            }
+          }
         }
       }
 
@@ -80,72 +144,10 @@ class RoundFragment : Fragment(), Observer {
         }
       }
     }
-    borderpane {
+    vbox{
       paddingTop = 20.0
       minWidth = 350.0
-      center {
-        add(list)
-      }
-      right {
-        vbox {
-          hbox {
-            spacing = 3.0
-            paddingBottom = 10.0
-            button {
-              prefWidth = 30.0
-              prefHeight = 30.0
-              style {
-                backgroundImage += URI.create("image/undo.png")
-                backgroundRepeat += Pair(BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT)
-                backgroundPosition += BackgroundPosition.CENTER
-              }
-              action {
-                controller.undo()
-              }
-            }
-            button {
-              prefWidth = 30.0
-              prefHeight = 30.0
-              style {
-                backgroundImage += URI.create("image/redo.png")
-                backgroundRepeat += Pair(BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT)
-                backgroundPosition += BackgroundPosition.CENTER
-              }
-              action {
-                controller.redo()
-              }
-            }
-          }
-          round!!.deliveries().forEach { delivery ->
-            hbox {
-              spacing = 3.0
-              paddingTop = 2
-              button {
-                prefWidth = 30.0
-                prefHeight = 30.0
-                style {
-                  backgroundImage += URI.create("image/edit.png")
-                  backgroundRepeat += Pair(BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT)
-                  backgroundPosition += BackgroundPosition.CENTER
-                }
-                action {
-                  controller.editingOfDelivery(delivery)
-                }
-              }
-              button {
-                action { deleteDelivery(delivery) }
-                prefWidth = 30.0
-                prefHeight = 30.0
-                style {
-                  backgroundImage += URI.create("image/delete.png")
-                  backgroundRepeat += Pair(BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT)
-                  backgroundPosition += BackgroundPosition.CENTER
-                }
-              }
-            }
-          }
-        }
-      }
+      add(list)
     }
     label("Entrepôt") {
       paddingTop=20.0
