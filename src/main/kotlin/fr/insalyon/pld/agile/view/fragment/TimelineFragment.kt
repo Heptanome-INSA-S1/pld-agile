@@ -5,6 +5,7 @@ import fr.insalyon.pld.agile.model.Junction
 import fr.insalyon.pld.agile.model.Round
 import fr.insalyon.pld.agile.model.seconds
 import fr.insalyon.pld.agile.util.Logger
+import fr.insalyon.pld.agile.util.min
 import fr.insalyon.pld.agile.view.event.HighlightLocationEvent
 import javafx.scene.control.Label
 import javafx.scene.layout.BorderPane
@@ -17,7 +18,6 @@ import tornadofx.*
 class TimelineFragment: Fragment() {
   val parentView:BorderPane by param()
   val round : Round by param()
-  val planSize: Pair<Double, Double> by param()
 
   var idHighlight: String? = null
   var colorHighlight: Color = Color.WHITE
@@ -32,17 +32,37 @@ class TimelineFragment: Fragment() {
     val middle = 15.0
     var actualX = 15.0
     var time = round.warehouse.departureHour
-    round.distancePathInMeters().forEach {
-      val deplacement = transform(it.edges)
-      actualX += deplacement
+    round.distancePathInMeters().forEachIndexed { index, it ->
+      //val deplacement = transform(it.edges)
+      val axes = if(index < round.distancePathInMeters().size-1) getAxes(it.edges, index) else Pair(transform(it.edges), 0.0)
+      actualX += axes.first
 
       line {
         id = it.nodes.first().id.toString()
-        startX = actualX - deplacement
+        startX = actualX - axes.first
         startY = middle
         endX = actualX
         endY = middle
         stroke = Config.Util.Colors.colorLine
+      }
+      if(index < round.getWaitingTimes().size && axes.second > round.getWaitingTimes()[index].toString().length*6){
+        label(round.getWaitingTimes()[index].toString()){
+          layoutX = actualX + (axes.second/2) - (round.getWaitingTimes()[index].toString().length * 6)
+          layoutY = middle + 10
+          style {
+            fontSize = 10.px
+          }
+        }
+
+      }
+      actualX += axes.second
+      line{
+        id = it.nodes.first().id.toString()
+        startX = actualX - axes.second
+        startY = middle
+        endX = actualX
+        endY = middle
+        stroke = Config.Util.Colors.colorLineWait
       }
     }
     actualX = 15.0
@@ -67,15 +87,15 @@ class TimelineFragment: Fragment() {
           }
         }
       }
-      if(deplacement>30)
+      if(deplacement >30)
         label(time.toShortFormattedString()) {
           id = idDelivery
           layoutX = actualX - 10.0
           layoutY = middle - 23
           style {
-            fontSize = 10.px
+              fontSize = 10.px
+          }
         }
-      }
       if (index < round.deliveries().size) {
         time += round.deliveries().first { it.address.id.toString() == idDelivery }.duration
         if(transform(round.distancePathInMeters().elementAt(index+1).edges)>30)
@@ -146,6 +166,18 @@ class TimelineFragment: Fragment() {
 
   private fun transform(edges: List<Junction>): Double =
       length(edges).toDouble() / TOTAL_LENGTH.toDouble() * (parentView.bottom.boundsInLocal.width - 70.0)
+
+  private fun getWaitRatio(deliveryIndex: Int): Double{
+    val waitTime = round.getWaitingTimes()[deliveryIndex]
+    val pathTime = round.durationPathInSeconds()[deliveryIndex]
+    return waitTime.toSeconds()*1.0/(waitTime + pathTime).toSeconds()
+  }
+
+  private fun getAxes(edges: List<Junction>, deliveryIndex: Int): Pair<Double, Double>{
+    val path = transform(edges)
+    val waitRatio = getWaitRatio(deliveryIndex)
+    return Pair(path * (1-waitRatio), path * waitRatio)
+  }
 
   private fun highlightLocation(idToHighlight: String, isWarehouse: Boolean) {
     if (idHighlight != null) {
