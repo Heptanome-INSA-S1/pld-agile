@@ -112,14 +112,15 @@ class Home : View() {
       controller.undo()
     }
 
-    shortcut("Ctrl+Z"){
+    shortcut("Ctrl+Z") {
       controller.undo()
     }
 
-    shortcut("Ctrl+Y"){
+    shortcut("Ctrl+Y") {
       controller.redo()
     }
 
+    controller.loadPreviousPlan()
   }
 
   fun refreshAll() {
