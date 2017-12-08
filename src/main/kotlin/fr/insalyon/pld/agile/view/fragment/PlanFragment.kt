@@ -306,7 +306,6 @@ class PlanFragment : Fragment() {
   }
 
   init {
-    println("MAP_SIZE: "+MAP_SIZE)
 
     subscribe<HighlightLocationEvent> { event ->
       highlightLocation(event.id, event.isWarehouse)
