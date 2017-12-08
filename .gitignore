@@ -7,3 +7,5 @@ build/
 /out/
 
 src/main/dist/FeuilleDeRoute\.html
+
+src/main/resources/config.properties

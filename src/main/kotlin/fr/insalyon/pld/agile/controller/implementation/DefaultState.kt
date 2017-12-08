@@ -102,7 +102,6 @@ abstract class DefaultState<in T> : State<T> {
     if (sourceFile.extension != "xml") throw InvalidFormatException("The file ${sourceFile.name} is not a xml file")
     if (!validator.isValid(sourceFile, xsdFile)) throw InvalidFormatException("The file ${sourceFile.name} does not match the valid pattern")
 
-    println(sourceFile.path)
     Config.updateLastPlan(sourceFile.path)
 
     controller.window.loadingPlan()
@@ -127,6 +126,7 @@ abstract class DefaultState<in T> : State<T> {
     if (sourceFile.extension != "xml") throw InvalidFormatException("The file ${sourceFile.name} is not a xml file")
     if (!validator.isValid(sourceFile, xsdFile)) throw InvalidFormatException("The file ${sourceFile.name} does not match the valid pattern")
     controller.window.loadingPlan()
+
     Config.updateLastPlan(sourceFile.path)
 
     val xmlDocument = XmlDocument.open(sourceFile)

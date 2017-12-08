@@ -28,10 +28,8 @@ class Home : View() {
 
   // Buttons
   private val loadPlanButton: Button by fxid()
-  private val loadPreviousPlanButton: Button by fxid()
   private val loadRoundRequestButton: Button by fxid()
   private val loadPlanMenuItem: MenuItem by fxid()
-  private val loadPreviousPlanMenuItem: MenuItem by fxid()
   private val loadRoundRequestMenuItem: MenuItem by fxid()
   private val undo: MenuItem by fxid()
   private val redo: MenuItem by fxid()
@@ -84,16 +82,8 @@ class Home : View() {
       controller.loadPlan()
     }
 
-    loadPreviousPlanButton.setOnAction {
-      controller.loadPreviousPlan()
-    }
-
     loadPlanMenuItem.setOnAction {
       controller.loadPlan()
-    }
-
-    loadPreviousPlanMenuItem.setOnAction {
-      controller.loadPreviousPlan()
     }
 
     loadRoundRequestButton.setOnAction {
@@ -112,14 +102,15 @@ class Home : View() {
       controller.undo()
     }
 
-    shortcut("Ctrl+Z"){
+    shortcut("Ctrl+Z") {
       controller.undo()
     }
 
-    shortcut("Ctrl+Y"){
+    shortcut("Ctrl+Y") {
       controller.redo()
     }
 
+    controller.loadPreviousPlan()
   }
 
   fun refreshAll() {
