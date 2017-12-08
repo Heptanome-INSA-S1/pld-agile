@@ -175,7 +175,7 @@ class Controller(val window: Home) {
   fun loadPreviousPlan() {
     if(Config.loadLastPlan().isNotEmpty() && currentState == INIT_STATE){
       val lastFile = File(Config.loadLastPlan())
-      println(lastFile.totalSpace)
+      println(lastFile.name)
       if(lastFile.exists() && lastFile.extension == "xml"){
         loadPlan(lastFile)
       }
