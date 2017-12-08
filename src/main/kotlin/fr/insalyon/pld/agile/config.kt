@@ -28,6 +28,7 @@ object Config {
 
     object Colors {
       val colorLine = Color.DARKGREEN!!
+      val colorLineWait = Color.GOLD!!
       val colorWarehouse = Color.INDIANRED!!
       val colorDelivery = Color.BLUE!!
       val colorCircleHighlight = Color.RED!!

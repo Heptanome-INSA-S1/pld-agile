@@ -170,7 +170,7 @@ class RoundFragment : Fragment(), Observer {
         }
       }
     }
-    label("RoadSheet") {
+    label("Feuille de route") {
       paddingLeft=30.0
       paddingTop=20.0
       style{
@@ -180,8 +180,8 @@ class RoundFragment : Fragment(), Observer {
     hbox {
       paddingTop=10.0
       paddingLeft=30.0
-      button("Browse"){
-        id=""+round!!.warehouse.address.id
+      button("Génerer"){
+        id=round!!.warehouse.address.id.toString()
         action{
           roadSheetSerializer.serializeHTML(round!!)
         }
