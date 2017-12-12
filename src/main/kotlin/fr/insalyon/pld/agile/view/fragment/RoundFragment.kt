@@ -72,6 +72,7 @@ class RoundFragment : Fragment(), Observer {
         }
         val addressId = delivery.address.id.toString()
         button(addressId) {
+          prefHeight = 30.0
           id = addressId
           action {
             fire(HighlightLocationEvent(addressId, false))
