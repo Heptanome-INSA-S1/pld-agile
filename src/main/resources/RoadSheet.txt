@@ -4,28 +4,23 @@ ________________________________________________________________________
 You have to : 
 
 	|Take J1 during 1000 m
-	|Take J2 during 1000 m
-	|Take J3 during 1000 m
 
-	It's now time to do the delivery 0 (x:10, y:20) - Details:
-		Start at : n/a
-		Finish at : n/a
-		Duration : 10m0s
-________________________________________________________________________
-You have to : 
-
-	|Take J4 during 1000 m
-	|Take J5 during 1000 m
-	|Take J1 during 1000 m
-
-	It's now time to do the delivery 1 (x:10, y:15) - Details:
+	It's now time to do the delivery 0 (x:10, y:15) - Details:
 		Start at : n/a
 		Finish at : n/a
 		Duration : 15m0s
 ________________________________________________________________________
+You have to : 
+
+	|Take J2 during 1000 m
+	|Take J3 during 1000 m
+
+	It's now time to do the delivery 1 (x:10, y:20) - Details:
+		Start at : n/a
+		Finish at : n/a
+		Duration : 10m0s
+________________________________________________________________________
 It's nearly finished, to come back at the warehouse : 
 
-	|Take J2 during e.length.dam.to(Distance.DistanceUnit.M).value} m
-	|Take J3 during e.length.dam.to(Distance.DistanceUnit.M).value} m
 	|Take J4 during e.length.dam.to(Distance.DistanceUnit.M).value} m
 	|Take J5 during e.length.dam.to(Distance.DistanceUnit.M).value} m

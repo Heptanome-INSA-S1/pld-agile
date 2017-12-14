@@ -7,6 +7,9 @@ import fr.insalyon.pld.agile.model.Round
  */
 interface RoundComputer {
 
+  /**
+   * Return a computed round
+   */
   val round: Round
 
 }

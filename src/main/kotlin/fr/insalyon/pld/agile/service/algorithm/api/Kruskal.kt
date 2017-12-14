@@ -9,6 +9,9 @@ import fr.insalyon.pld.agile.lib.graph.model.Path
  */
 interface Kruskal {
 
+  /**
+   * Return the minimum spanning tree of the graph `graph`
+   */
   fun <N, E : Measurable> getMinimumSpanningTree(graph: Graph<N, E>): Path<N, E>
 
   /**

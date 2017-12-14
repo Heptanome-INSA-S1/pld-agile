@@ -12,11 +12,12 @@ import kotlin.math.max
 class TSPAdvanced(
     roundRequest: RoundRequest
 ) : TemplateTSPWithTimeSlot(roundRequest) {
+
   override fun bound(sommetCourant: Int, nonVus: ArrayList<Int>, cout: Array<IntArray>, duree: IntArray, currentTime: Int, startTimes: IntArray, endTimes: IntArray, bestCost: Int): Int {
 
-    for(nonVu in nonVus) {
+    for (nonVu in nonVus) {
       val arrivalTime = max(currentTime + cout[sommetCourant][nonVu], startTimes[nonVu])
-      if(arrivalTime + duree[nonVu] > endTimes[nonVu]) return Int.POSITIVE_INFINITY
+      if (arrivalTime + duree[nonVu] > endTimes[nonVu]) return Int.POSITIVE_INFINITY
     }
     return bound(sommetCourant, nonVus, cout, duree, bestCost)
   }
@@ -24,7 +25,6 @@ class TSPAdvanced(
   private fun bound(sommetCrt: Int, nonVus: ArrayList<Int>, cout: Array<IntArray>, duree: IntArray, bestCost: Int): Int {
 
     val minsRow = IntArray(nonVus.size + 1)
-
     val indicies = listOf(sommetCrt) + nonVus
 
     var sumRow = 0

@@ -5,15 +5,11 @@ import java.io.File
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 
-class XmlDocument {
-
-  companion object {
+object XmlDocument {
     fun open(file: File): Document {
       val factory: DocumentBuilderFactory = DocumentBuilderFactory.newInstance()
       val builder: DocumentBuilder = factory.newDocumentBuilder()
 
       return builder.parse(file)
     }
-  }
-
 }
