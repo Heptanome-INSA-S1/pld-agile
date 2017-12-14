@@ -7,6 +7,9 @@ import javafx.scene.shape.MoveTo
 import javafx.scene.shape.Path
 import tornadofx.*
 
+/**
+ * Class to draw arrows in fxml
+ */
 class Arrow @JvmOverloads constructor(startX: Double, startY: Double, endX: Double, endY: Double, arrowHeadSize: Double = defaultArrowHeadSize, color: Color = Color.BLACK) : Path() {
 
   init {

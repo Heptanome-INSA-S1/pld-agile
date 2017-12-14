@@ -182,8 +182,6 @@ class Home : View() {
         DeliveryAdd::parentView to this))
   }
 
-
-
   fun loadingPlan() {
     centerBox.clear()
     centerBox.add(progressIndicator)

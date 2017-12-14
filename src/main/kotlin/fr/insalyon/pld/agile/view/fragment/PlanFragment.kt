@@ -24,13 +24,16 @@ import javafx.util.Duration
 import tornadofx.*
 import java.lang.Math.*
 
-
+// Could be replaced by enum class
 const val UP: Int = 0
 const val RIGHT: Int = 1
 const val DOWN: Int = 2
 const val LEFT: Int = 3
 const val CENTER: Int = 4
 
+/**
+ * View fragment of plan
+ */
 class PlanFragment : Fragment() {
 
   private val colorLine: Color = Color.ORANGE
@@ -48,10 +51,11 @@ class PlanFragment : Fragment() {
   //var MAP_SIZE=min(parentView.center.boundsInLocal.width,parentView.center.boundsInLocal.height)
   val MAP_SIZE = if (parentView.center.boundsInLocal.width>0.0) min(parentView.center.boundsInLocal.width, parentView.center.boundsInLocal.height) else 800.0
 
-
-
   var SIZE = 1.5
 
+  /**
+   * Transform the intersection coordinates to pixel coordinates in the view
+   */
   private fun transform(x: Number, y: Number): Pair<Double, Double> {
     val transformedX = (y.toDouble() / (plan.height.toDouble()) * MAP_SIZE)
     val transformedY = (x.toDouble() / (plan.width.toDouble()) * MAP_SIZE) * -1.0

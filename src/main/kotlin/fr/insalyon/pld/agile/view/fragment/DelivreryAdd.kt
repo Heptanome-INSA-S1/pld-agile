@@ -6,6 +6,9 @@ import fr.insalyon.pld.agile.view.Home
 import javafx.scene.layout.BorderPane
 import tornadofx.*
 
+/**
+ * Popup for adding a delivery
+ */
 class DeliveryAdd: Fragment("Ajouter une livraison"){
 
   val intersection : Intersection by param()

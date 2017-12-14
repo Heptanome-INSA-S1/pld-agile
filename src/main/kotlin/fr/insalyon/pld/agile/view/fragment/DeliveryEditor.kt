@@ -7,6 +7,9 @@ import fr.insalyon.pld.agile.view.Home
 import javafx.scene.layout.BorderPane
 import tornadofx.*
 
+/**
+ * Popup to modify a delivery
+ */
 class DeliveryEditor: Fragment("Modification de livraison"){
 
   val prevDelivery : Delivery by param()
